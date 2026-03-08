@@ -249,7 +249,7 @@
   }
 
   .hero-gradient-animated {
-    background: linear-gradient(135deg, hsl(var(--landing-purple)), hsl(var(--landing-indigo)), hsl(var(--landing-cyan)));
+    background: linear-gradient(135deg, hsl(var(--landing-pink)), hsl(var(--landing-orange)), hsl(var(--landing-coral)));
     background-size: 200% 200%;
     animation: gradient-shift 6s ease infinite;
   }
