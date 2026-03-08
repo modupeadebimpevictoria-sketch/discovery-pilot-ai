@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Compass, Home, Flame, Map, User } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import PathfinderChat from "@/components/PathfinderChat";
+import OrbitChat from "@/components/PathfinderChat";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
