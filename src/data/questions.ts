@@ -303,10 +303,9 @@ export const archetypes: Record<string, Archetype> = {
 export function matchCareers(answers: Record<number, string | number>) {
   const scores: Record<string, number> = {};
   
-  // Use dynamic import workaround - careers passed inline
-  const { careers } = await import("./careers") as any;
+  const { careers: careerList } = require("./careers") as { careers: any[] };
 
-  careers.forEach((career: any) => {
+  careerList.forEach((career: any) => {
     let score = 0;
 
     // Interest matching
