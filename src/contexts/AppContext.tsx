@@ -25,6 +25,10 @@ interface AppState {
   addCompletedMission: (id: string) => void;
   badges: string[];
   addBadge: (b: string) => void;
+  xp: number;
+  addXp: (amount: number) => void;
+  appliedInternships: string[];
+  applyToInternship: (id: string) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -37,6 +41,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [savedCareers, setSavedCareers] = useState<string[]>([]);
   const [completedMissions, setCompletedMissions] = useState<string[]>([]);
   const [badges, setBadges] = useState<string[]>([]);
+  const [xp, setXp] = useState(0);
+  const [appliedInternships, setAppliedInternships] = useState<string[]>([]);
 
   const toggleSavedCareer = (id: string) => {
     setSavedCareers((prev) =>
@@ -50,6 +56,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addBadge = (b: string) => {
     setBadges((prev) => (prev.includes(b) ? prev : [...prev, b]));
+  };
+
+  const addXp = (amount: number) => {
+    setXp((prev) => prev + amount);
+  };
+
+  const applyToInternship = (id: string) => {
+    setAppliedInternships((prev) => (prev.includes(id) ? prev : [...prev, id]));
   };
 
   return (
@@ -69,6 +83,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addCompletedMission,
         badges,
         addBadge,
+        xp,
+        addXp,
+        appliedInternships,
+        applyToInternship,
       }}
     >
       {children}

@@ -1,9 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, Compass, Flame, Zap, Star } from "lucide-react";
+import { Sparkles, ArrowRight, Compass, Flame, Zap, Star, Bot } from "lucide-react";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import PathfinderChat from "@/components/PathfinderChat";
 
 export default function Index() {
   const navigate = useNavigate();
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 text-center overflow-hidden relative pb-24">
@@ -38,17 +42,17 @@ export default function Index() {
         <div className="space-y-3">
           <h1 className="text-5xl font-bold gradient-text leading-tight">Orbit</h1>
           <p className="text-base text-muted-foreground leading-relaxed">
-            Discover careers you'll actually love. <br />
-            AI-powered, fun, and built for you. ✨
+            Find careers you'll actually love. <br />
+            Fun quizzes, real missions, and your own AI mentor. ✨
           </p>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 justify-center">
           {[
-            { emoji: "🤖", label: "AI-Powered" },
-            { emoji: "🎯", label: "Personalized" },
-            { emoji: "🔥", label: "TikTok-Style Feed" },
+            { emoji: "🧭", label: "AI Career Mentor" },
+            { emoji: "🎯", label: "Made For You" },
+            { emoji: "🔥", label: "Fun Missions" },
             { emoji: "🌍", label: "30+ Careers" },
           ].map((t) => (
             <motion.span
@@ -68,16 +72,16 @@ export default function Index() {
           onClick={() => navigate("/onboarding")}
           className="w-full btn-primary-glow text-lg flex items-center justify-center gap-2 py-4 animate-pulse-glow"
         >
-          <Sparkles size={20} /> Start Your Journey <ArrowRight size={20} />
+          <Sparkles size={20} /> Let's Go! <ArrowRight size={20} />
         </motion.button>
 
         {/* Feature cards */}
         <div className="grid grid-cols-2 gap-3">
           {[
-            { icon: <Zap size={20} />, label: "5-Min Quiz", desc: "Quick & fun assessment", color: "text-primary" },
-            { icon: <Flame size={20} />, label: "Swipe Feed", desc: "TikTok-style explore", color: "text-accent" },
-            { icon: <Star size={20} />, label: "Smart Match", desc: "AI career matching", color: "text-secondary" },
-            { icon: <Compass size={20} />, label: "30+ Careers", desc: "Deep dive into each", color: "text-glow-purple" },
+            { icon: <Zap size={20} />, label: "5-Min Quiz", desc: "Quick & fun questions", color: "text-primary" },
+            { icon: <Flame size={20} />, label: "Career Missions", desc: "Try real career tasks", color: "text-accent" },
+            { icon: <Star size={20} />, label: "Smart Match", desc: "AI picks your best fits", color: "text-secondary" },
+            { icon: <Bot size={20} />, label: "AI Mentor", desc: "Ask anything about careers", color: "text-glow-purple" },
           ].map((f) => (
             <motion.div
               key={f.label}
@@ -91,6 +95,14 @@ export default function Index() {
           ))}
         </div>
 
+        {/* AI Mentor CTA */}
+        <button
+          onClick={() => setChatOpen(true)}
+          className="w-full btn-glass flex items-center justify-center gap-2 text-sm"
+        >
+          <Bot size={18} className="text-primary" /> Chat with Pathfinder AI 🧭
+        </button>
+
         {/* Social proof */}
         <div className="flex items-center justify-center gap-2 pt-2">
           <div className="flex -space-x-2">
@@ -100,9 +112,13 @@ export default function Index() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">Join thousands of students</p>
+          <p className="text-xs text-muted-foreground">Join thousands of students exploring their future</p>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { fireBurst } from "@/lib/confetti";
 
 export default function Assessment() {
   const navigate = useNavigate();
-  const { setAssessmentAnswers, setMatchedCareers, setArchetype, addBadge } = useApp();
+  const { setAssessmentAnswers, setMatchedCareers, setArchetype, addBadge, addXp } = useApp();
   const [qIndex, setQIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string | number>>({});
   const [sliderValue, setSliderValue] = useState(50);
@@ -22,18 +22,15 @@ export default function Assessment() {
 
   const handleSelect = (value: string) => {
     setAnswers((a) => ({ ...a, [q.id]: value }));
-    // Auto-advance on selection for non-slider questions
-    if (q.type !== "slider") {
-      setTimeout(() => {
-        const newAnswers = { ...answers, [q.id]: value };
-        if (isLast) {
-          finalize(newAnswers);
-        } else {
-          setQIndex((i) => i + 1);
-          setSliderValue(50);
-        }
-      }, 300);
-    }
+    setTimeout(() => {
+      const newAnswers = { ...answers, [q.id]: value };
+      if (isLast) {
+        finalize(newAnswers);
+      } else {
+        setQIndex((i) => i + 1);
+        setSliderValue(50);
+      }
+    }, 300);
   };
 
   const finalize = (finalAnswers: Record<number, string | number>) => {
@@ -44,6 +41,7 @@ export default function Assessment() {
     const arch = determineArchetype(finalAnswers);
     setArchetype(arch);
     addBadge("Career Explorer");
+    addXp(25);
     fireBurst();
     navigate("/results");
   };
@@ -66,7 +64,7 @@ export default function Assessment() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Progress bar - thin and clean */}
+      {/* Progress bar */}
       <div className="px-0 pt-0">
         <div className="h-1 bg-muted">
           <motion.div
@@ -169,7 +167,7 @@ export default function Assessment() {
         </AnimatePresence>
       </div>
 
-      {/* Navigation — only show for sliders (multiple choice auto-advances) */}
+      {/* Navigation — only show for sliders */}
       {q.type === "slider" && (
         <div className="px-5 pb-8 flex gap-3">
           {qIndex > 0 && (
@@ -182,7 +180,7 @@ export default function Assessment() {
             className="flex-1 btn-primary-glow flex items-center justify-center gap-2"
           >
             {isLast ? (
-              <><Sparkles size={18} /> See My Matches</>
+              <><Sparkles size={18} /> Show My Matches!</>
             ) : (
               <><span>Next</span> <ArrowRight size={18} /></>
             )}
@@ -194,7 +192,7 @@ export default function Assessment() {
       {q.type !== "slider" && qIndex > 0 && (
         <div className="px-5 pb-8">
           <button onClick={() => { setQIndex((i) => i - 1); setSliderValue(50); }} className="text-sm text-muted-foreground">
-            ← Back
+            ← Go back
           </button>
         </div>
       )}

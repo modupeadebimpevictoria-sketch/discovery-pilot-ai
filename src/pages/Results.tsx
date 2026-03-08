@@ -10,34 +10,34 @@ import { ArrowRight, Share2, Sparkles, Heart, ChevronDown } from "lucide-react";
 
 const surprisingFacts: Record<string, string> = {
   "ai-engineer": "AI engineers can earn more than doctors within 5 years of graduating! 🤯",
-  "dentist": "Dentists consistently rank as one of the happiest professions worldwide! 😊",
-  "aerospace-engineer": "Aerospace engineers at SpaceX helped land a rocket on a drone ship in the ocean! 🚀",
-  "music-producer": "Max Martin has written more #1 hits than The Beatles! 🎵",
+  "dentist": "Dentists are some of the happiest workers in the world! 😊",
+  "aerospace-engineer": "SpaceX engineers landed a rocket on a ship in the middle of the ocean! 🚀",
+  "music-producer": "Max Martin has written more number-one hits than The Beatles! 🎵",
   "architect": "The world's tallest building took 6 years to design but only 5 to build! 🏗️",
-  "climate-scientist": "Climate scientists discovered that planting 1 trillion trees could cancel 10 years of CO2! 🌳",
-  "data-scientist": "Data science was called the 'sexiest job of the 21st century' by Harvard Business Review! 📊",
-  "film-director": "Christopher Nolan never uses a phone or email! 🎬",
-  "game-developer": "The game Minecraft was built by one person in just 6 days! 🎮",
-  "investment-banker": "Junior investment bankers can earn $200k+ in their first year! 💰",
-  "robotics-engineer": "Boston Dynamics' robots can now do parkour! 🦾",
-  "tv-presenter": "Oprah was fired from her first TV job — she's now worth $2.5 billion! 📺",
-  "wildlife-conservationist": "Conservationists helped bring the bald eagle back from near extinction! 🦅",
-  "sports-physiotherapist": "Sports physios travel the world with elite teams during tournaments! ⚽",
-  "diplomat": "Diplomats get a special passport and diplomatic immunity! 🌐",
+  "climate-scientist": "Planting 1 trillion trees could cancel 10 years of pollution! 🌳",
+  "data-scientist": "Harvard called data science 'the coolest job of the century'! 📊",
+  "film-director": "Christopher Nolan doesn't use a phone or email! 🎬",
+  "game-developer": "Minecraft was built by one person in just 6 days! 🎮",
+  "investment-banker": "New investment bankers can earn $200k+ in their first year! 💰",
+  "robotics-engineer": "Robots can now do parkour better than most humans! 🦾",
+  "tv-presenter": "Oprah was fired from her first TV job — now she's worth $2.5 billion! 📺",
+  "wildlife-conservationist": "Scientists saved the bald eagle from going extinct! 🦅",
+  "sports-physiotherapist": "Sports physios travel the world with famous athletes! ⚽",
+  "diplomat": "Diplomats get a special passport and can't be arrested! 🌐",
   "entrepreneur": "Most billionaires started their first business before age 25! 🚀",
   "chef": "Gordon Ramsay has earned 16 Michelin stars in his career! 👨‍🍳",
-  "urban-planner": "Cities designed by urban planners can reduce car use by 40%! 🏙️",
-  "fashion-designer": "Virgil Abloh went from DJing to leading Louis Vuitton menswear! 👗",
-  "cybersecurity-analyst": "There are 3.5 million unfilled cybersecurity jobs worldwide right now! 🔐",
+  "urban-planner": "Well-designed cities can cut car use by 40%! 🏙️",
+  "fashion-designer": "Virgil Abloh went from DJing to running Louis Vuitton! 👗",
+  "cybersecurity-analyst": "There are 3.5 million unfilled cybersecurity jobs right now! 🔐",
   "surgeon": "Surgeons can now operate on patients from thousands of miles away using robots! 🏥",
-  "ux-designer": "A good UX design can increase conversion rates by up to 400%! 🎨",
-  "marine-biologist": "We've explored more of the Moon's surface than the deep ocean floor! 🐋",
-  "psychologist": "Psychologists discovered that it takes just 7 seconds to form a first impression! 🧠",
-  "software-engineer": "Software engineers at Google get free gourmet meals every day! 💻",
-  "biomedical-engineer": "Biomedical engineers created a 3D-printed heart from human cells! 🫀",
-  "journalist": "Woodward and Bernstein's journalism brought down a US president! 📰",
-  "pharmacist": "Pharmacists are the most accessible healthcare professionals — no appointment needed! 💊",
-  "environmental-engineer": "Environmental engineers helped clean up 80% of rivers in developed countries! ♻️",
+  "ux-designer": "Good design can make a website 400% more successful! 🎨",
+  "marine-biologist": "We've explored more of the Moon than the deep ocean! 🐋",
+  "psychologist": "It takes just 7 seconds to form a first impression! 🧠",
+  "software-engineer": "Software engineers at Google get free food every day! 💻",
+  "biomedical-engineer": "Engineers 3D-printed a heart from human cells! 🫀",
+  "journalist": "Two journalists' reporting brought down a US president! 📰",
+  "pharmacist": "Pharmacists are the easiest doctors to access — no appointment needed! 💊",
+  "environmental-engineer": "Environmental engineers helped clean up 80% of polluted rivers! ♻️",
   "professional-athlete": "Cristiano Ronaldo earns more from Instagram than from playing football! 🏆",
 };
 
@@ -90,7 +90,7 @@ export default function Results() {
     purple: "from-glow-purple to-secondary",
   };
 
-  // Archetype reveal phase
+  // Archetype reveal
   if (phase === "archetype" && arch) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
@@ -124,14 +124,14 @@ export default function Results() {
             className="flex flex-col items-center gap-2 pt-4"
           >
             <ChevronDown size={20} className="swipe-hint text-primary" />
-            <span className="text-xs text-muted-foreground">Your career matches are loading...</span>
+            <span className="text-xs text-muted-foreground">Finding your best career matches...</span>
           </motion.div>
         </motion.div>
       </div>
     );
   }
 
-  // Swipeable card reveal phase
+  // Swipeable card reveal
   if (phase === "reveal") {
     const current = matchedCareers[cardIndex];
     const career = current ? getCareerById(current.careerId) : null;
@@ -164,24 +164,16 @@ export default function Results() {
         </p>
 
         {/* Card */}
-        <SwipeCard
-          key={career.id}
-          onSwipe={handleSwipe}
-        >
-          <div className={`glass-heavy p-6 rounded-3xl space-y-5 w-full max-w-sm border border-glass-border/60`}>
+        <SwipeCard key={career.id} onSwipe={handleSwipe}>
+          <div className="glass-heavy p-6 rounded-3xl space-y-5 w-full max-w-sm border border-glass-border/60">
             {/* Score ring */}
             <div className="flex justify-center">
               <div className="relative">
                 <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
                   <motion.circle
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    fill="none"
-                    stroke="url(#scoreGrad)"
-                    strokeWidth="8"
-                    strokeLinecap="round"
+                    cx="50" cy="50" r="42" fill="none"
+                    stroke="url(#scoreGrad)" strokeWidth="8" strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 42}`}
                     initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
                     animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - current.score / 100) }}
@@ -220,8 +212,7 @@ export default function Results() {
             <div className="glass-card p-3 rounded-xl space-y-1">
               <p className="text-xs font-bold text-primary uppercase tracking-wider">Why this fits you</p>
               <p className="text-sm text-muted-foreground">
-                Your {career.personalityFit.slice(0, 2).join(" and ")} traits align perfectly with {career.title}. You value{" "}
-                {career.tags.includes("creative") ? "creativity" : career.tags.includes("analytical") ? "analytical thinking" : "impact"}, which is core to this role.
+                Your {career.personalityFit.slice(0, 2).join(" and ")} personality matches perfectly with being a {career.title}. You'd love this!
               </p>
             </div>
 
@@ -231,7 +222,7 @@ export default function Results() {
               <p className="text-sm text-muted-foreground">{fact}</p>
             </div>
 
-            {/* Salary peek */}
+            {/* Quick facts */}
             <div className="flex gap-2">
               <span className="fact-pill flex-1 justify-center">💰 {career.salaryRange.mid}</span>
               <span className="fact-pill flex-1 justify-center">⏱️ {career.timelineYears}yr path</span>
@@ -241,14 +232,11 @@ export default function Results() {
 
         {/* Swipe instructions */}
         <div className="mt-6 flex gap-8 text-xs text-muted-foreground">
-          <span>← Skip</span>
-          <span>Save →</span>
+          <span>← Not for me</span>
+          <span>Save it! →</span>
         </div>
 
-        <button
-          onClick={() => setPhase("cards")}
-          className="mt-4 text-xs text-muted-foreground underline"
-        >
+        <button onClick={() => setPhase("cards")} className="mt-4 text-xs text-muted-foreground underline">
           See all matches
         </button>
       </div>
@@ -263,12 +251,9 @@ export default function Results() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{profile?.name}'s results</p>
-            <h1 className="text-2xl font-bold gradient-text">Your Career Matches 🎯</h1>
+            <h1 className="text-2xl font-bold gradient-text">Your Best Career Matches 🎯</h1>
           </div>
-          <button
-            onClick={() => setShareOpen(true)}
-            className="w-10 h-10 rounded-xl glass-card flex items-center justify-center"
-          >
+          <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
             <Share2 size={18} className="text-foreground" />
           </button>
         </div>
@@ -327,7 +312,7 @@ export default function Results() {
               {/* Score bar */}
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground font-medium">Compatibility</span>
+                  <span className="text-muted-foreground font-medium">How well it fits you</span>
                   <span className="text-primary font-bold text-lg">{match.score}%</span>
                 </div>
                 <div className="progress-bar h-3 rounded-full">
@@ -340,7 +325,7 @@ export default function Results() {
                 </div>
               </div>
 
-              {/* Quick facts row */}
+              {/* Quick facts */}
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 <span className="fact-pill whitespace-nowrap">💰 {career.salaryRange.mid}</span>
                 <span className="fact-pill whitespace-nowrap">⏱️ {career.timelineYears}yr</span>
@@ -349,15 +334,13 @@ export default function Results() {
                 ))}
               </div>
 
-              {fact && (
-                <p className="text-xs text-muted-foreground italic">🤯 {fact}</p>
-              )}
+              {fact && <p className="text-xs text-muted-foreground italic">🤯 {fact}</p>}
 
               <button
                 onClick={() => navigate(`/career/${career.id}`)}
                 className="w-full btn-primary-glow flex items-center justify-center gap-2 text-sm"
               >
-                Explore Career <ArrowRight size={16} />
+                Learn More <ArrowRight size={16} />
               </button>
             </motion.div>
           );
@@ -367,7 +350,7 @@ export default function Results() {
       {/* Bottom actions */}
       <div className="px-5 mt-6 space-y-3">
         <button onClick={() => navigate("/feed")} className="w-full btn-glass text-center flex items-center justify-center gap-2">
-          🔥 Discover More Careers
+          🔥 Explore More Careers
         </button>
       </div>
 
@@ -390,11 +373,8 @@ function SwipeCard({ children, onSwipe }: { children: React.ReactNode; onSwipe: 
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0.5, 1, 1, 1, 0.5]);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.x > 80) {
-      onSwipe("right");
-    } else if (info.offset.x < -80) {
-      onSwipe("left");
-    }
+    if (info.offset.x > 80) onSwipe("right");
+    else if (info.offset.x < -80) onSwipe("left");
   };
 
   return (
