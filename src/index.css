@@ -279,8 +279,8 @@
   }
 
   .landing-card:hover {
-    box-shadow: 0 8px 30px -10px hsl(var(--landing-purple) / 0.15);
-    border-color: hsl(var(--landing-purple) / 0.15);
+    box-shadow: 0 8px 30px -10px hsl(var(--landing-pink) / 0.15);
+    border-color: hsl(var(--landing-pink) / 0.15);
     transform: translateY(-2px);
   }
 
