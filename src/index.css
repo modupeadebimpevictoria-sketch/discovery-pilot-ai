@@ -131,15 +131,15 @@
   }
 
   .neon-border {
-    @apply border border-primary/40 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.4)];
+    @apply border-2 border-primary/30 shadow-[0_2px_12px_-3px_hsl(var(--primary)/0.2)];
   }
 
   .neon-border-secondary {
-    @apply border border-secondary/40 shadow-[0_0_15px_-3px_hsl(var(--secondary)/0.4)];
+    @apply border-2 border-secondary/30 shadow-[0_2px_12px_-3px_hsl(var(--secondary)/0.2)];
   }
 
   .neon-border-accent {
-    @apply border border-accent/40 shadow-[0_0_15px_-3px_hsl(var(--accent)/0.4)];
+    @apply border-2 border-accent/30 shadow-[0_2px_12px_-3px_hsl(var(--accent)/0.2)];
   }
 
   .btn-primary-glow {
