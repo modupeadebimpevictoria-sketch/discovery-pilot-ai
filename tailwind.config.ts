@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["DM Sans", "system-ui", "sans-serif"],
+        display: ["Clash Display", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -71,13 +72,12 @@ export default {
           purple: "hsl(var(--glow-purple))",
           pink: "hsl(var(--glow-pink))",
         },
+        highlight: "hsl(var(--highlight))",
         landing: {
-          pink: "hsl(var(--landing-pink))",
-          orange: "hsl(var(--landing-orange))",
+          lime: "hsl(var(--landing-lime))",
           coral: "hsl(var(--landing-coral))",
-          teal: "hsl(var(--landing-teal))",
-          "teal-bright": "hsl(var(--landing-teal-bright))",
-          yellow: "hsl(var(--landing-yellow))",
+          violet: "hsl(var(--landing-violet))",
+          mint: "hsl(var(--landing-mint))",
           charcoal: "hsl(var(--landing-charcoal))",
           bg: "hsl(var(--landing-bg))",
         },
