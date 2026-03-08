@@ -353,7 +353,7 @@ export default function Index() {
               <Bot size={28} className="text-white" />
             </div>
             <div className="text-left flex-1">
-              <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-purple transition-colors">
+              <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-pink transition-colors">
                 Chat with Orbit AI 🚀
               </p>
               <p className="text-xs text-landing-charcoal/50">
