@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import BottomNav from "@/components/BottomNav";
+import TopBar from "@/components/TopBar";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import Assessment from "./pages/Assessment";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <TopBar />
           <BottomNav />
         </BrowserRouter>
       </AppProvider>

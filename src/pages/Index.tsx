@@ -69,6 +69,16 @@ export default function Index() {
         {/* Overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80" />
 
+        {/* App logo */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="absolute top-6 left-6 z-20"
+        >
+          <span className="text-2xl font-bold font-display text-primary tracking-tight">Orbit</span>
+        </motion.div>
+
         {/* Floating emoji badges */}
         {floatingEmojis.map((emoji, i) => (
           <motion.div
