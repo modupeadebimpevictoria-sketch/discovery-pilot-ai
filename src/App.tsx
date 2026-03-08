@@ -44,6 +44,7 @@ const App = () => (
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <TopBar />
           <BottomNav />
         </BrowserRouter>
       </AppProvider>
