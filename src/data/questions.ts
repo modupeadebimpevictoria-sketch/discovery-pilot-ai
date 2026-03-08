@@ -1,3 +1,5 @@
+import { careers as careerData } from "./careers";
+
 export type QuestionType = "multiple-choice" | "scenario" | "slider" | "personality";
 
 export interface AssessmentQuestion {
