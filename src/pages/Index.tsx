@@ -13,38 +13,38 @@ const featureCards = [
     icon: <Zap size={28} />,
     title: "Interactive Career Missions",
     desc: "Try mini challenges that show what a career is really like.",
-    color: "text-landing-pink",
-    bg: "bg-landing-pink/10",
+    color: "text-primary",
+    bg: "bg-primary/10",
   },
   {
     icon: <Briefcase size={28} />,
     title: "Internship Opportunities",
     desc: "Get access to real-life internships for your dream path.",
-    color: "text-landing-orange",
-    bg: "bg-landing-orange/10",
+    color: "text-landing-coral",
+    bg: "bg-landing-coral/10",
   },
   {
     icon: <Bot size={28} />,
     title: "AI Career Mentor",
     desc: "Ask your personal guide anything about your future career.",
-    color: "text-landing-teal",
-    bg: "bg-landing-teal/10",
+    color: "text-landing-mint",
+    bg: "bg-landing-mint/10",
   },
   {
     icon: <Award size={28} />,
     title: "Skill Builder & Career Passport",
     desc: "Track your growth and unlock achievements as you go.",
-    color: "text-landing-coral",
-    bg: "bg-landing-coral/10",
+    color: "text-landing-violet",
+    bg: "bg-landing-violet/10",
   },
 ];
 
 const careerPreviews = [
-  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-pink to-landing-orange" },
-  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-teal to-landing-orange" },
-  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-orange to-landing-coral" },
-  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-coral to-landing-pink" },
-  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-yellow/80 to-landing-teal" },
+  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-violet to-landing-lime" },
+  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-mint to-landing-violet" },
+  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-coral to-landing-violet" },
+  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-violet to-landing-coral" },
+  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-mint to-landing-lime" },
 ];
 
 export default function Index() {
@@ -55,25 +55,25 @@ export default function Index() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   const handleCTA = () => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6B81", "#FF9472", "#FFA94D", "#1DD1A1", "#FFD93D"] });
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4", "#FFD93D"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
   return (
-    <div className="min-h-screen bg-landing-bg overflow-hidden">
+    <div className="min-h-screen bg-background overflow-hidden">
       {/* ===== HERO SECTION ===== */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-5 text-center overflow-hidden">
         {/* Animated gradient background */}
         <div className="absolute inset-0 hero-gradient-animated" />
         
         {/* Overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-landing-bg/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80" />
 
         {/* Floating emoji badges */}
         {floatingEmojis.map((emoji, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl pointer-events-none opacity-40"
+            className="absolute text-2xl pointer-events-none opacity-30"
             style={{
               left: `${10 + (i * 9) % 80}%`,
               top: `${15 + (i * 13) % 60}%`,
@@ -119,7 +119,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-5xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight"
+            className="text-5xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight font-display"
           >
             Discover <span className="neon-glow-cyan">YOUR</span> Future.{" "}
             <span className="block">Today.</span>
@@ -132,13 +132,13 @@ export default function Index() {
             transition={{ delay: 0.7 }}
             className="space-y-2"
           >
-            <p className="text-base md:text-lg text-white/90 leading-relaxed">
+            <p className="text-base md:text-lg text-foreground/80 leading-relaxed">
               Take our quick quiz. Explore your strengths.<br />
               See where your passions could take you.
             </p>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-muted-foreground">
               Dentist. AI Engineer. Space Explorer. Music Creator.<br />
-              <span className="text-landing-yellow font-semibold">Your future is waiting.</span>
+              <span className="text-primary font-semibold">Your future is waiting.</span>
             </p>
           </motion.div>
 
@@ -166,7 +166,7 @@ export default function Index() {
             className="flex flex-wrap gap-2 justify-center"
           >
             {["🧭 AI Mentor", "🎮 Fun Missions", "🏆 Earn Badges", "🌍 30+ Careers"].map((tag) => (
-              <span key={tag} className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-white/80 text-xs font-medium border border-white/10">
+              <span key={tag} className="px-3 py-1.5 rounded-full bg-card/40 backdrop-blur-sm text-foreground/70 text-xs font-medium border border-glass-border">
                 {tag}
               </span>
             ))}
@@ -179,11 +179,11 @@ export default function Index() {
           transition={{ repeat: Infinity, duration: 1.5 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
         >
-          <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center pt-2">
+          <div className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center pt-2">
             <motion.div
               animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-1.5 h-1.5 rounded-full bg-white/70"
+              className="w-1.5 h-1.5 rounded-full bg-primary/70"
             />
           </div>
         </motion.div>
@@ -199,9 +199,9 @@ export default function Index() {
             className="text-center mb-12 space-y-3"
           >
             <span className="badge-lime">✨ What You Get</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-landing-charcoal">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground font-display">
               Everything you need to<br />
-              <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-hero)" }}>
+              <span className="gradient-text">
                 find your dream career
               </span>
             </h2>
@@ -220,8 +220,8 @@ export default function Index() {
                 <div className={`w-14 h-14 rounded-2xl ${card.bg} flex items-center justify-center ${card.color} mb-4 group-hover:scale-110 transition-transform`}>
                   {card.icon}
                 </div>
-                <h3 className="text-lg font-bold text-landing-charcoal mb-1">{card.title}</h3>
-                <p className="text-sm text-landing-charcoal/60 leading-relaxed">{card.desc}</p>
+                <h3 className="text-lg font-bold text-foreground mb-1 font-display">{card.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -238,10 +238,10 @@ export default function Index() {
             className="text-center mb-10 space-y-3"
           >
             <span className="badge-lime">🔥 Hot Careers</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-landing-charcoal">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground font-display">
               Careers you didn't know<br />you'd love
             </h2>
-            <p className="text-sm text-landing-charcoal/50">Swipe through 30+ career paths. Which one is yours?</p>
+            <p className="text-sm text-muted-foreground">Swipe through 30+ career paths. Which one is yours?</p>
           </motion.div>
 
           {/* Swipeable preview cards */}
@@ -254,7 +254,8 @@ export default function Index() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ y: -4 }}
-                className="flex-shrink-0 w-[160px] sm:w-[200px] rounded-3xl overflow-hidden shadow-lg cursor-pointer group"
+                className="flex-shrink-0 w-[160px] sm:w-[200px] rounded-3xl overflow-hidden cursor-pointer group border border-glass-border"
+                style={{ boxShadow: "var(--shadow-card)" }}
                 onClick={() => navigate("/onboarding")}
               >
                 <div className={`bg-gradient-to-br ${career.color} p-6 pb-8 text-center`}>
@@ -265,14 +266,14 @@ export default function Index() {
                   >
                     {career.emoji}
                   </motion.span>
-                  <p className="text-white font-bold text-sm">{career.title}</p>
+                  <p className="text-foreground font-bold text-sm">{career.title}</p>
                 </div>
-                <div className="bg-white p-3 text-center">
+                <div className="bg-card p-3 text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <Star size={12} className="text-landing-coral fill-landing-coral" />
-                    <span className="text-sm font-bold text-landing-charcoal">{career.match}% match</span>
+                    <Star size={12} className="text-primary fill-primary" />
+                    <span className="text-sm font-bold text-foreground">{career.match}% match</span>
                   </div>
-                  <p className="text-[10px] text-landing-charcoal/40 mt-0.5">Based on your profile</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Based on your profile</p>
                 </div>
               </motion.div>
             ))}
@@ -287,7 +288,8 @@ export default function Index() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="rounded-3xl overflow-hidden"
+            className="rounded-3xl overflow-hidden border border-glass-border"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
             <div className="hero-gradient-animated p-10 text-center space-y-6">
               {/* Avatars */}
@@ -300,7 +302,7 @@ export default function Index() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg border-2 border-white/30"
+                      className="w-10 h-10 rounded-full bg-card/30 backdrop-blur-sm flex items-center justify-center text-lg border-2 border-glass-border"
                     >
                       {e}
                     </motion.div>
@@ -309,11 +311,11 @@ export default function Index() {
               </div>
 
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight font-display">
                   Join 10,000+ students<br />
                   exploring careers they love.
                 </h2>
-                <p className="text-white/70 text-sm mt-2">
+                <p className="text-muted-foreground text-sm mt-2">
                   Your future starts with one quiz. Are you ready?
                 </p>
               </div>
@@ -330,7 +332,7 @@ export default function Index() {
               {/* Trust badges */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((t) => (
-                  <span key={t} className="text-[10px] text-white/60 font-medium">{t}</span>
+                  <span key={t} className="text-[10px] text-muted-foreground font-medium">{t}</span>
                 ))}
               </div>
             </div>
@@ -349,18 +351,18 @@ export default function Index() {
             onClick={() => setChatOpen(true)}
             className="w-full landing-card flex items-center gap-4 !p-5 cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 hero-gradient-animated">
-              <Bot size={28} className="text-white" />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-landing-violet to-landing-mint">
+              <Bot size={28} className="text-foreground" />
             </div>
             <div className="text-left flex-1">
-              <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-pink transition-colors">
+              <p className="text-base font-bold text-foreground group-hover:text-primary transition-colors font-display">
                 Chat with Orbit AI 🚀
               </p>
-              <p className="text-xs text-landing-charcoal/50">
+              <p className="text-xs text-muted-foreground">
                 Got career questions? Your AI mentor has answers.
               </p>
             </div>
-            <ChevronRight size={20} className="text-landing-charcoal/30 group-hover:text-landing-pink transition-colors" />
+            <ChevronRight size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
           </motion.button>
         </div>
       </section>
