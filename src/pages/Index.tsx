@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star } from "lucide-react";
+import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star, Sun, Moon } from "lucide-react";
 import { useState, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import OrbitChat from "@/components/PathfinderChat";
 import confetti from "canvas-confetti";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const floatingEmojis = ["🚀", "🎯", "🧬", "🎨", "💻", "🌍", "🏗️", "🎵", "🔬", "⚡"];
 
