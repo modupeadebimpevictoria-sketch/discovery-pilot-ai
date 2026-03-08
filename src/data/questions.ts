@@ -303,8 +303,8 @@ export const archetypes: Record<string, Archetype> = {
 export function matchCareers(answers: Record<number, string | number>) {
   const scores: Record<string, number> = {};
   
-  // Import will be from careers
-  const { careers } = require("./careers");
+  // Use dynamic import workaround - careers passed inline
+  const { careers } = await import("./careers") as any;
 
   careers.forEach((career: any) => {
     let score = 0;
