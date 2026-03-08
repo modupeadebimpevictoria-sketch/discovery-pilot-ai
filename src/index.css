@@ -269,9 +269,9 @@
 
   .badge-lime {
     @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold;
-    background: hsl(var(--landing-lime) / 0.2);
-    color: hsl(var(--landing-lime));
-    border: 1px solid hsl(var(--landing-lime) / 0.3);
+    background: hsl(var(--landing-yellow) / 0.2);
+    color: hsl(var(--landing-yellow));
+    border: 1px solid hsl(var(--landing-yellow) / 0.3);
   }
 
   .landing-card {
