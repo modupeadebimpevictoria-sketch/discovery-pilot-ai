@@ -138,7 +138,7 @@ export default function Index() {
             </p>
             <p className="text-sm text-white/60">
               Dentist. AI Engineer. Space Explorer. Music Creator.<br />
-              <span className="text-landing-lime font-semibold">Your future is waiting.</span>
+              <span className="text-landing-yellow font-semibold">Your future is waiting.</span>
             </p>
           </motion.div>
 
