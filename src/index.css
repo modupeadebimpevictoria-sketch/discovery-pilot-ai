@@ -63,15 +63,16 @@
     --shadow-glow-accent: 0 4px 20px -5px hsl(15 85% 55% / 0.25);
 
     /* Landing page tokens */
-    --landing-purple: 255 63% 68%;
-    --landing-indigo: 224 100% 65%;
-    --landing-cyan: 194 100% 56%;
-    --landing-coral: 0 100% 71%;
-    --landing-lime: 78 100% 64%;
-    --landing-charcoal: 215 26% 17%;
-    --landing-bg: 225 33% 97%;
-    --gradient-hero: linear-gradient(135deg, hsl(255 63% 68%), hsl(224 100% 65%), hsl(194 100% 56%));
-    --gradient-hero-radial: radial-gradient(ellipse at 30% 20%, hsl(255 63% 68%), hsl(224 100% 65%) 50%, hsl(194 100% 56%));
+    --landing-pink: 351 100% 71%;
+    --landing-orange: 17 100% 72%;
+    --landing-coral: 27 100% 62%;
+    --landing-teal: 162 72% 47%;
+    --landing-teal-bright: 162 78% 55%;
+    --landing-yellow: 45 100% 62%;
+    --landing-charcoal: 0 0% 18%;
+    --landing-bg: 210 20% 98%;
+    --gradient-hero: linear-gradient(135deg, hsl(351 100% 71%), hsl(17 100% 72%), hsl(27 100% 62%));
+    --gradient-hero-radial: radial-gradient(ellipse at 30% 20%, hsl(351 100% 71%), hsl(17 100% 72%) 50%, hsl(27 100% 62%));
   }
 }
 
@@ -248,28 +249,29 @@
   }
 
   .hero-gradient-animated {
-    background: linear-gradient(135deg, hsl(var(--landing-purple)), hsl(var(--landing-indigo)), hsl(var(--landing-cyan)));
+    background: linear-gradient(135deg, hsl(var(--landing-pink)), hsl(var(--landing-orange)), hsl(var(--landing-coral)));
     background-size: 200% 200%;
     animation: gradient-shift 6s ease infinite;
   }
 
   .btn-coral {
     @apply font-bold rounded-2xl px-8 py-4 transition-all duration-300 active:scale-95;
-    background: hsl(var(--landing-coral));
+    background: hsl(var(--landing-teal));
     color: white;
-    box-shadow: 0 4px 20px -5px hsl(var(--landing-coral) / 0.5);
+    box-shadow: 0 4px 20px -5px hsl(var(--landing-teal) / 0.5);
   }
 
   .btn-coral:hover {
-    box-shadow: 0 0 30px -5px hsl(var(--landing-cyan) / 0.7), 0 4px 20px -5px hsl(var(--landing-coral) / 0.6);
+    background: hsl(var(--landing-teal-bright));
+    box-shadow: 0 0 30px -5px hsl(var(--landing-teal-bright) / 0.7), 0 4px 20px -5px hsl(var(--landing-teal) / 0.6);
     transform: scale(1.03);
   }
 
   .badge-lime {
     @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold;
-    background: hsl(var(--landing-lime) / 0.2);
-    color: hsl(var(--landing-lime));
-    border: 1px solid hsl(var(--landing-lime) / 0.3);
+    background: hsl(var(--landing-yellow) / 0.2);
+    color: hsl(var(--landing-yellow));
+    border: 1px solid hsl(var(--landing-yellow) / 0.3);
   }
 
   .landing-card {
@@ -277,13 +279,14 @@
   }
 
   .landing-card:hover {
-    box-shadow: 0 8px 30px -10px hsl(var(--landing-purple) / 0.15);
-    border-color: hsl(var(--landing-purple) / 0.15);
+    box-shadow: 0 8px 30px -10px hsl(var(--landing-pink) / 0.15);
+    border-color: hsl(var(--landing-pink) / 0.15);
     transform: translateY(-2px);
   }
 
   .neon-glow-cyan {
-    text-shadow: 0 0 20px hsl(var(--landing-cyan) / 0.5);
+    text-shadow: 0 0 20px hsl(var(--landing-yellow) / 0.6);
+    color: hsl(var(--landing-yellow));
   }
 }
 

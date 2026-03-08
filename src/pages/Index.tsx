@@ -13,22 +13,22 @@ const featureCards = [
     icon: <Zap size={28} />,
     title: "Interactive Career Missions",
     desc: "Try mini challenges that show what a career is really like.",
-    color: "text-landing-purple",
-    bg: "bg-landing-purple/10",
+    color: "text-landing-pink",
+    bg: "bg-landing-pink/10",
   },
   {
     icon: <Briefcase size={28} />,
     title: "Internship Opportunities",
     desc: "Get access to real-life internships for your dream path.",
-    color: "text-landing-indigo",
-    bg: "bg-landing-indigo/10",
+    color: "text-landing-orange",
+    bg: "bg-landing-orange/10",
   },
   {
     icon: <Bot size={28} />,
     title: "AI Career Mentor",
     desc: "Ask your personal guide anything about your future career.",
-    color: "text-landing-cyan",
-    bg: "bg-landing-cyan/10",
+    color: "text-landing-teal",
+    bg: "bg-landing-teal/10",
   },
   {
     icon: <Award size={28} />,
@@ -40,11 +40,11 @@ const featureCards = [
 ];
 
 const careerPreviews = [
-  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-purple to-landing-indigo" },
-  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-cyan to-landing-indigo" },
-  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-indigo to-landing-cyan" },
-  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-coral to-landing-purple" },
-  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-lime/80 to-landing-cyan" },
+  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-pink to-landing-orange" },
+  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-teal to-landing-orange" },
+  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-orange to-landing-coral" },
+  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-coral to-landing-pink" },
+  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-yellow/80 to-landing-teal" },
 ];
 
 export default function Index() {
@@ -55,7 +55,7 @@ export default function Index() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   const handleCTA = () => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#7B61FF", "#4F7CFF", "#23D5FF", "#FF6B6B", "#C6FF4A"] });
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6B81", "#FF9472", "#FFA94D", "#1DD1A1", "#FFD93D"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
@@ -138,7 +138,7 @@ export default function Index() {
             </p>
             <p className="text-sm text-white/60">
               Dentist. AI Engineer. Space Explorer. Music Creator.<br />
-              <span className="text-landing-lime font-semibold">Your future is waiting.</span>
+              <span className="text-landing-yellow font-semibold">Your future is waiting.</span>
             </p>
           </motion.div>
 
@@ -353,14 +353,14 @@ export default function Index() {
               <Bot size={28} className="text-white" />
             </div>
             <div className="text-left flex-1">
-              <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-purple transition-colors">
+              <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-pink transition-colors">
                 Chat with Orbit AI 🚀
               </p>
               <p className="text-xs text-landing-charcoal/50">
                 Got career questions? Your AI mentor has answers.
               </p>
             </div>
-            <ChevronRight size={20} className="text-landing-charcoal/30 group-hover:text-landing-purple transition-colors" />
+            <ChevronRight size={20} className="text-landing-charcoal/30 group-hover:text-landing-pink transition-colors" />
           </motion.button>
         </div>
       </section>
