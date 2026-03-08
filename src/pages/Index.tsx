@@ -40,11 +40,11 @@ const featureCards = [
 ];
 
 const careerPreviews = [
-  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-purple to-landing-indigo" },
-  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-cyan to-landing-indigo" },
-  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-indigo to-landing-cyan" },
-  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-coral to-landing-purple" },
-  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-lime/80 to-landing-cyan" },
+  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-pink to-landing-orange" },
+  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-teal to-landing-orange" },
+  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-orange to-landing-coral" },
+  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-coral to-landing-pink" },
+  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-yellow/80 to-landing-teal" },
 ];
 
 export default function Index() {
