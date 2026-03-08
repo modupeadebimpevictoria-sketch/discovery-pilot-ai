@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 
@@ -9,9 +9,9 @@ const steps = [
   { key: "age", question: "How old are you?", placeholder: "Your age", emoji: "🎂", type: "number" },
   { key: "grade", question: "What grade are you in?", emoji: "📚", options: ["Year 9 / Grade 8", "Year 10 / Grade 9", "Year 11 / Grade 10", "Year 12 / Grade 11", "Year 13 / Grade 12"] },
   { key: "country", question: "Where are you from?", placeholder: "Your country", emoji: "🌍" },
-  { key: "subjects", question: "What subjects are you taking? (Pick all that apply)", emoji: "📖", multi: true, options: ["Mathematics", "Physics", "Chemistry", "Biology", "Computer Science", "English", "History", "Geography", "Art & Design", "Music", "Drama", "Economics", "Business Studies", "Psychology", "Physical Education", "Languages", "Media Studies", "Design Technology"] },
-  { key: "dreamCareer", question: "Do you have a dream career? (Totally optional!)", placeholder: "e.g., Astronaut, Chef, or 'no idea yet!'", emoji: "💭" },
-  { key: "interests", question: "What are your hobbies and interests?", emoji: "🎮", multi: true, options: ["Gaming", "Sports", "Music", "Art & Drawing", "Reading", "Coding", "Science Experiments", "Cooking", "Photography", "Travel", "Social Media", "Volunteering", "Writing", "Fashion", "Animals", "Nature", "Debate", "Entrepreneurship"] },
+  { key: "subjects", question: "What subjects are you taking?", emoji: "📖", multi: true, options: ["Mathematics", "Physics", "Chemistry", "Biology", "Computer Science", "English", "History", "Geography", "Art & Design", "Music", "Drama", "Economics", "Business Studies", "Psychology", "Physical Education", "Languages", "Media Studies", "Design Technology"] },
+  { key: "dreamCareer", question: "Dream career? (Optional!)", placeholder: "e.g., Astronaut, Chef, or 'no idea!'", emoji: "💭" },
+  { key: "interests", question: "What are you into?", emoji: "🎮", multi: true, options: ["Gaming", "Sports", "Music", "Art & Drawing", "Reading", "Coding", "Science", "Cooking", "Photography", "Travel", "Social Media", "Volunteering", "Writing", "Fashion", "Animals", "Nature", "Debate", "Entrepreneurship"] },
 ];
 
 export default function Onboarding() {
@@ -49,6 +49,14 @@ export default function Onboarding() {
     }
   };
 
+  const selectOption = (opt: string) => {
+    setData((d) => ({ ...d, [current.key]: opt }));
+    // Auto-advance for single-select
+    setTimeout(() => {
+      if (!isLast) setStep((s) => s + 1);
+    }, 250);
+  };
+
   const toggleMulti = (key: string, val: string) => {
     setData((d) => ({
       ...d,
@@ -56,98 +64,97 @@ export default function Onboarding() {
     }));
   };
 
+  const progress = ((step + 1) / steps.length) * 100;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Progress */}
-      <div className="px-4 pt-6 pb-2">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-muted-foreground">Step {step + 1} of {steps.length}</span>
-          <span className="text-sm text-primary font-medium">{Math.round(((step + 1) / steps.length) * 100)}%</span>
-        </div>
-        <div className="progress-bar">
-          <motion.div
-            className="progress-bar-fill"
-            animate={{ width: `${((step + 1) / steps.length) * 100}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          />
-        </div>
+      {/* Progress - thin top bar */}
+      <div className="h-1 bg-muted">
+        <motion.div className="h-full gradient-bg" animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
+      </div>
+
+      <div className="px-5 pt-4 flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">{step + 1} of {steps.length}</span>
+        <span className="text-xs font-bold text-primary">{Math.round(progress)}%</span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-4 pb-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2">
-              <span className="text-5xl">{current.emoji}</span>
-              <h2 className="text-2xl font-bold text-foreground leading-tight">
-                {current.key === "name" ? current.question : data.name ? `${current.question.replace("your", data.name + "'s")}` : current.question}
-              </h2>
+      <div className="flex-1 flex flex-col justify-center px-5 pb-8">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
+          transition={{ duration: 0.25 }}
+          className="space-y-6"
+        >
+          <div className="space-y-2">
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="text-5xl block">
+              {current.emoji}
+            </motion.span>
+            <h2 className="text-2xl font-bold text-foreground leading-snug">{current.question}</h2>
+          </div>
+
+          {/* Single select */}
+          {current.options && !current.multi && (
+            <div className="space-y-2">
+              {current.options.map((opt) => (
+                <motion.button
+                  key={opt}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => selectOption(opt)}
+                  className={`w-full p-4 rounded-2xl text-left font-medium transition-all duration-200 text-sm ${
+                    data[current.key] === opt
+                      ? "neon-border bg-primary/10 text-primary"
+                      : "glass-card text-foreground active:bg-muted/60"
+                  }`}
+                >
+                  {opt}
+                </motion.button>
+              ))}
             </div>
+          )}
 
-            {/* Input types */}
-            {current.options && !current.multi && (
-              <div className="grid gap-3">
-                {current.options.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setData((d) => ({ ...d, [current.key]: opt }))}
-                    className={`p-4 rounded-xl text-left font-medium transition-all duration-200 ${
-                      data[current.key] === opt
-                        ? "neon-border bg-primary/10 text-primary"
-                        : "glass-card text-foreground hover:border-primary/20"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Multi select */}
+          {current.multi && current.options && (
+            <div className="flex flex-wrap gap-2">
+              {current.options.map((opt) => (
+                <motion.button
+                  key={opt}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => toggleMulti(current.key, opt)}
+                  className={`category-chip ${
+                    data[current.key].includes(opt)
+                      ? "gradient-bg text-primary-foreground"
+                      : "glass-card text-muted-foreground"
+                  }`}
+                >
+                  {opt}
+                </motion.button>
+              ))}
+            </div>
+          )}
 
-            {current.multi && current.options && (
-              <div className="flex flex-wrap gap-2 justify-center">
-                {current.options.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => toggleMulti(current.key, opt)}
-                    className={`category-chip ${
-                      data[current.key].includes(opt)
-                        ? "gradient-bg text-primary-foreground"
-                        : "glass-card text-foreground"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {!current.options && (
-              <input
-                type={current.type || "text"}
-                value={data[current.key]}
-                onChange={(e) => setData((d) => ({ ...d, [current.key]: e.target.value }))}
-                placeholder={current.placeholder}
-                className="w-full p-4 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-lg"
-                onKeyDown={(e) => e.key === "Enter" && canNext() && handleNext()}
-                autoFocus
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
+          {/* Text input */}
+          {!current.options && (
+            <input
+              type={current.type || "text"}
+              value={data[current.key]}
+              onChange={(e) => setData((d) => ({ ...d, [current.key]: e.target.value }))}
+              placeholder={current.placeholder}
+              className="w-full p-4 rounded-2xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors text-lg"
+              onKeyDown={(e) => e.key === "Enter" && canNext() && handleNext()}
+              autoFocus
+            />
+          )}
+        </motion.div>
       </div>
 
       {/* Navigation */}
-      <div className="px-4 pb-8 flex gap-3">
+      <div className="px-5 pb-8 flex gap-3">
         {step > 0 && (
-          <button onClick={() => setStep((s) => s - 1)} className="btn-glass flex items-center gap-2">
-            <ArrowLeft size={18} /> Back
+          <button onClick={() => setStep((s) => s - 1)} className="btn-glass flex items-center gap-2 px-4">
+            <ArrowLeft size={18} />
           </button>
         )}
         <button
@@ -156,13 +163,9 @@ export default function Onboarding() {
           className={`flex-1 btn-primary-glow flex items-center justify-center gap-2 ${!canNext() ? "opacity-40 cursor-not-allowed" : ""}`}
         >
           {isLast ? (
-            <>
-              Start Discovery <Sparkles size={18} />
-            </>
+            <><Sparkles size={18} /> Start Discovery</>
           ) : (
-            <>
-              Continue <ArrowRight size={18} />
-            </>
+            <><span>Continue</span> <ArrowRight size={18} /></>
           )}
         </button>
       </div>
