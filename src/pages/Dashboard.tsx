@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   const level = Math.min(10, Math.floor(xp / 100) + 1);
   const xpProgress = xp % 100;
-  const levelTitles = ["Starter", "Explorer", "Discoverer", "Pathfinder", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
+  const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
 
   // Roadmap progress
   const roadmap = career ? getOrCreateRoadmap(career.id, career.title) : null;

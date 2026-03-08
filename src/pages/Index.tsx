@@ -366,7 +366,7 @@ export default function Index() {
       </section>
 
       <AnimatePresence>
-        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+        {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
     </div>
   );

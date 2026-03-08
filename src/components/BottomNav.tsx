@@ -47,7 +47,7 @@ export default function BottomNav() {
       </nav>
 
       <AnimatePresence>
-        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+        {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
     </>
   );

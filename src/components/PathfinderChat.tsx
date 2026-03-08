@@ -159,7 +159,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }} className="text-6xl">
                 🧭
               </motion.div>
-              <h3 className="text-lg font-bold gradient-text">Hey there! I'm Pathfinder AI</h3>
+              <h3 className="text-lg font-bold gradient-text">Hey there! I'm Orbit AI</h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 I'm here to help you figure out careers, subjects, and your future. Ask me anything! 💬
               </p>
