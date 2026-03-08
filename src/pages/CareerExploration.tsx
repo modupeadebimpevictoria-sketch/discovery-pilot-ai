@@ -366,6 +366,30 @@ export default function CareerExploration() {
           </p>
         </div>
 
+        {/* Career Journey Actions */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => navigate(`/roadmap/${career.id}`)}
+            className="glass-card-hover p-4 rounded-2xl text-left space-y-2"
+          >
+            <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center">
+              <MapPin size={18} className="text-primary-foreground" />
+            </div>
+            <p className="text-sm font-bold text-foreground">Career Roadmap</p>
+            <p className="text-[10px] text-muted-foreground">Step-by-step path to this career</p>
+          </button>
+          <button
+            onClick={() => navigate("/opportunities")}
+            className="glass-card-hover p-4 rounded-2xl text-left space-y-2"
+          >
+            <div className="w-9 h-9 rounded-xl gradient-bg-warm flex items-center justify-center">
+              <GraduationCap size={18} className="text-accent-foreground" />
+            </div>
+            <p className="text-sm font-bold text-foreground">Opportunities</p>
+            <p className="text-[10px] text-muted-foreground">Scholarships, courses & more</p>
+          </button>
+        </div>
+
         {/* Ask AI Mentor */}
         <button
           onClick={() => setChatOpen(true)}
