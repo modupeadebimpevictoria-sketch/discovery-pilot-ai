@@ -48,6 +48,19 @@ const careerPreviews = [
   { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-mint to-landing-lime" },
 ];
 
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors"
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? <Sun size={18} className="text-foreground" /> : <Moon size={18} className="text-foreground" />}
+    </button>
+  );
+}
+
 export default function Index() {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
