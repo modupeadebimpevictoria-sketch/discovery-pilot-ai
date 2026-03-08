@@ -354,7 +354,7 @@ export default function Index() {
             </div>
             <div className="text-left flex-1">
               <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-purple transition-colors">
-                Chat with Pathfinder AI 🧭
+                Chat with Orbit AI 🚀
               </p>
               <p className="text-xs text-landing-charcoal/50">
                 Got career questions? Your AI mentor has answers.
