@@ -15,7 +15,7 @@ const suggestedQuestions = [
   "How do I know what career is right for me? 🤔",
 ];
 
-export default function PathfinderChat({ onClose }: { onClose: () => void }) {
+export default function OrbitChat({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
