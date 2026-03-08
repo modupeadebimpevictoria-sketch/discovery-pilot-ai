@@ -360,7 +360,7 @@ export default function Index() {
                 Got career questions? Your AI mentor has answers.
               </p>
             </div>
-            <ChevronRight size={20} className="text-landing-charcoal/30 group-hover:text-landing-purple transition-colors" />
+            <ChevronRight size={20} className="text-landing-charcoal/30 group-hover:text-landing-pink transition-colors" />
           </motion.button>
         </div>
       </section>
