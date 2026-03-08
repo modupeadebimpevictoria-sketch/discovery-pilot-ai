@@ -29,6 +29,21 @@ interface AppState {
   addXp: (amount: number) => void;
   appliedInternships: string[];
   applyToInternship: (id: string) => void;
+  // Roadmap
+  completedMilestones: string[];
+  toggleMilestone: (id: string) => void;
+  // Weekly Quests
+  completedQuests: string[];
+  completeQuest: (id: string) => void;
+  // Skill XP tracking: { [skillId]: xpAmount }
+  skillXp: Record<string, number>;
+  addSkillXp: (skillId: string, amount: number) => void;
+  // Selected career path (the one they're building towards)
+  selectedCareerPath: string | null;
+  setSelectedCareerPath: (id: string | null) => void;
+  // Career check-in
+  lastCheckInDate: string | null;
+  setLastCheckInDate: (date: string) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -43,6 +58,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [badges, setBadges] = useState<string[]>([]);
   const [xp, setXp] = useState(0);
   const [appliedInternships, setAppliedInternships] = useState<string[]>([]);
+  const [completedMilestones, setCompletedMilestones] = useState<string[]>([]);
+  const [completedQuests, setCompletedQuests] = useState<string[]>([]);
+  const [skillXp, setSkillXp] = useState<Record<string, number>>({});
+  const [selectedCareerPath, setSelectedCareerPath] = useState<string | null>(null);
+  const [lastCheckInDate, setLastCheckInDate] = useState<string | null>(null);
 
   const toggleSavedCareer = (id: string) => {
     setSavedCareers((prev) =>
@@ -66,27 +86,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAppliedInternships((prev) => (prev.includes(id) ? prev : [...prev, id]));
   };
 
+  const toggleMilestone = (id: string) => {
+    setCompletedMilestones((prev) =>
+      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+    );
+  };
+
+  const completeQuest = (id: string) => {
+    setCompletedQuests((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const addSkillXp = (skillId: string, amount: number) => {
+    setSkillXp((prev) => ({ ...prev, [skillId]: (prev[skillId] || 0) + amount }));
+  };
+
   return (
     <AppContext.Provider
       value={{
-        profile,
-        setProfile,
-        assessmentAnswers,
-        setAssessmentAnswers,
-        matchedCareers,
-        setMatchedCareers,
-        archetype,
-        setArchetype,
-        savedCareers,
-        toggleSavedCareer,
-        completedMissions,
-        addCompletedMission,
-        badges,
-        addBadge,
-        xp,
-        addXp,
-        appliedInternships,
-        applyToInternship,
+        profile, setProfile,
+        assessmentAnswers, setAssessmentAnswers,
+        matchedCareers, setMatchedCareers,
+        archetype, setArchetype,
+        savedCareers, toggleSavedCareer,
+        completedMissions, addCompletedMission,
+        badges, addBadge,
+        xp, addXp,
+        appliedInternships, applyToInternship,
+        completedMilestones, toggleMilestone,
+        completedQuests, completeQuest,
+        skillXp, addSkillXp,
+        selectedCareerPath, setSelectedCareerPath,
+        lastCheckInDate, setLastCheckInDate,
       }}
     >
       {children}
