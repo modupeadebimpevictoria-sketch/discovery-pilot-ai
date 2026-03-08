@@ -8,7 +8,7 @@ import { useApp } from "@/contexts/AppContext";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
-import PathfinderChat from "@/components/PathfinderChat";
+import OrbitChat from "@/components/PathfinderChat";
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
@@ -400,7 +400,7 @@ export default function CareerExploration() {
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Got questions about {career.title}?</p>
-            <p className="text-[10px] text-muted-foreground">Ask Pathfinder AI — your career mentor 🧭</p>
+            <p className="text-[10px] text-muted-foreground">Ask Orbit AI — your career mentor 🚀</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
@@ -431,7 +431,7 @@ export default function CareerExploration() {
       />
 
       <AnimatePresence>
-        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+        {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
     </div>
   );

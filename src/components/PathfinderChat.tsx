@@ -15,7 +15,7 @@ const suggestedQuestions = [
   "How do I know what career is right for me? 🤔",
 ];
 
-export default function PathfinderChat({ onClose }: { onClose: () => void }) {
+export default function OrbitChat({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +142,7 @@ export default function PathfinderChat({ onClose }: { onClose: () => void }) {
             <Bot size={20} className="text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-foreground">Pathfinder AI</h2>
+            <h2 className="text-sm font-bold text-foreground">Orbit AI</h2>
             <p className="text-[10px] text-muted-foreground">Your career mentor 🧭</p>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function PathfinderChat({ onClose }: { onClose: () => void }) {
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }} className="text-6xl">
                 🧭
               </motion.div>
-              <h3 className="text-lg font-bold gradient-text">Hey there! I'm Pathfinder AI</h3>
+              <h3 className="text-lg font-bold gradient-text">Hey there! I'm Orbit AI</h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 I'm here to help you figure out careers, subjects, and your future. Ask me anything! 💬
               </p>

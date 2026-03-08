@@ -25,7 +25,7 @@ export default function CareerPassport() {
   const career = careerId ? getCareerById(careerId) : null;
 
   const level = Math.min(10, Math.floor(xp / 100) + 1);
-  const levelTitles = ["Starter", "Explorer", "Discoverer", "Pathfinder", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
+  const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
 
   const completedMissionData = missions.filter((m) => completedMissions.includes(m.id));
   const completedQuestData = weeklyQuests.filter((q) => completedQuests.includes(q.id));

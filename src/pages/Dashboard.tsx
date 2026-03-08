@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
-import PathfinderChat from "@/components/PathfinderChat";
+import OrbitChat from "@/components/PathfinderChat";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   const level = Math.min(10, Math.floor(xp / 100) + 1);
   const xpProgress = xp % 100;
-  const levelTitles = ["Starter", "Explorer", "Discoverer", "Pathfinder", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
+  const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
 
   // Roadmap progress
   const roadmap = career ? getOrCreateRoadmap(career.id, career.title) : null;
@@ -191,7 +191,7 @@ export default function Dashboard() {
             <Bot size={24} className="text-primary-foreground" />
           </div>
           <div className="text-left flex-1">
-            <p className="text-sm font-bold text-foreground">Ask Pathfinder AI 🧭</p>
+            <p className="text-sm font-bold text-foreground">Ask Orbit AI 🚀</p>
             <p className="text-[10px] text-muted-foreground">Questions about careers, subjects, or your future?</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
@@ -284,7 +284,7 @@ export default function Dashboard() {
       />
 
       <AnimatePresence>
-        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+        {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
     </div>
   );

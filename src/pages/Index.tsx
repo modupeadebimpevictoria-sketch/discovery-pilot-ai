@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star } from "lucide-react";
 import { useState, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
-import PathfinderChat from "@/components/PathfinderChat";
+import OrbitChat from "@/components/PathfinderChat";
 import confetti from "canvas-confetti";
 
 const floatingEmojis = ["🚀", "🎯", "🧬", "🎨", "💻", "🌍", "🏗️", "🎵", "🔬", "⚡"];
@@ -354,7 +354,7 @@ export default function Index() {
             </div>
             <div className="text-left flex-1">
               <p className="text-base font-bold text-landing-charcoal group-hover:text-landing-purple transition-colors">
-                Chat with Pathfinder AI 🧭
+                Chat with Orbit AI 🚀
               </p>
               <p className="text-xs text-landing-charcoal/50">
                 Got career questions? Your AI mentor has answers.
@@ -366,7 +366,7 @@ export default function Index() {
       </section>
 
       <AnimatePresence>
-        {chatOpen && <PathfinderChat onClose={() => setChatOpen(false)} />}
+        {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
     </div>
   );
