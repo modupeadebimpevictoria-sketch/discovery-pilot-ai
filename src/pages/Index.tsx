@@ -36,7 +36,7 @@ export default function Index() {
 
         {/* Title */}
         <div className="space-y-3">
-          <h1 className="text-5xl font-bold gradient-text leading-tight">Pathfinder</h1>
+          <h1 className="text-5xl font-bold gradient-text leading-tight">Orbit</h1>
           <p className="text-base text-muted-foreground leading-relaxed">
             Discover careers you'll actually love. <br />
             AI-powered, fun, and built for you. ✨
