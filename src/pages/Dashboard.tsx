@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
-import PathfinderChat from "@/components/PathfinderChat";
+import OrbitChat from "@/components/PathfinderChat";
 
 export default function Dashboard() {
   const navigate = useNavigate();
