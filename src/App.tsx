@@ -13,6 +13,10 @@ import CareerExploration from "./pages/CareerExploration";
 import CareerUniverse from "./pages/CareerUniverse";
 import CareerFeed from "./pages/CareerFeed";
 import Dashboard from "./pages/Dashboard";
+import Roadmap from "./pages/Roadmap";
+import Quests from "./pages/Quests";
+import CareerPassport from "./pages/CareerPassport";
+import Opportunities from "./pages/Opportunities";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +37,10 @@ const App = () => (
             <Route path="/universe" element={<CareerUniverse />} />
             <Route path="/feed" element={<CareerFeed />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/roadmap/:id" element={<Roadmap />} />
+            <Route path="/quests" element={<Quests />} />
+            <Route path="/passport" element={<CareerPassport />} />
+            <Route path="/opportunities" element={<Opportunities />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
