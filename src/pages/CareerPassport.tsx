@@ -1,0 +1,203 @@
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useApp } from "@/contexts/AppContext";
+import { getCareerById } from "@/data/careers";
+import { missions } from "@/data/missions";
+import { internships } from "@/data/internships";
+import { weeklyQuests } from "@/data/weeklyQuests";
+import {
+  ChevronLeft, Award, BookOpen, Briefcase, Trophy, Target,
+  Zap, CheckCircle, Share2, Star
+} from "lucide-react";
+import { useState } from "react";
+import ShareModal from "@/components/ShareModal";
+
+export default function CareerPassport() {
+  const navigate = useNavigate();
+  const {
+    profile, matchedCareers, archetype, savedCareers, badges,
+    completedMissions, completedQuests, completedMilestones,
+    xp, appliedInternships, selectedCareerPath
+  } = useApp();
+  const [shareOpen, setShareOpen] = useState(false);
+
+  const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
+  const career = careerId ? getCareerById(careerId) : null;
+
+  const level = Math.min(10, Math.floor(xp / 100) + 1);
+  const levelTitles = ["Starter", "Explorer", "Discoverer", "Pathfinder", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
+
+  const completedMissionData = missions.filter((m) => completedMissions.includes(m.id));
+  const completedQuestData = weeklyQuests.filter((q) => completedQuests.includes(q.id));
+  const appliedInternshipData = internships.filter((i) => appliedInternships.includes(i.id));
+
+  const stats = [
+    { icon: "🎯", label: "Milestones", value: completedMilestones.length },
+    { icon: "⚡", label: "Missions", value: completedMissions.length },
+    { icon: "🔥", label: "Quests", value: completedQuests.length },
+    { icon: "🏆", label: "Badges", value: badges.length },
+    { icon: "💼", label: "Applications", value: appliedInternships.length },
+    { icon: "⭐", label: "Total XP", value: xp },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background pb-28">
+      {/* Header */}
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-muted-foreground text-sm">
+            <ChevronLeft size={18} /> Back
+          </button>
+          <button onClick={() => setShareOpen(true)} className="w-9 h-9 rounded-xl glass-card flex items-center justify-center">
+            <Share2 size={16} className="text-foreground" />
+          </button>
+        </div>
+
+        {/* Passport Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-card neon-border p-6 rounded-2xl text-center space-y-3"
+        >
+          <div className="w-16 h-16 rounded-full gradient-bg mx-auto flex items-center justify-center text-2xl font-bold text-primary-foreground">
+            {profile?.name?.[0]?.toUpperCase() || "?"}
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">{profile?.name || "Student"}</h1>
+            <p className="text-sm text-muted-foreground">Career Passport</p>
+          </div>
+          {career && (
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-2xl">{career.emoji}</span>
+              <span className="text-sm font-semibold text-primary">Future {career.title}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-center gap-2">
+            <div className="px-3 py-1 rounded-full gradient-bg text-xs font-bold text-primary-foreground">
+              Level {level} • {levelTitles[level - 1]}
+            </div>
+            <div className="px-3 py-1 rounded-full bg-accent/10 text-xs font-bold text-accent">
+              {xp} XP
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="px-5 mb-6">
+        <div className="grid grid-cols-3 gap-2">
+          {stats.map((s) => (
+            <div key={s.label} className="glass-card p-3 text-center rounded-2xl">
+              <span className="text-lg">{s.icon}</span>
+              <p className="text-lg font-bold text-foreground">{s.value}</p>
+              <p className="text-[10px] text-muted-foreground">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Badges */}
+      {badges.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
+            <Award size={16} className="text-primary" /> Badges Earned
+          </h2>
+          <div className="flex gap-2 flex-wrap">
+            {badges.map((b) => (
+              <span key={b} className="px-3 py-2 rounded-full text-xs font-bold gradient-bg text-primary-foreground">🏆 {b}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completed Missions */}
+      {completedMissionData.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
+            <Target size={16} className="text-accent" /> Missions Completed
+          </h2>
+          <div className="space-y-2">
+            {completedMissionData.map((m) => (
+              <div key={m.id} className="glass-card p-3 rounded-xl flex items-center gap-3">
+                <span className="text-xl">{m.emoji}</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-foreground">{m.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{m.description.slice(0, 60)}...</p>
+                </div>
+                <CheckCircle size={16} className="text-primary" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completed Quests */}
+      {completedQuestData.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
+            <Zap size={16} className="text-secondary" /> Quests Completed
+          </h2>
+          <div className="space-y-2">
+            {completedQuestData.map((q) => (
+              <div key={q.id} className="glass-card p-3 rounded-xl flex items-center gap-3">
+                <span className="text-xl">{q.emoji}</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-foreground">{q.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{q.skillTag}</p>
+                </div>
+                <span className="text-[10px] font-bold text-primary">+{q.xpReward} XP</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Applications */}
+      {appliedInternshipData.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
+            <Briefcase size={16} className="text-glow-purple" /> Applications
+          </h2>
+          <div className="space-y-2">
+            {appliedInternshipData.map((i) => (
+              <div key={i.id} className="glass-card p-3 rounded-xl flex items-center gap-3">
+                <span className="text-xl">{i.emoji}</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-foreground">{i.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{i.company}</p>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">Applied ✓</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {completedMissionData.length === 0 && completedQuestData.length === 0 && badges.length === 0 && (
+        <div className="px-5">
+          <div className="glass-card p-8 rounded-2xl text-center space-y-3">
+            <span className="text-5xl">🎒</span>
+            <h2 className="text-lg font-bold text-foreground">Your Passport is Empty!</h2>
+            <p className="text-sm text-muted-foreground">
+              Complete missions, quests, and milestones to build your Career Passport. 
+              This becomes your portfolio for university applications!
+            </p>
+            <button onClick={() => navigate("/quests")} className="btn-primary-glow text-sm">
+              Start a Quest
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        careerTitle={career?.title || "career"}
+        careerEmoji={career?.emoji || "🎯"}
+        score={matchedCareers[0]?.score}
+        archetype={archetype}
+      />
+    </div>
+  );
+}
