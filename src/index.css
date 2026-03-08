@@ -63,15 +63,16 @@
     --shadow-glow-accent: 0 4px 20px -5px hsl(15 85% 55% / 0.25);
 
     /* Landing page tokens */
-    --landing-purple: 255 63% 68%;
-    --landing-indigo: 224 100% 65%;
-    --landing-cyan: 194 100% 56%;
-    --landing-coral: 0 100% 71%;
-    --landing-lime: 78 100% 64%;
-    --landing-charcoal: 215 26% 17%;
-    --landing-bg: 225 33% 97%;
-    --gradient-hero: linear-gradient(135deg, hsl(255 63% 68%), hsl(224 100% 65%), hsl(194 100% 56%));
-    --gradient-hero-radial: radial-gradient(ellipse at 30% 20%, hsl(255 63% 68%), hsl(224 100% 65%) 50%, hsl(194 100% 56%));
+    --landing-pink: 351 100% 71%;
+    --landing-orange: 17 100% 72%;
+    --landing-coral: 27 100% 62%;
+    --landing-teal: 162 72% 47%;
+    --landing-teal-bright: 162 78% 55%;
+    --landing-yellow: 45 100% 62%;
+    --landing-charcoal: 0 0% 18%;
+    --landing-bg: 210 20% 98%;
+    --gradient-hero: linear-gradient(135deg, hsl(351 100% 71%), hsl(17 100% 72%), hsl(27 100% 62%));
+    --gradient-hero-radial: radial-gradient(ellipse at 30% 20%, hsl(351 100% 71%), hsl(17 100% 72%) 50%, hsl(27 100% 62%));
   }
 }
 
