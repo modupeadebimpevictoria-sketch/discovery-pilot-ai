@@ -70,14 +70,15 @@ export default function Index() {
         {/* Overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80" />
 
-        {/* App logo */}
+        {/* App logo + theme toggle */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="absolute top-6 left-6 z-20"
+          className="absolute top-6 left-6 right-6 z-20 flex items-center justify-between"
         >
           <span className="text-2xl font-bold font-display text-primary tracking-tight">Orbit</span>
+          <ThemeToggle />
         </motion.div>
 
         {/* Floating emoji badges */}
