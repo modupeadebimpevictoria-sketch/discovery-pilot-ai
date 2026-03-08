@@ -71,6 +71,15 @@ export default {
           purple: "hsl(var(--glow-purple))",
           pink: "hsl(var(--glow-pink))",
         },
+        landing: {
+          purple: "hsl(var(--landing-purple))",
+          indigo: "hsl(var(--landing-indigo))",
+          cyan: "hsl(var(--landing-cyan))",
+          coral: "hsl(var(--landing-coral))",
+          lime: "hsl(var(--landing-lime))",
+          charcoal: "hsl(var(--landing-charcoal))",
+          bg: "hsl(var(--landing-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
