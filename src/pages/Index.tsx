@@ -55,7 +55,7 @@ export default function Index() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   const handleCTA = () => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#7B61FF", "#4F7CFF", "#23D5FF", "#FF6B6B", "#C6FF4A"] });
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#FF6B81", "#FF9472", "#FFA94D", "#1DD1A1", "#FFD93D"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
