@@ -256,13 +256,14 @@
 
   .btn-coral {
     @apply font-bold rounded-2xl px-8 py-4 transition-all duration-300 active:scale-95;
-    background: hsl(var(--landing-coral));
+    background: hsl(var(--landing-teal));
     color: white;
-    box-shadow: 0 4px 20px -5px hsl(var(--landing-coral) / 0.5);
+    box-shadow: 0 4px 20px -5px hsl(var(--landing-teal) / 0.5);
   }
 
   .btn-coral:hover {
-    box-shadow: 0 0 30px -5px hsl(var(--landing-cyan) / 0.7), 0 4px 20px -5px hsl(var(--landing-coral) / 0.6);
+    background: hsl(var(--landing-teal-bright));
+    box-shadow: 0 0 30px -5px hsl(var(--landing-teal-bright) / 0.7), 0 4px 20px -5px hsl(var(--landing-teal) / 0.6);
     transform: scale(1.03);
   }
 
