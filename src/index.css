@@ -285,7 +285,8 @@
   }
 
   .neon-glow-cyan {
-    text-shadow: 0 0 20px hsl(var(--landing-cyan) / 0.5);
+    text-shadow: 0 0 20px hsl(var(--landing-yellow) / 0.6);
+    color: hsl(var(--landing-yellow));
   }
 }
 
