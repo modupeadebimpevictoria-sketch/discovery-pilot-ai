@@ -191,7 +191,7 @@ export default function Dashboard() {
             <Bot size={24} className="text-primary-foreground" />
           </div>
           <div className="text-left flex-1">
-            <p className="text-sm font-bold text-foreground">Ask Pathfinder AI 🧭</p>
+            <p className="text-sm font-bold text-foreground">Ask Orbit AI 🚀</p>
             <p className="text-[10px] text-muted-foreground">Questions about careers, subjects, or your future?</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
