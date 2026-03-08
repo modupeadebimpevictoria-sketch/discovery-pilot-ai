@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import BottomNav from "@/components/BottomNav";
 import TopBar from "@/components/TopBar";
 import Index from "./pages/Index";
@@ -28,29 +27,27 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <ThemeProvider>
-        <AppProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/assessment" element={<Assessment />} />
-              <Route path="/results" element={<Results />} />
-              <Route path="/career/:id" element={<CareerExploration />} />
-              <Route path="/universe" element={<CareerUniverse />} />
-              <Route path="/feed" element={<CareerFeed />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/roadmap/:id" element={<Roadmap />} />
-              <Route path="/quests" element={<Quests />} />
-              <Route path="/passport" element={<CareerPassport />} />
-              <Route path="/opportunities" element={<Opportunities />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <TopBar />
-            <BottomNav />
-          </BrowserRouter>
-        </AppProvider>
-      </ThemeProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/assessment" element={<Assessment />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/career/:id" element={<CareerExploration />} />
+            <Route path="/universe" element={<CareerUniverse />} />
+            <Route path="/feed" element={<CareerFeed />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/roadmap/:id" element={<Roadmap />} />
+            <Route path="/quests" element={<Quests />} />
+            <Route path="/passport" element={<CareerPassport />} />
+            <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <TopBar />
+          <BottomNav />
+        </BrowserRouter>
+      </AppProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

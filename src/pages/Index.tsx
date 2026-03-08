@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star, Sun, Moon } from "lucide-react";
+import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star } from "lucide-react";
 import { useState, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import OrbitChat from "@/components/PathfinderChat";
 import confetti from "canvas-confetti";
-import { useTheme } from "@/contexts/ThemeContext";
 
 const floatingEmojis = ["🚀", "🎯", "🧬", "🎨", "💻", "🌍", "🏗️", "🎵", "🔬", "⚡"];
 
@@ -48,19 +47,6 @@ const careerPreviews = [
   { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-mint to-landing-lime" },
 ];
 
-function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
-  return (
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors"
-      aria-label="Toggle theme"
-    >
-      {theme === "dark" ? <Sun size={18} className="text-foreground" /> : <Moon size={18} className="text-foreground" />}
-    </button>
-  );
-}
-
 export default function Index() {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
@@ -83,15 +69,14 @@ export default function Index() {
         {/* Overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80" />
 
-        {/* App logo + theme toggle */}
+        {/* App logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="absolute top-6 left-6 right-6 z-20 flex items-center justify-between"
+          className="absolute top-6 left-6 z-20"
         >
           <span className="text-2xl font-bold font-display text-primary tracking-tight">Orbit</span>
-          <ThemeToggle />
         </motion.div>
 
         {/* Floating emoji badges */}
