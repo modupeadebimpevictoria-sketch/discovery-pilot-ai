@@ -305,9 +305,9 @@ export const archetypes: Record<string, Archetype> = {
 export function matchCareers(answers: Record<number, string | number>) {
   const scores: Record<string, number> = {};
   
-  const { careers: careerList } = require("./careers") as { careers: any[] };
+  const { careers: careerList } = { careers: careerData };
 
-  careerList.forEach((career: any) => {
+  careerList.forEach((career) => {
     let score = 0;
 
     // Interest matching
