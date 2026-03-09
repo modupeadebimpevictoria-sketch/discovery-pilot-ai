@@ -393,8 +393,8 @@ export default function Index() {
             onClick={() => setChatOpen(true)}
             className="w-full landing-card flex items-center gap-4 !p-4 cursor-pointer group"
           >
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-landing-violet to-landing-mint">
-              <Bot size={24} className="text-foreground" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary">
+              <Bot size={24} className="text-primary-foreground" />
             </div>
             <div className="text-left flex-1">
               <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors font-display">
