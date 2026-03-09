@@ -165,8 +165,8 @@ const testimonials = [
 // SpringBoard logo — clean, no animation
 function SpringBoardLogo({ size = "text-2xl" }: { size?: string }) {
   return (
-    <span className={`font-bold font-display text-primary tracking-tight ${size}`}>
-      Spring<span className="text-landing-mint">Board</span>
+    <span className={`font-bold font-display text-secondary tracking-tight ${size}`}>
+      Spring<span className="text-primary-foreground">Board</span>
     </span>
   );
 }
