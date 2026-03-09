@@ -14,12 +14,12 @@ import confetti from "canvas-confetti";
 const fadeIn = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut" },
+  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
 };
 
 const stagger = (delay: number) => ({
   ...fadeIn,
-  transition: { ...fadeIn.transition, delay },
+  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const, delay },
 });
 
 // Feature data
