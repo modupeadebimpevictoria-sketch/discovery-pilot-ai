@@ -176,7 +176,7 @@ export default function Index() {
   const [chatOpen, setChatOpen] = useState(false);
 
   const handleCTA = () => {
-    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4"] });
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#AAED4E", "#2D6A00", "#FFE14D", "#1A1A1A"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
