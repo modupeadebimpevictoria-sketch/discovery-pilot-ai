@@ -125,8 +125,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       archetype,
       matched_careers: matchedCareers,
       assessment_answers: assessmentAnswers,
-      journal_entries: journalEntries,
-      saved_resources: savedResources,
+      journal_entries: journalEntries as unknown as Record<string, unknown>[],
+      saved_resources: savedResources as unknown as Record<string, unknown>[],
       last_engaged_date: new Date().toISOString().split("T")[0],
       updated_at: new Date().toISOString(),
     };
