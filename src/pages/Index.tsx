@@ -124,7 +124,7 @@ const categoryTiles = [
     label: "Engineering",
     emoji: "⚙️",
     videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1581092160607-ee67df30d1a2?w=600&h=400&fit=crop&q=90",
+    fallback: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Science",
