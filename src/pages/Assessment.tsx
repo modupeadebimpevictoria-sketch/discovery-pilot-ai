@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { assessmentQuestions } from "@/data/questions";
 import { matchCareers, determineArchetype } from "@/data/questions";
-import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, Sparkles, ChevronLeft } from "lucide-react";
 import { fireBurst } from "@/lib/confetti";
 
 export default function Assessment() {
