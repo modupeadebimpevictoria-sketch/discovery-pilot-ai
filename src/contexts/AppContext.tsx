@@ -10,6 +10,21 @@ export interface StudentProfile {
   interests: string[];
 }
 
+export interface JournalEntry {
+  id: string;
+  careerId: string;
+  text: string;
+  date: string;
+}
+
+export interface SavedResource {
+  id: string;
+  title: string;
+  type: "article" | "video" | "profile";
+  url?: string;
+  careerId?: string;
+}
+
 interface AppState {
   profile: StudentProfile | null;
   setProfile: (p: StudentProfile) => void;
@@ -29,21 +44,30 @@ interface AppState {
   addXp: (amount: number) => void;
   appliedInternships: string[];
   applyToInternship: (id: string) => void;
-  // Roadmap
   completedMilestones: string[];
   toggleMilestone: (id: string) => void;
-  // Weekly Quests
   completedQuests: string[];
   completeQuest: (id: string) => void;
-  // Skill XP tracking: { [skillId]: xpAmount }
   skillXp: Record<string, number>;
   addSkillXp: (skillId: string, amount: number) => void;
-  // Selected career path (the one they're building towards)
   selectedCareerPath: string | null;
   setSelectedCareerPath: (id: string | null) => void;
-  // Career check-in
   lastCheckInDate: string | null;
   setLastCheckInDate: (date: string) => void;
+  // Dashboard additions
+  rejectedCareers: string[];
+  rejectCareer: (id: string) => void;
+  journalEntries: JournalEntry[];
+  addJournalEntry: (entry: JournalEntry) => void;
+  savedResources: SavedResource[];
+  addSavedResource: (r: SavedResource) => void;
+  removeSavedResource: (id: string) => void;
+  streak: number;
+  incrementStreak: () => void;
+  pulseCheck: string | null;
+  setPulseCheck: (emoji: string | null) => void;
+  pathwayStartDate: string | null;
+  setPathwayStartDate: (date: string | null) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -63,6 +87,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [skillXp, setSkillXp] = useState<Record<string, number>>({});
   const [selectedCareerPath, setSelectedCareerPath] = useState<string | null>(null);
   const [lastCheckInDate, setLastCheckInDate] = useState<string | null>(null);
+  // Dashboard additions
+  const [rejectedCareers, setRejectedCareers] = useState<string[]>([]);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [savedResources, setSavedResources] = useState<SavedResource[]>([]);
+  const [streak, setStreak] = useState(0);
+  const [pulseCheck, setPulseCheck] = useState<string | null>(null);
+  const [pathwayStartDate, setPathwayStartDate] = useState<string | null>(null);
 
   const toggleSavedCareer = (id: string) => {
     setSavedCareers((prev) =>
@@ -100,6 +131,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSkillXp((prev) => ({ ...prev, [skillId]: (prev[skillId] || 0) + amount }));
   };
 
+  const rejectCareer = (id: string) => {
+    setRejectedCareers((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const addJournalEntry = (entry: JournalEntry) => {
+    setJournalEntries((prev) => [entry, ...prev]);
+  };
+
+  const addSavedResource = (r: SavedResource) => {
+    setSavedResources((prev) => (prev.find((x) => x.id === r.id) ? prev : [r, ...prev]));
+  };
+
+  const removeSavedResource = (id: string) => {
+    setSavedResources((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const incrementStreak = () => {
+    setStreak((prev) => prev + 1);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -117,6 +168,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         skillXp, addSkillXp,
         selectedCareerPath, setSelectedCareerPath,
         lastCheckInDate, setLastCheckInDate,
+        rejectedCareers, rejectCareer,
+        journalEntries, addJournalEntry,
+        savedResources, addSavedResource, removeSavedResource,
+        streak, incrementStreak,
+        pulseCheck, setPulseCheck,
+        pathwayStartDate, setPathwayStartDate,
       }}
     >
       {children}
