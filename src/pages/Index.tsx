@@ -134,31 +134,31 @@ const categoryTiles = [
   },
 ];
 
-// Testimonials — real young people, real quotes
+// Testimonials — young Black and African professionals
 const testimonials = [
   {
-    name: "Zara J.",
+    name: "Zara O.",
     role: "UX Designer, 23",
     quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
     photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Marcus D.",
+    name: "Marcus A.",
     role: "Data Analyst, 24",
     quote: "The quiz nailed it. I always liked patterns and numbers but never connected that to a career. Now I'm a data analyst and I love it.",
-    photoUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Aisha R.",
+    name: "Aisha K.",
     role: "Biomedical Researcher, 22",
     quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
-    photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Liam C.",
+    name: "Tunde B.",
     role: "Filmmaker, 25",
     quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
-    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
   },
 ];
 
