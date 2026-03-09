@@ -2,3 +2,6 @@ project_id = "haxswkkcpxoqyrttrkgl"
 
 [functions.career-mentor]
 verify_jwt = false
+
+[functions.scrape-opportunities]
+verify_jwt = false

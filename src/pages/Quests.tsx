@@ -3,37 +3,49 @@ import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { getQuestsForCareer, getCurrentWeekNumber, WeeklyQuest } from "@/data/weeklyQuests";
 import { getCareerById } from "@/data/careers";
-import { ChevronLeft, Clock, Zap, CheckCircle, Flame, Calendar } from "lucide-react";
+import { getCareerListingById } from "@/data/careerFamilies";
+import { ChevronLeft, Clock, Zap, CheckCircle, Flame, Calendar, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
 export default function Quests() {
   const navigate = useNavigate();
-  const { selectedCareerPath, matchedCareers, completedQuests, completeQuest, addXp, addBadge, xp } = useApp();
+  const { selectedCareerPath, matchedCareers, completedQuests, completeQuest, addXp, addBadge, user } = useApp();
   const [expandedQuest, setExpandedQuest] = useState<string | null>(null);
 
-  const careerId = selectedCareerPath || matchedCareers[0]?.careerId || "ai-engineer";
-  const career = getCareerById(careerId);
+  const careerId = selectedCareerPath || matchedCareers[0]?.careerId || null;
+  const career = careerId ? (getCareerById(careerId) || (() => { const l = getCareerListingById(careerId); return l ? { id: l.id, title: l.title, emoji: "💼" } : null; })()) : null;
   const weekNumber = getCurrentWeekNumber();
-  const thisWeekQuests = getQuestsForCareer(careerId, weekNumber);
-  const allQuests = getQuestsForCareer(careerId);
+  const thisWeekQuests = careerId ? getQuestsForCareer(careerId, weekNumber) : [];
+  const allQuests = careerId ? getQuestsForCareer(careerId) : [];
 
   const completedThisWeek = thisWeekQuests.filter((q) => completedQuests.includes(q.id)).length;
-  const streakWeeks = Math.floor(completedQuests.length / 3); // rough streak
+  const streakWeeks = Math.floor(completedQuests.length / 3);
 
   const handleComplete = (quest: WeeklyQuest) => {
     if (completedQuests.includes(quest.id)) return;
     completeQuest(quest.id);
     addXp(quest.xpReward);
     toast.success(`+${quest.xpReward} XP! Quest completed! 🎉`);
-    
-    if (completedQuests.length + 1 >= 5) {
-      addBadge("Quest Champion");
-    }
-    if (completedQuests.length + 1 >= 10) {
-      addBadge("Quest Master");
-    }
+    if (completedQuests.length + 1 >= 5) addBadge("Quest Champion");
+    if (completedQuests.length + 1 >= 10) addBadge("Quest Master");
   };
+
+  // No Active Path gate
+  if (!careerId) {
+    return (
+      <div className="min-h-screen bg-background pb-28 flex items-center justify-center px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4 max-w-xs">
+          <Lock size={48} className="text-muted-foreground mx-auto" />
+          <h2 className="text-xl font-bold text-foreground">Set Your Active Path First</h2>
+          <p className="text-sm text-muted-foreground">You need to explore a career and set it as your Active Path before you can start quests.</p>
+          <button onClick={() => navigate("/universe")} className="btn-primary-glow w-full">
+            Explore Careers
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-28">

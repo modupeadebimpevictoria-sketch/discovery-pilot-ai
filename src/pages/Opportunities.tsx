@@ -3,8 +3,11 @@ import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { opportunities, Opportunity, OpportunityType } from "@/data/opportunities";
 import { getCareerById } from "@/data/careers";
-import { ChevronLeft, ExternalLink, Filter, GraduationCap, Trophy, BookOpen, Briefcase, Users } from "lucide-react";
-import { useState } from "react";
+import { getCareerListingById } from "@/data/careerFamilies";
+import { ChevronLeft, ExternalLink, Lock, Briefcase } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const typeConfig: Record<OpportunityType, { emoji: string; label: string; color: string }> = {
   scholarship: { emoji: "🎓", label: "Scholarship", color: "bg-primary/10 text-primary" },
@@ -15,13 +18,44 @@ const typeConfig: Record<OpportunityType, { emoji: string; label: string; color:
   internship: { emoji: "💼", label: "Internship", color: "bg-secondary/10 text-secondary" },
 };
 
+interface ScrapedOpportunity {
+  title: string;
+  company: string;
+  location: string;
+  url: string;
+  type: string;
+}
+
 export default function Opportunities() {
   const navigate = useNavigate();
-  const { selectedCareerPath, matchedCareers } = useApp();
+  const { selectedCareerPath, matchedCareers, appliedInternships, applyToInternship } = useApp();
   const [filter, setFilter] = useState<OpportunityType | "all">("all");
+  const [scrapedOpps, setScrapedOpps] = useState<ScrapedOpportunity[]>([]);
+  const [loadingScrape, setLoadingScrape] = useState(false);
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
-  const career = careerId ? getCareerById(careerId) : null;
+  const career = careerId ? (getCareerById(careerId) || (() => { const l = getCareerListingById(careerId); return l ? { id: l.id, title: l.title, emoji: "💼" } : null; })()) : null;
+
+  // Fetch scraped internships on mount
+  useEffect(() => {
+    const fetchScrapedOpps = async () => {
+      setLoadingScrape(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("scrape-opportunities", {
+          body: { query: career?.title || "internship" },
+        });
+        if (error) throw error;
+        if (data?.opportunities) {
+          setScrapedOpps(data.opportunities);
+        }
+      } catch (err) {
+        console.error("Failed to fetch scraped opportunities:", err);
+      } finally {
+        setLoadingScrape(false);
+      }
+    };
+    fetchScrapedOpps();
+  }, [career?.title]);
 
   // Show recommended first, then all
   const recommended = careerId
@@ -29,17 +63,26 @@ export default function Opportunities() {
     : [];
   const otherOpps = opportunities.filter((o) => !recommended.find((r) => r.id === o.id));
   const allOpps = [...recommended, ...otherOpps];
-
   const filtered = filter === "all" ? allOpps : allOpps.filter((o) => o.type === filter);
 
   const filters: { key: OpportunityType | "all"; label: string }[] = [
     { key: "all", label: "All" },
+    { key: "internship", label: "💼 Internships" },
     { key: "scholarship", label: "🎓 Scholarships" },
     { key: "competition", label: "🏆 Competitions" },
     { key: "course", label: "📚 Courses" },
     { key: "program", label: "🌍 Programs" },
     { key: "workshop", label: "🤝 Workshops" },
   ];
+
+  const handleApply = (oppId: string) => {
+    if (!careerId) {
+      toast.error("Set a career as your Active Path to apply");
+      return;
+    }
+    applyToInternship(oppId);
+    toast.success("Application sent! 🎉");
+  };
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -83,23 +126,85 @@ export default function Opportunities() {
         </div>
       )}
 
-      {/* Opportunity Cards */}
+      {/* Scraped Real Internships */}
+      {(filter === "all" || filter === "internship") && scrapedOpps.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
+            <Briefcase size={16} className="text-secondary" /> Real Internships (Nigeria & International)
+          </h2>
+          <div className="space-y-3">
+            {scrapedOpps.map((opp, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="glass-card-hover p-4 rounded-2xl"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">💼</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-foreground">{opp.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{opp.company}</p>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span className="text-[10px] text-muted-foreground">📍 {opp.location}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary/10 text-secondary">{opp.type}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <a href={opp.url} target="_blank" rel="noopener noreferrer" className="flex-1 btn-glass text-xs py-2 flex items-center justify-center gap-1">
+                    <ExternalLink size={12} /> View Details
+                  </a>
+                  {careerId ? (
+                    <button
+                      onClick={() => handleApply(`scraped-${idx}`)}
+                      disabled={appliedInternships.includes(`scraped-${idx}`)}
+                      className={`flex-1 text-xs py-2 rounded-2xl font-bold transition-all flex items-center justify-center gap-1 ${
+                        appliedInternships.includes(`scraped-${idx}`)
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "btn-primary-glow"
+                      }`}
+                    >
+                      {appliedInternships.includes(`scraped-${idx}`) ? "✅ Applied" : "📩 Apply"}
+                    </button>
+                  ) : (
+                    <div className="flex-1 text-xs py-2 rounded-2xl font-bold bg-muted/50 text-muted-foreground flex items-center justify-center gap-1">
+                      <Lock size={12} /> Set Active Path to apply
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {loadingScrape && (
+        <div className="px-5 mb-4">
+          <div className="glass-card p-4 rounded-2xl text-center">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs text-muted-foreground">Finding real internships...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Curated Opportunity Cards */}
       <div className="px-5 space-y-3">
         {filtered.map((opp, idx) => {
           const isRecommended = recommended.find((r) => r.id === opp.id);
           const cfg = typeConfig[opp.type];
           return (
-            <motion.a
+            <motion.div
               key={opp.id}
-              href={opp.link}
-              target="_blank"
-              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className={`block glass-card-hover p-4 rounded-2xl ${isRecommended ? "border-primary/20" : ""}`}
+              className={`glass-card-hover p-4 rounded-2xl ${isRecommended ? "border-primary/20" : ""}`}
             >
-              <div className="flex items-start gap-3">
+              <a href={opp.link} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3">
                 <span className="text-2xl">{cfg.emoji}</span>
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-2">
@@ -121,13 +226,13 @@ export default function Opportunities() {
                     )}
                   </div>
                 </div>
-              </div>
-            </motion.a>
+              </a>
+            </motion.div>
           );
         })}
       </div>
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 && scrapedOpps.length === 0 && (
         <div className="px-5">
           <div className="glass-card p-8 rounded-2xl text-center">
             <span className="text-3xl">🔍</span>
