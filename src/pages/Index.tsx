@@ -185,7 +185,7 @@ export default function Index() {
       {/* ===== HERO SECTION — Video Background ===== */}
       <VideoBackground
         videoUrl="https://videos.pexels.com/video-files/3205828/3205828-sd_960_506_25fps.mp4"
-        fallbackImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&h=1080&fit=crop"
+        fallbackImage="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&h=1080&fit=crop&q=90"
         overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
