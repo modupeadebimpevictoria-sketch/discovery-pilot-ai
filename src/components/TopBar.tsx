@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 
-const showOn = ["/dashboard", "/feed", "/quests", "/universe", "/opportunities", "/passport"];
+const showOn = ["/dashboard", "/feed", "/quests", "/universe", "/opportunities", "/passport", "/auth"];
 
 export default function TopBar() {
   const location = useLocation();
