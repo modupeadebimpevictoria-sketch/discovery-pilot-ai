@@ -54,42 +54,42 @@ const featureCards = [
   },
 ];
 
-// Career profile cards — real people, real quotes
+// Career profile cards — young professionals at work
 const careerProfiles = [
   {
-    name: "Amara T.",
+    name: "Nia O.",
     title: "AI Engineer",
     quote: "I build apps used by millions — and I started in my bedroom.",
-    photoUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
     match: 94,
   },
   {
-    name: "Carlos M.",
+    name: "Kwame A.",
     title: "Dentist",
     quote: "Every day I help someone smile again. That never gets old.",
-    photoUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop&crop=face",
     match: 87,
   },
   {
-    name: "Priya K.",
+    name: "Adaeze N.",
     title: "Aerospace Engineer",
     quote: "I'm designing things that will fly beyond Earth. How cool is that?",
-    photoUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=400&h=500&fit=crop&crop=face",
     match: 82,
   },
   {
-    name: "Jordan L.",
+    name: "Jamal T.",
     title: "Music Producer",
     quote: "I turned beats in my garage into a full-time career.",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=400&h=500&fit=crop&crop=face",
     match: 79,
   },
   {
-    name: "Mei W.",
+    name: "Amara D.",
     title: "Architect",
     quote: "I design the spaces where life happens.",
-    photoUrl: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589568484476-ab57f5b1dee8?w=400&h=500&fit=crop&crop=face",
     match: 76,
   },
 ];
