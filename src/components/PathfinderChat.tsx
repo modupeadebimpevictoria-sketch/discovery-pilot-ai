@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, Bot, Sparkles, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useApp } from "@/contexts/AppContext";
+import { getCareerById } from "@/data/careers";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -15,11 +17,39 @@ const suggestedQuestions = [
   "How do I know what career is right for me? 🤔",
 ];
 
+function useStudentContext() {
+  const {
+    profile, selectedCareerPath, matchedCareers, xp, streak,
+    completedQuests, completedMissions, badges, archetype,
+  } = useApp();
+
+  const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
+  const career = careerId ? getCareerById(careerId) : null;
+
+  return {
+    name: profile?.name,
+    age: profile?.age,
+    grade: profile?.grade,
+    country: profile?.country,
+    subjects: profile?.subjects,
+    interests: profile?.interests,
+    dreamCareer: profile?.dreamCareer,
+    activeCareer: career?.title,
+    xp,
+    streak,
+    completedQuests: completedQuests.length,
+    completedMissions: completedMissions.length,
+    badges,
+    archetype,
+  };
+}
+
 export default function OrbitChat({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const studentContext = useStudentContext();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -42,7 +72,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: allMessages }),
+        body: JSON.stringify({ messages: allMessages, studentContext }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -92,7 +122,6 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
         }
       }
 
-      // Final flush
       if (textBuffer.trim()) {
         for (let raw of textBuffer.split("\n")) {
           if (!raw) continue;
@@ -127,6 +156,16 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
     setIsLoading(false);
   };
 
+  const activeCareer = studentContext.activeCareer;
+  const dynamicSuggestions = activeCareer
+    ? [
+        `What does a day in the life of a ${activeCareer} look like? 🌅`,
+        `What WAEC subjects do I need for ${activeCareer}? 📚`,
+        `How much does a ${activeCareer} earn in Nigeria? 💰`,
+        ...suggestedQuestions.slice(3),
+      ]
+    : suggestedQuestions;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: "100%" }}
@@ -143,7 +182,9 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <h2 className="text-sm font-bold text-foreground">SpringBoard AI</h2>
-            <p className="text-[10px] text-muted-foreground">Your career launchpad 🏊</p>
+            <p className="text-[10px] text-muted-foreground">
+              {activeCareer ? `Helping you become a ${activeCareer} 🎯` : "Your career launchpad 🚀"}
+            </p>
           </div>
         </div>
         <button onClick={onClose} className="p-2 rounded-xl bg-muted/50">
@@ -157,16 +198,20 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
           <div className="space-y-4 pt-8">
             <div className="text-center space-y-2">
               <motion.div animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 2, ease: [0.34, 1.56, 0.64, 1] }} className="text-6xl">
-                🏊
+                🚀
               </motion.div>
-              <h3 className="text-lg font-bold gradient-text">Hey there! I'm SpringBoard AI</h3>
+              <h3 className="text-lg font-bold gradient-text">
+                {studentContext.name ? `Hey ${studentContext.name}! 👋` : "Hey there! I'm SpringBoard AI"}
+              </h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                I'm here to springboard you into the right career. Ask me anything about your future! 💬
+                {activeCareer
+                  ? `I know you're exploring ${activeCareer} — ask me anything about it or any other career! 💬`
+                  : "I'm here to springboard you into the right career. Ask me anything about your future! 💬"}
               </p>
             </div>
             <div className="space-y-2">
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1">Try asking:</p>
-              {suggestedQuestions.map((q) => (
+              {dynamicSuggestions.map((q) => (
                 <button
                   key={q}
                   onClick={() => send(q)}
@@ -234,7 +279,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything about careers..."
+            placeholder={activeCareer ? `Ask about ${activeCareer} or anything...` : "Ask me anything about careers..."}
             className="flex-1 px-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             disabled={isLoading}
           />
