@@ -96,9 +96,14 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Welcome back</p>
             <h1 className="text-2xl font-bold text-foreground">Hey {profile.name}! 👋</h1>
           </div>
-          <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
-            <Share2 size={18} className="text-foreground" />
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+              <Share2 size={18} className="text-foreground" />
+            </button>
+            <button onClick={signOut} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+              <LogOut size={18} className="text-foreground" />
+            </button>
+          </div>
         </div>
 
         {/* 6. Streak & XP Bar */}
