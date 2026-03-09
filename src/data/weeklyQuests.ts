@@ -165,7 +165,7 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
     { titleFn: (c) => `Budget Like a ${c}`, descFn: (c) => `Track every naira you spend this week. Categorise spending and create a ${c}-quality budget report with insights.`, time: 15, xp: 20, emoji: "💳", skillFn: () => "Budgeting", week: 2 },
     { titleFn: (c) => `${c} Financial News Digest`, descFn: (c) => `Read 3 finance articles that a ${c} should know about. Summarise each and explain the market impact.`, time: 15, xp: 20, emoji: "📰", skillFn: () => "Financial Literacy", week: 3 },
     { titleFn: (c) => `Compound Interest Calculator`, descFn: (c) => `As a ${c}, calculate how much you'd have saving ₦500/week for 10 years at 5%, 10%, and 15% interest. Show your work.`, time: 15, xp: 25, emoji: "🏦", skillFn: () => "Compound Interest", week: 4 },
-    { titleFn: (c) => `${c} Risk Assessment`, descFn: (c) => `Evaluate the risk of 3 different investment types (stocks, bonds, crypto). Write what a ${c} would advise a client.`, time: 20, xp: 25, emoji: "⚠️", skillFn: () => "Risk Management", week: 5 },
+    { titleFn: (c) => `${c} Risk Assessment`, descFn: (c) => `Research 3 types of investments (stocks, bonds, crypto). Rank them from safest to riskiest and explain why — like a ${c} in training.`, time: 20, xp: 25, emoji: "⚠️", skillFn: () => "Risk Management", week: 5 },
   ],
   "marketing-communications": [
     { titleFn: (c) => `${c} Ad Breakdown`, descFn: (c) => `Find 3 ads on social media and analyse them through a ${c}'s lens: target audience, message, call to action, and effectiveness.`, time: 15, xp: 20, emoji: "📣", skillFn: () => "Ad Analysis", week: 1 },
