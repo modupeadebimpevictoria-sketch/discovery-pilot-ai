@@ -3,52 +3,59 @@ import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { getCareerById } from "@/data/careers";
 import { archetypes } from "@/data/questions";
-import { missions } from "@/data/missions";
-import { internships } from "@/data/internships";
-import { getOrCreateRoadmap } from "@/data/roadmaps";
 import { getQuestsForCareer, getCurrentWeekNumber } from "@/data/weeklyQuests";
-import {
-  ChevronRight, Sparkles, Heart, Flame, Compass, Award,
-  Target, Zap, Share2, TrendingUp, Bot, Briefcase, CheckCircle,
-  Map, GraduationCap, BookOpen, FileText
-} from "lucide-react";
+import { Share2, Sparkles, Bot, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
 
+// Dashboard sections
+import StreakXpBar from "@/components/dashboard/StreakXpBar";
+import ActivePathwayCard from "@/components/dashboard/ActivePathwayCard";
+import MatchedPathwaysQueue from "@/components/dashboard/MatchedPathwaysQueue";
+import CareerPassportPreview from "@/components/dashboard/CareerPassportPreview";
+import QuestProgress from "@/components/dashboard/QuestProgress";
+import DailyNudge from "@/components/dashboard/DailyNudge";
+import PeopleLikeYou from "@/components/dashboard/PeopleLikeYou";
+import MentorSpotlight from "@/components/dashboard/MentorSpotlight";
+import SavedResourcesList from "@/components/dashboard/SavedResourcesList";
+import JournalSection from "@/components/dashboard/JournalSection";
+import PathwayPulseCheck from "@/components/dashboard/PathwayPulseCheck";
+
+const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const {
-    profile, matchedCareers, archetype, savedCareers, badges,
-    completedMissions, xp, appliedInternships, completedMilestones,
-    completedQuests, selectedCareerPath, setSelectedCareerPath
+    profile, matchedCareers, archetype, badges,
+    completedMissions, xp, completedMilestones,
+    completedQuests, selectedCareerPath, setSelectedCareerPath,
+    rejectedCareers, rejectCareer,
+    journalEntries, addJournalEntry,
+    savedResources, removeSavedResource,
+    streak, pulseCheck, setPulseCheck,
+    pathwayStartDate,
   } = useApp();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
   const arch = archetypes[archetype];
-  const topCareer = matchedCareers[0] ? getCareerById(matchedCareers[0].careerId) : null;
 
-  // Set selected career path if not set
-  const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
-  const career = careerId ? getCareerById(careerId) : null;
+  // Active pathway — first matched career or selected one
+  const activePathwayId = selectedCareerPath || matchedCareers[0]?.careerId || null;
+  const activeCareeer = activePathwayId ? getCareerById(activePathwayId) : null;
+  const activeMatch = matchedCareers.find((m) => m.careerId === activePathwayId);
 
   const level = Math.min(10, Math.floor(xp / 100) + 1);
   const xpProgress = xp % 100;
-  const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
 
-  // Roadmap progress
-  const roadmap = career ? getOrCreateRoadmap(career.id, career.title) : null;
-  const roadmapProgress = roadmap
-    ? Math.round((roadmap.milestones.filter((m) => completedMilestones.includes(m.id)).length / roadmap.milestones.length) * 100)
-    : 0;
-
-  // Weekly quest progress
+  // Weekly quest progress for active pathway
   const weekNumber = getCurrentWeekNumber();
-  const weekQuests = career ? getQuestsForCareer(career.id, weekNumber) : [];
-  const weekQuestsDone = weekQuests.filter((q) => completedQuests.includes(q.id)).length;
+  const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber) : [];
+  const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id, 0) : [];
 
+  // Not logged in / no assessment
   if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
@@ -66,7 +73,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Hero header */}
+      {/* Header */}
       <div className="px-5 pt-8 pb-2 space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -78,111 +85,84 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Level bar */}
-        <div className="glass-card p-4 rounded-2xl space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center text-sm font-bold text-primary-foreground">
-                {level}
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">{levelTitles[level - 1]}</p>
-                <p className="text-[10px] text-muted-foreground">Level {level} • {xp} XP total</p>
-              </div>
-            </div>
-            {arch && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-                <span className="text-lg">{arch.emoji}</span>
-                <span className="text-xs font-bold text-primary">{arch.name}</span>
-              </div>
-            )}
-          </div>
-          <div className="level-bar">
-            <motion.div className="level-bar-fill gradient-bg" initial={{ width: 0 }} animate={{ width: `${xpProgress}%` }} transition={{ duration: 1, delay: 0.3 }} />
-          </div>
-        </div>
-
-        {/* Quick stats */}
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { icon: "🎯", value: completedMilestones.length, label: "Milestones" },
-            { icon: "🔥", value: completedQuests.length, label: "Quests" },
-            { icon: "🏆", value: badges.length, label: "Badges" },
-            { icon: "⚡", value: completedMissions.length, label: "Missions" },
-          ].map((s) => (
-            <div key={s.label} className="glass-card p-3 text-center rounded-2xl">
-              <span className="text-lg">{s.icon}</span>
-              <p className="text-lg font-bold text-foreground">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground">{s.label}</p>
-            </div>
-          ))}
-        </div>
+        {/* 6. Streak & XP Bar */}
+        <StreakXpBar
+          streak={streak}
+          xp={xp}
+          level={level}
+          levelTitle={levelTitles[level - 1]}
+          xpProgress={xpProgress}
+        />
       </div>
 
-      {/* Career Roadmap Progress */}
-      {career && roadmap && (
-        <div className="px-5 mb-4">
-          <button
-            onClick={() => navigate(`/roadmap/${career.id}`)}
-            className="w-full glass-card neon-border p-4 rounded-2xl text-left space-y-3"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Map size={16} className="text-primary" />
-                <span className="text-sm font-bold text-foreground">Your Career Roadmap</span>
-              </div>
-              <ChevronRight size={16} className="text-muted-foreground" />
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">{career.emoji}</span>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground">Path to {career.title}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {roadmap.milestones.filter((m) => completedMilestones.includes(m.id)).length}/{roadmap.milestones.length} milestones
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-primary">{roadmapProgress}%</p>
-              </div>
-            </div>
-            <div className="progress-bar">
-              <motion.div className="progress-bar-fill" initial={{ width: 0 }} animate={{ width: `${roadmapProgress}%` }} transition={{ duration: 0.8 }} />
-            </div>
-          </button>
-        </div>
-      )}
+      <div className="px-5 space-y-5 mt-2">
+        {/* 1. Active Career Pathway Card */}
+        {activeCareeer && activeMatch && (
+          <ActivePathwayCard
+            career={activeCareeer}
+            matchScore={activeMatch.score}
+            questsCompleted={allQuestsForCareer.filter((q) => completedQuests.includes(q.id)).length}
+            questsTotal={allQuestsForCareer.length}
+            onContinue={() => navigate(`/career/${activeCareeer.id}`)}
+          />
+        )}
 
-      {/* Weekly Quests Preview */}
-      <div className="px-5 mb-4">
-        <button
-          onClick={() => navigate("/quests")}
-          className="w-full glass-card-hover p-4 rounded-2xl text-left"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Flame size={16} className="text-accent" />
-              <span className="text-sm font-bold text-foreground">Weekly Quests</span>
-            </div>
-            <ChevronRight size={16} className="text-muted-foreground" />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <p className="text-[10px] text-muted-foreground">
-                {weekQuestsDone}/{weekQuests.length} completed this week
-              </p>
-              <div className="progress-bar mt-1.5">
-                <div className="progress-bar-fill" style={{ width: `${weekQuests.length > 0 ? (weekQuestsDone / weekQuests.length) * 100 : 0}%` }} />
-              </div>
-            </div>
-            {weekQuestsDone === weekQuests.length && weekQuests.length > 0 && (
-              <span className="text-xs font-bold text-primary">All done! 🎉</span>
-            )}
-          </div>
-        </button>
-      </div>
+        {/* 2. Matched Pathways Queue */}
+        <MatchedPathwaysQueue
+          matchedCareers={matchedCareers}
+          activePathwayId={activePathwayId}
+          rejectedCareers={rejectedCareers}
+          onReject={rejectCareer}
+        />
 
-      {/* AI Mentor */}
-      <div className="px-5 mb-4">
+        {/* 3. Career Passport Preview */}
+        <CareerPassportPreview
+          matchedCareers={matchedCareers}
+          badges={badges}
+          completedMilestones={completedMilestones}
+        />
+
+        {/* 4. Quest Progress */}
+        <QuestProgress
+          weekQuests={weekQuests}
+          completedQuests={completedQuests}
+        />
+
+        {/* 5. Daily Nudge */}
+        {activeCareeer && <DailyNudge career={activeCareeer} />}
+
+        {/* 11. Pathway Pulse Check */}
+        {activeCareeer && (
+          <PathwayPulseCheck
+            pathwayStartDate={pathwayStartDate}
+            careerTitle={activeCareeer.title}
+            currentPulse={pulseCheck}
+            onPulse={setPulseCheck}
+          />
+        )}
+
+        {/* 7. People Like You */}
+        <PeopleLikeYou />
+
+        {/* 8. Mentor Spotlight */}
+        <MentorSpotlight />
+
+        {/* 9. Saved Resources */}
+        <SavedResourcesList
+          resources={savedResources}
+          onRemove={removeSavedResource}
+        />
+
+        {/* 10. Journal */}
+        {activePathwayId && (
+          <JournalSection
+            entries={journalEntries}
+            careerId={activePathwayId}
+            onAdd={addJournalEntry}
+          />
+        )}
+
+        {/* AI Mentor CTA */}
         <button
           onClick={() => setChatOpen(true)}
           className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3"
@@ -192,94 +172,18 @@ export default function Dashboard() {
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Ask SpringBoard AI 🏊</p>
-            <p className="text-[10px] text-muted-foreground">Ready to launch? Ask about careers, subjects, or your future!</p>
+            <p className="text-[10px] text-muted-foreground">Got career questions? Your AI coach is ready.</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
       </div>
 
-      {/* Quick Actions Grid */}
-      <div className="px-5 mb-4">
-        <h2 className="text-base font-bold text-foreground mb-3">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { icon: <Map size={18} className="text-primary" />, label: "Roadmap", desc: "Your career path", path: career ? `/roadmap/${career.id}` : "/universe" },
-            { icon: <GraduationCap size={18} className="text-secondary" />, label: "Opportunities", desc: "Scholarships & more", path: "/opportunities" },
-            { icon: <FileText size={18} className="text-glow-purple" />, label: "Passport", desc: "Your portfolio", path: "/passport" },
-            { icon: <Compass size={18} className="text-accent" />, label: "Explore", desc: "Browse careers", path: "/universe" },
-          ].map((a) => (
-            <button
-              key={a.path + a.label}
-              onClick={() => navigate(a.path)}
-              className="glass-card-hover p-4 rounded-2xl text-left"
-            >
-              <div className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center mb-2">{a.icon}</div>
-              <p className="text-sm font-semibold text-foreground">{a.label}</p>
-              <p className="text-[10px] text-muted-foreground">{a.desc}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Top Match */}
-      {topCareer && (
-        <div className="px-5 mb-4">
-          <div className="glass-card p-4 rounded-2xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={14} className="text-primary" />
-              <span className="text-xs font-bold text-primary uppercase tracking-wider">Your #1 Match</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">{topCareer.emoji}</span>
-              <div className="flex-1">
-                <h3 className="font-bold text-foreground">{topCareer.title}</h3>
-                <span className="text-sm font-bold text-primary">{matchedCareers[0].score}% match</span>
-              </div>
-              <button onClick={() => navigate(`/career/${topCareer.id}`)} className="px-3 py-1.5 rounded-xl gradient-bg text-xs font-bold text-primary-foreground">
-                View
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Badges */}
-      {badges.length > 0 && (
-        <div className="px-5 mb-4">
-          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
-            <Award size={16} className="text-secondary" /> Badges
-          </h2>
-          <div className="flex gap-2 flex-wrap">
-            {badges.map((b) => (
-              <span key={b} className="px-3 py-1.5 rounded-full text-xs font-bold gradient-bg text-primary-foreground">🏆 {b}</span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* More Actions */}
-      <div className="px-5 space-y-2">
-        {[
-          { icon: <Flame size={18} className="text-accent" />, label: "Swipe Careers", desc: "TikTok-style feed", path: "/feed" },
-          { icon: <Target size={18} className="text-primary" />, label: "Retake Quiz", desc: "Get new matches", path: "/assessment" },
-        ].map((a) => (
-          <button key={a.path} onClick={() => navigate(a.path)} className="glass-card-hover w-full p-4 flex items-center gap-3 rounded-2xl">
-            <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center">{a.icon}</div>
-            <div className="text-left flex-1">
-              <p className="text-sm font-semibold text-foreground">{a.label}</p>
-              <p className="text-[10px] text-muted-foreground">{a.desc}</p>
-            </div>
-            <ChevronRight size={16} className="text-muted-foreground" />
-          </button>
-        ))}
-      </div>
-
       <ShareModal
         isOpen={shareOpen}
         onClose={() => setShareOpen(false)}
-        careerTitle={topCareer?.title || "career"}
-        careerEmoji={topCareer?.emoji || "🎯"}
-        score={matchedCareers[0]?.score}
+        careerTitle={activeCareeer?.title || "career"}
+        careerEmoji={activeCareeer?.emoji || "🎯"}
+        score={activeMatch?.score}
         archetype={arch?.name}
       />
 
