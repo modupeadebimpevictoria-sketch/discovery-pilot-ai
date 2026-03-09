@@ -5,7 +5,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are SpringBoard AI — a friendly, energetic career coach that helps high school students (14-18) take the leap into their future. 
+function buildSystemPrompt(context?: {
+  name?: string;
+  age?: number;
+  grade?: string;
+  country?: string;
+  subjects?: string[];
+  interests?: string[];
+  dreamCareer?: string;
+  activeCareer?: string;
+  xp?: number;
+  streak?: number;
+  completedQuests?: number;
+  completedMissions?: number;
+  badges?: string[];
+  archetype?: string;
+}) {
+  let base = `You are SpringBoard AI — a friendly, energetic career coach that helps high school students (14-18) take the leap into their future. 
 
 Your personality:
 - You speak like a cool, encouraging older sibling or mentor
@@ -33,15 +49,44 @@ Rules:
 - When asked about subjects, explain WHY they matter for that career
 - Frame career exploration as an exciting journey — they're on the springboard, ready to leap!`;
 
+  if (context && (context.name || context.activeCareer)) {
+    base += `\n\n--- STUDENT CONTEXT (use this to personalize your answers) ---`;
+    if (context.name) base += `\nStudent's name: ${context.name}`;
+    if (context.age) base += `\nAge: ${context.age}`;
+    if (context.grade) base += `\nGrade: ${context.grade}`;
+    if (context.country) base += `\nCountry: ${context.country}`;
+    if (context.subjects?.length) base += `\nFavourite subjects: ${context.subjects.join(", ")}`;
+    if (context.interests?.length) base += `\nInterests/hobbies: ${context.interests.join(", ")}`;
+    if (context.dreamCareer) base += `\nDream career: ${context.dreamCareer}`;
+    if (context.activeCareer) base += `\nActive career path they're exploring: ${context.activeCareer}`;
+    if (context.archetype) base += `\nCareer archetype: ${context.archetype}`;
+    if (context.xp !== undefined) base += `\nXP earned so far: ${context.xp}`;
+    if (context.streak) base += `\nCurrent streak: ${context.streak} days`;
+    if (context.completedQuests) base += `\nQuests completed: ${context.completedQuests}`;
+    if (context.completedMissions) base += `\nMissions completed: ${context.completedMissions}`;
+    if (context.badges?.length) base += `\nBadges earned: ${context.badges.join(", ")}`;
+    base += `\n\nUse this context to:
+- Address the student by name when natural
+- Relate your answers to their active career path and subjects
+- Acknowledge their progress (XP, streak, badges) to motivate them
+- Give career advice that's relevant to their grade level and country
+- If they have an active career, bias your suggestions toward that career unless they ask about something else`;
+  }
+
+  return base;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, studentContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const systemPrompt = buildSystemPrompt(studentContext);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -52,7 +97,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
