@@ -133,7 +133,7 @@ export default function CareerExploration() {
   const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getDefaultMatch(career.id);
   const currentAge = profile?.age || 15;
   const missions = getMissionsByCareer(career.id);
-  const skills = getSkillBuilders(career.id);
+  
   const internshipList = getInternshipsByCareer(career.id);
 
   const timeline = [
