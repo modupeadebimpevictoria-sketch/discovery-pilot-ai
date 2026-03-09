@@ -144,6 +144,27 @@ export default function Dashboard() {
           completedMilestones={completedMilestones}
         />
 
+        {/* Career Progress Tracker */}
+        <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass-card p-4 rounded-2xl space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">📊 Your Progress</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: "Milestones", value: completedMilestones.length, emoji: "🏁" },
+              { label: "Quests Done", value: completedQuests.length, emoji: "⚔️" },
+              { label: "Badges", value: badges.length, emoji: "🏅" },
+              { label: "Missions", value: completedMissions.length, emoji: "🎯" },
+              { label: "Applied", value: appliedInternships.length, emoji: "📩" },
+              { label: "Saved", value: savedCareers.length, emoji: "❤️" },
+            ].map((s) => (
+              <div key={s.label} className="text-center p-2 rounded-xl bg-muted/30">
+                <p className="text-lg">{s.emoji}</p>
+                <p className="text-lg font-bold text-foreground">{s.value}</p>
+                <p className="text-[10px] text-muted-foreground">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
         {/* 4. Quest Progress */}
         <QuestProgress
           weekQuests={weekQuests}
