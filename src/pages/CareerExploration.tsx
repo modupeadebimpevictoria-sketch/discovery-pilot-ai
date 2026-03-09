@@ -10,10 +10,11 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
+import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModal";
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
-  Target, Briefcase, Bot, CheckCircle, ExternalLink
+  Target, Briefcase, Bot, CheckCircle, ExternalLink, Lock, Shield
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,11 +24,9 @@ function listingToCareer(id: string): Career | undefined {
   if (!listing) return undefined;
   const family = getCareerFamilyById(listing.familyId);
 
-  // Parse salary range for entry/mid/senior
   const salaryParts = listing.salaryRange.replace(/\$/g, "").split("–").map((s) => s.trim());
   const entryPay = salaryParts[0] ? `$${salaryParts[0].replace(/\s/g, "")}` : "$30,000";
   const seniorPay = salaryParts[1] ? `$${salaryParts[1].replace(/\s/g, "")}` : "$100,000+";
-  // Estimate mid from the range
   const entryNum = parseInt(salaryParts[0]?.replace(/[^0-9]/g, "") || "30") * 1000;
   const seniorNum = parseInt(salaryParts[1]?.replace(/[^0-9+]/g, "") || "100") * 1000;
   const midNum = Math.round((entryNum + seniorNum) / 2);
@@ -105,16 +104,27 @@ function listingToCareer(id: string): Career | undefined {
 export default function CareerExploration() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { savedCareers, toggleSavedCareer, matchedCareers, profile, completedMissions, addCompletedMission, addBadge, addXp, appliedInternships, applyToInternship } = useApp();
+  const {
+    savedCareers, toggleSavedCareer, matchedCareers, profile,
+    completedMissions, addCompletedMission, addBadge, addXp,
+    appliedInternships, applyToInternship,
+    selectedCareerPath, setSelectedCareerPath,
+  } = useApp();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [showSetActiveModal, setShowSetActiveModal] = useState(false);
+  const [showSwitchModal, setShowSwitchModal] = useState(false);
 
-  // Try detailed career first, then fall back to listing conversion
   const career = getCareerById(id || "") || listingToCareer(id || "");
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   const saved = savedCareers.includes(career.id);
-  // Generate deterministic match score for listing-only careers
+  const isActivePath = selectedCareerPath === career.id;
+  const hasAnyActivePath = !!selectedCareerPath;
+  const currentActiveCareer = selectedCareerPath
+    ? (getCareerById(selectedCareerPath) || listingToCareer(selectedCareerPath))
+    : null;
+
   const getDefaultMatch = (cid: string) => {
     let hash = 0;
     for (let i = 0; i < cid.length; i++) { hash = ((hash << 5) - hash) + cid.charCodeAt(i); hash |= 0; }
@@ -141,16 +151,71 @@ export default function CareerExploration() {
     Stable: "demand-stable",
   };
 
+  // Gated action handler — shows modal if not active path
+  const requireActivePath = (action: () => void) => {
+    if (isActivePath) {
+      action();
+      return;
+    }
+    setShowSetActiveModal(true);
+  };
+
+  const handleSetActivePath = () => {
+    if (hasAnyActivePath && !isActivePath) {
+      setShowSetActiveModal(false);
+      setShowSwitchModal(true);
+      return;
+    }
+    setSelectedCareerPath(career.id);
+    setShowSetActiveModal(false);
+    toast.success(`${career.emoji} ${career.title} is now your Active Path!`);
+  };
+
+  const handleSwitchPath = () => {
+    setSelectedCareerPath(career.id);
+    setShowSwitchModal(false);
+    toast.success(`Switched to ${career.emoji} ${career.title} as your Active Path!`);
+  };
+
+  const handleSaveAndContinue = () => {
+    if (!saved) toggleSavedCareer(career.id);
+    setShowSwitchModal(false);
+    toast.success(`${career.emoji} ${career.title} saved for later!`);
+  };
+
   const handleCompleteMission = (missionId: string, xpReward: number, badge?: string) => {
-    addCompletedMission(missionId);
-    addXp(xpReward);
-    if (badge) addBadge(badge);
-    toast.success(`Mission complete! +${xpReward} XP 🎉${badge ? ` Badge: ${badge}` : ""}`);
+    requireActivePath(() => {
+      addCompletedMission(missionId);
+      addXp(xpReward);
+      if (badge) addBadge(badge);
+      toast.success(`Mission complete! +${xpReward} XP 🎉${badge ? ` Badge: ${badge}` : ""}`);
+    });
   };
 
   const handleApplyInternship = (internshipId: string) => {
-    applyToInternship(internshipId);
-    toast.success("Application sent! 🎉 We'll keep you updated.");
+    requireActivePath(() => {
+      applyToInternship(internshipId);
+      toast.success("Application sent! 🎉 We'll keep you updated.");
+    });
+  };
+
+  // Locked button component for gated actions
+  const LockedOverlay = ({ children, label }: { children: React.ReactNode; label?: string }) => {
+    if (isActivePath) return <>{children}</>;
+    return (
+      <button
+        onClick={() => setShowSetActiveModal(true)}
+        className="w-full relative"
+      >
+        <div className="pointer-events-none opacity-40">{children}</div>
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-xl backdrop-blur-sm">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <Lock size={14} />
+            <span>{label || "Set as Active Path"}</span>
+          </div>
+        </div>
+      </button>
+    );
   };
 
   return (
@@ -160,7 +225,14 @@ export default function CareerExploration() {
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-muted/50 active:scale-95 transition-transform">
           <ArrowLeft size={18} className="text-foreground" />
         </button>
-        <h1 className="text-sm font-bold text-foreground">{career.emoji} {career.title}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-sm font-bold text-foreground">{career.emoji} {career.title}</h1>
+          {isActivePath && (
+            <span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold flex items-center gap-1">
+              <Shield size={10} /> Active Path
+            </span>
+          )}
+        </div>
         <div className="flex gap-2">
           <button onClick={() => setShareOpen(true)} className="p-2 rounded-xl bg-muted/50 active:scale-95 transition-transform">
             <Share2 size={18} className="text-foreground" />
@@ -179,10 +251,32 @@ export default function CareerExploration() {
         <h1 className="text-3xl font-bold gradient-text">{career.title}</h1>
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <span className="fact-pill">{career.category}</span>
-          {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% Match</span>}
+          {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% fit</span>}
           <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
+          {isActivePath && (
+            <span className="fact-pill border-primary/30 bg-primary/10 text-primary font-bold flex items-center gap-1">
+              <Shield size={12} /> Active Path
+            </span>
+          )}
         </div>
       </motion.div>
+
+      {/* Set as Active Path button */}
+      <div className="px-5 mb-4">
+        {!isActivePath ? (
+          <button
+            onClick={handleSetActivePath}
+            className="w-full btn-primary-glow text-sm py-3 flex items-center justify-center gap-2"
+          >
+            <Shield size={16} /> Set as Active Path
+          </button>
+        ) : (
+          <div className="w-full glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border-primary/30 bg-primary/5">
+            <Shield size={16} className="text-primary" />
+            <span className="text-sm font-bold text-primary">This is your Active Path</span>
+          </div>
+        )}
+      </div>
 
       <div className="px-5 space-y-4">
         {/* Quick Stats */}
@@ -244,7 +338,7 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
         </Card>
 
-        {/* 🎮 Career Missions */}
+        {/* 🎮 Career Missions — GATED */}
         {missions.length > 0 && (
           <Card title="🎮 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
             <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
@@ -273,12 +367,14 @@ export default function CareerExploration() {
                       ))}
                     </div>
                     {!done && (
-                      <button
-                        onClick={() => handleCompleteMission(m.id, m.xpReward, m.badge)}
-                        className="w-full btn-primary-glow text-xs py-2.5 flex items-center justify-center gap-1"
-                      >
-                        ✅ I did this! Claim {m.xpReward} XP
-                      </button>
+                      <LockedOverlay label="Set Active Path to start">
+                        <button
+                          onClick={() => handleCompleteMission(m.id, m.xpReward, m.badge)}
+                          className="w-full btn-primary-glow text-xs py-2.5 flex items-center justify-center gap-1"
+                        >
+                          ✅ I did this! Claim {m.xpReward} XP
+                        </button>
+                      </LockedOverlay>
                     )}
                     {done && m.badge && (
                       <p className="text-xs text-primary font-bold text-center">🏆 Badge earned: {m.badge}</p>
@@ -290,31 +386,33 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* 🛠️ Skill Builder */}
+        {/* 🛠️ Skill Builder — GATED */}
         {skills.length > 0 && (
           <Card title="🛠️ Start Building Skills Now" icon={<TrendingUp size={16} className="text-primary" />}>
             <p className="text-xs text-muted-foreground mb-3">Things you can do RIGHT NOW to get closer to this career:</p>
-            <div className="space-y-2">
-              {skills.map((s) => (
-                <div key={s.id} className="glass-card p-3 rounded-xl flex items-start gap-3">
-                  <span className="text-2xl">{s.emoji}</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-foreground">{s.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
-                    <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      s.difficulty === "Easy" ? "bg-primary/10 text-primary" :
-                      s.difficulty === "Medium" ? "bg-secondary/10 text-secondary" :
-                      "bg-accent/10 text-accent"
-                    }`}>{s.difficulty}</span>
+            <LockedOverlay label="Set Active Path to start skills">
+              <div className="space-y-2">
+                {skills.map((s) => (
+                  <div key={s.id} className="glass-card p-3 rounded-xl flex items-start gap-3">
+                    <span className="text-2xl">{s.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-foreground">{s.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
+                      <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        s.difficulty === "Easy" ? "bg-primary/10 text-primary" :
+                        s.difficulty === "Medium" ? "bg-secondary/10 text-secondary" :
+                        "bg-accent/10 text-accent"
+                      }`}>{s.difficulty}</span>
+                    </div>
+                    {s.link && (
+                      <a href={s.link} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-muted/50">
+                        <ExternalLink size={14} className="text-muted-foreground" />
+                      </a>
+                    )}
                   </div>
-                  {s.link && (
-                    <a href={s.link} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-muted/50">
-                      <ExternalLink size={14} className="text-muted-foreground" />
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </LockedOverlay>
           </Card>
         )}
 
@@ -392,7 +490,7 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.futureGrowth}</p>
         </Card>
 
-        {/* 🏢 Try This Career in Real Life */}
+        {/* 🏢 Try This Career in Real Life — GATED */}
         {internshipList.length > 0 && (
           <Card title="🏢 Try This Career in Real Life" icon={<Briefcase size={16} className="text-glow-purple" />}>
             <p className="text-xs text-muted-foreground mb-3">Shadow opportunities and internships for Year 10+ students:</p>
@@ -419,17 +517,19 @@ export default function CareerExploration() {
                         <span key={r} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{r}</span>
                       ))}
                     </div>
-                    <button
-                      onClick={() => !applied && handleApplyInternship(intern.id)}
-                      disabled={applied}
-                      className={`w-full text-xs py-2.5 rounded-xl font-bold transition-all ${
-                        applied
-                          ? "bg-primary/10 text-primary border border-primary/20"
-                          : "btn-primary-glow"
-                      } flex items-center justify-center gap-1`}
-                    >
-                      {applied ? "✅ Applied!" : "📩 Apply Now"}
-                    </button>
+                    <LockedOverlay label="Set Active Path to apply">
+                      <button
+                        onClick={() => !applied && handleApplyInternship(intern.id)}
+                        disabled={applied}
+                        className={`w-full text-xs py-2.5 rounded-xl font-bold transition-all ${
+                          applied
+                            ? "bg-primary/10 text-primary border border-primary/20"
+                            : "btn-primary-glow"
+                        } flex items-center justify-center gap-1`}
+                      >
+                        {applied ? "✅ Applied!" : "📩 Apply Now"}
+                      </button>
+                    </LockedOverlay>
                   </div>
                 );
               })}
@@ -528,6 +628,25 @@ export default function CareerExploration() {
       <AnimatePresence>
         {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
+
+      {/* Active Path Modals */}
+      <SetActivePathModal
+        open={showSetActiveModal}
+        onClose={() => setShowSetActiveModal(false)}
+        onSetActive={handleSetActivePath}
+        careerTitle={career.title}
+        careerEmoji={career.emoji}
+      />
+
+      <SwitchPathModal
+        open={showSwitchModal}
+        onClose={() => setShowSwitchModal(false)}
+        onSwitch={handleSwitchPath}
+        onSaveAndContinue={handleSaveAndContinue}
+        currentCareerTitle={currentActiveCareer?.title || "another career"}
+        newCareerTitle={career.title}
+        newCareerEmoji={career.emoji}
+      />
     </div>
   );
 }
