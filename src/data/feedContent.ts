@@ -16,13 +16,13 @@ export interface FeedPost {
   typeLabel: string;
 }
 
-const typeConfig: Record<FeedContentType, { emoji: string; label: string }> = {
-  "deep-dive": { emoji: "📖", label: "Career Deep-Dive" },
-  "interview": { emoji: "🎥", label: "Pro Interview" },
-  "field-update": { emoji: "🌍", label: "Field Update" },
-  "history": { emoji: "🏛️", label: "History & Context" },
-  "spotlight": { emoji: "💬", label: "Inspiration" },
-  "quest-nudge": { emoji: "🧭", label: "Quest Nudge" },
+const typeConfig: Record<FeedContentType, { typeEmoji: string; typeLabel: string }> = {
+  "deep-dive": { typeEmoji: "📖", typeLabel: "Career Deep-Dive" },
+  "interview": { typeEmoji: "🎥", typeLabel: "Pro Interview" },
+  "field-update": { typeEmoji: "🌍", typeLabel: "Field Update" },
+  "history": { typeEmoji: "🏛️", typeLabel: "History & Context" },
+  "spotlight": { typeEmoji: "💬", typeLabel: "Inspiration" },
+  "quest-nudge": { typeEmoji: "🧭", typeLabel: "Quest Nudge" },
 };
 
 // Real professional portrait photos from Unsplash
