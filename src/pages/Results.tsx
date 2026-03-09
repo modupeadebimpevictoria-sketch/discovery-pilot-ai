@@ -309,11 +309,11 @@ export default function Results() {
                 </button>
               </div>
 
-              {/* Score bar */}
+              {/* Fit indicator */}
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground font-medium">How well it fits you</span>
-                  <span className="text-primary font-bold text-lg">{match.score}%</span>
+                  <span className="text-primary font-bold text-lg">{match.score}% fit</span>
                 </div>
                 <div className="progress-bar h-3 rounded-full">
                   <motion.div
