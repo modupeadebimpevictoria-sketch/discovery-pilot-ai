@@ -163,6 +163,9 @@ export default function Roadmap() {
                         </span>
                         <span className="text-[10px] text-primary font-bold">+{milestone.xpReward} XP</span>
                       </div>
+                      {milestone.alternativePath && (
+                        <p className="text-[9px] text-accent mt-1 italic">🌍 {milestone.alternativePath}</p>
+                      )}
                     </div>
                   </motion.button>
                 );
