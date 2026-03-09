@@ -1,56 +1,171 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Zap, Briefcase, Bot, Award, Rocket, Sparkles, ChevronRight, Star, TrendingUp } from "lucide-react";
-import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Zap, Briefcase, Bot, Award, Sparkles, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import OrbitChat from "@/components/PathfinderChat";
+import VideoBackground from "@/components/VideoBackground";
+import CareerProfileCard from "@/components/CareerProfileCard";
+import CategoryVideoTile from "@/components/CategoryVideoTile";
+import TestimonialCard from "@/components/TestimonialCard";
 import confetti from "canvas-confetti";
 
-const floatingEmojis = ["🏊", "🎯", "🧬", "🎨", "💻", "🌍", "🏗️", "🎵", "🔬", "⚡"];
+// Subtle fade-in only — no looping or bouncing
+const fadeIn = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" },
+};
 
+const stagger = (delay: number) => ({
+  ...fadeIn,
+  transition: { ...fadeIn.transition, delay },
+});
+
+// Feature data
 const featureCards = [
   {
-    icon: <Zap size={28} />,
+    icon: <Zap size={24} />,
     title: "Launch Pad Missions",
-    desc: "Bounce into mini challenges that reveal what careers actually feel like.",
+    desc: "Try mini challenges that show what careers actually feel like.",
     color: "text-primary",
     bg: "bg-primary/10",
   },
   {
-    icon: <Briefcase size={28} />,
+    icon: <Briefcase size={24} />,
     title: "Internship Launchpad",
-    desc: "Spring into real-life internships matched to your dream path.",
+    desc: "Find real internships matched to your strengths and interests.",
     color: "text-landing-coral",
     bg: "bg-landing-coral/10",
   },
   {
-    icon: <Bot size={28} />,
+    icon: <Bot size={24} />,
     title: "AI Career Coach",
-    desc: "Your personal springboard — ask anything about your future career.",
+    desc: "Ask anything about your future — get honest, personalized answers.",
     color: "text-landing-mint",
     bg: "bg-landing-mint/10",
   },
   {
-    icon: <Award size={28} />,
-    title: "Skill Builder & Career Passport",
-    desc: "Level up, earn badges, and build momentum for the big leap.",
+    icon: <Award size={24} />,
+    title: "Skill Builder & Passport",
+    desc: "Level up, earn badges, and track your career readiness.",
     color: "text-landing-violet",
     bg: "bg-landing-violet/10",
   },
 ];
 
-const careerPreviews = [
-  { emoji: "🤖", title: "AI Engineer", match: 94, color: "from-landing-violet to-landing-lime" },
-  { emoji: "🦷", title: "Dentist", match: 87, color: "from-landing-mint to-landing-violet" },
-  { emoji: "🚀", title: "Aerospace Engineer", match: 82, color: "from-landing-coral to-landing-violet" },
-  { emoji: "🎵", title: "Music Producer", match: 79, color: "from-landing-violet to-landing-coral" },
-  { emoji: "🏗️", title: "Architect", match: 76, color: "from-landing-mint to-landing-lime" },
+// Career profile cards — real people, real quotes
+const careerProfiles = [
+  {
+    name: "Amara T.",
+    title: "AI Engineer",
+    quote: "I build apps used by millions — and I started in my bedroom.",
+    photoUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=face",
+    videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
+    match: 94,
+  },
+  {
+    name: "Carlos M.",
+    title: "Dentist",
+    quote: "Every day I help someone smile again. That never gets old.",
+    photoUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=500&fit=crop&crop=face",
+    match: 87,
+  },
+  {
+    name: "Priya K.",
+    title: "Aerospace Engineer",
+    quote: "I'm designing things that will fly beyond Earth. How cool is that?",
+    photoUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&h=500&fit=crop&crop=face",
+    match: 82,
+  },
+  {
+    name: "Jordan L.",
+    title: "Music Producer",
+    quote: "I turned beats in my garage into a full-time career.",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
+    match: 79,
+  },
+  {
+    name: "Mei W.",
+    title: "Architect",
+    quote: "I design the spaces where life happens.",
+    photoUrl: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&h=500&fit=crop&crop=face",
+    match: 76,
+  },
 ];
 
-// Springboard SVG logo component
-function SpringBoardLogo({ className = "", size = "text-2xl" }: { className?: string; size?: string }) {
+// Category tiles with video backgrounds
+const categoryTiles = [
+  {
+    label: "Technology",
+    emoji: "💻",
+    videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop",
+  },
+  {
+    label: "Healthcare",
+    emoji: "🏥",
+    videoUrl: "https://videos.pexels.com/video-files/7579956/7579956-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=600&h=400&fit=crop",
+  },
+  {
+    label: "Creative Arts",
+    emoji: "🎨",
+    videoUrl: "https://videos.pexels.com/video-files/3209265/3209265-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
+  },
+  {
+    label: "Business",
+    emoji: "💼",
+    videoUrl: "https://videos.pexels.com/video-files/3205567/3205567-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=600&h=400&fit=crop",
+  },
+  {
+    label: "Engineering",
+    emoji: "⚙️",
+    videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop",
+  },
+  {
+    label: "Science",
+    emoji: "🔬",
+    videoUrl: "https://videos.pexels.com/video-files/3209214/3209214-sd_640_360_25fps.mp4",
+    fallback: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=400&fit=crop",
+  },
+];
+
+// Testimonials — real young people, real quotes
+const testimonials = [
+  {
+    name: "Zara J.",
+    role: "UX Designer, 23",
+    quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
+    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
+  },
+  {
+    name: "Marcus D.",
+    role: "Data Analyst, 24",
+    quote: "The quiz nailed it. I always liked patterns and numbers but never connected that to a career. Now I'm a data analyst and I love it.",
+    photoUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+  },
+  {
+    name: "Aisha R.",
+    role: "Biomedical Researcher, 22",
+    quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
+    photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+  },
+  {
+    name: "Liam C.",
+    role: "Filmmaker, 25",
+    quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
+    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+  },
+];
+
+// SpringBoard logo — clean, no animation
+function SpringBoardLogo({ size = "text-2xl" }: { size?: string }) {
   return (
-    <span className={`font-bold font-display text-primary tracking-tight ${size} ${className}`}>
+    <span className={`font-bold font-display text-primary tracking-tight ${size}`}>
       Spring<span className="text-landing-mint">Board</span>
     </span>
   );
@@ -59,193 +174,130 @@ function SpringBoardLogo({ className = "", size = "text-2xl" }: { className?: st
 export default function Index() {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   const handleCTA = () => {
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4", "#FFD93D"] });
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* ===== HERO SECTION ===== */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-5 text-center overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 hero-gradient-animated" />
-        
-        {/* Overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80" />
-
-        {/* App logo */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="absolute top-6 left-6 z-20 flex items-center gap-2"
-        >
-          {/* Springboard icon */}
-          <motion.div
-            animate={{ rotate: [0, -8, 0] }}
-            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-          >
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Board */}
-              <rect x="4" y="18" width="24" height="3" rx="1.5" fill="hsl(72, 100%, 50%)" />
-              {/* Support */}
-              <rect x="14" y="20" width="4" height="10" rx="1" fill="hsl(164, 100%, 48%)" />
-              {/* Base */}
-              <rect x="8" y="28" width="16" height="3" rx="1.5" fill="hsl(271, 91%, 65%)" />
-              {/* Person launching */}
-              <circle cx="16" cy="10" r="3" fill="hsl(72, 100%, 50%)" opacity="0.9" />
-              <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="hsl(72, 100%, 50%)" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
-            </svg>
-          </motion.div>
+    <div className="min-h-screen bg-background">
+      {/* ===== HERO SECTION — Video Background ===== */}
+      <VideoBackground
+        videoUrl="https://videos.pexels.com/video-files/3205828/3205828-sd_960_506_25fps.mp4"
+        fallbackImage="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=1080&fit=crop"
+        overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
+        className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
+      >
+        {/* Logo — top left */}
+        <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="hsl(72, 100%, 50%)" />
+            <rect x="14" y="20" width="4" height="10" rx="1" fill="hsl(164, 100%, 48%)" />
+            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="hsl(271, 91%, 65%)" />
+            <circle cx="16" cy="10" r="3" fill="hsl(72, 100%, 50%)" opacity="0.9" />
+            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="hsl(72, 100%, 50%)" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
+          </svg>
           <SpringBoardLogo />
-        </motion.div>
-
-        {/* Floating emoji badges with bounce animation */}
-        {floatingEmojis.map((emoji, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-2xl pointer-events-none opacity-30"
-            style={{
-              left: `${10 + (i * 9) % 80}%`,
-              top: `${15 + (i * 13) % 60}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 2 + i * 0.3,
-              delay: i * 0.2,
-              ease: [0.34, 1.56, 0.64, 1], // springy bounce
-            }}
-          >
-            <span className="badge-lime text-lg">{emoji}</span>
-          </motion.div>
-        ))}
+        </div>
 
         {/* Hero content */}
-        <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "spring", damping: 12, stiffness: 100 }}
-          className="relative z-10 max-w-lg w-full space-y-6"
-          style={{ opacity: heroOpacity }}
-        >
-          {/* Trending badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            className="flex justify-center"
-          >
-            <span className="badge-lime">
-              <TrendingUp size={14} /> 10,000+ Students Launched
-            </span>
+        <div className="max-w-lg w-full space-y-6">
+          <motion.div {...stagger(0)}>
+            <span className="badge-lime text-xs">10,000+ students launched</span>
           </motion.div>
 
-          {/* Headline — springboard themed */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, type: "spring", damping: 10, stiffness: 100 }}
-            className="text-5xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight font-display"
+            {...stagger(0.1)}
+            className="text-4xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight font-display"
           >
-            Leap Into{" "}
-            <motion.span
-              className="neon-glow-cyan inline-block"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ repeat: Infinity, duration: 2, ease: [0.34, 1.56, 0.64, 1] }}
-            >
-              YOUR
-            </motion.span>{" "}
-            Future.
+            Find the career{" "}
+            <span className="text-primary">you'll actually love.</span>
           </motion.h1>
 
-          {/* Subheadline */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="space-y-2"
-          >
-            <p className="text-base md:text-lg text-foreground/80 leading-relaxed">
-              Take a quick quiz. Discover your strengths.<br />
-              Let us springboard you to the career you'll love.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Dentist. AI Engineer. Space Explorer. Music Creator.<br />
-              <span className="text-primary font-semibold">Ready to take the leap?</span>
-            </p>
-          </motion.div>
+          <motion.p {...stagger(0.2)} className="text-base text-foreground/70 leading-relaxed">
+            Take a quick quiz. Discover your strengths.
+            <br />
+            Get a personalized career roadmap — for free.
+          </motion.p>
 
-          {/* CTA Button with bounce */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, type: "spring", stiffness: 200, damping: 15 }}
-          >
-            <motion.button
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.96, y: 4 }}
+          <motion.div {...stagger(0.3)}>
+            <button
               onClick={handleCTA}
-              className="btn-coral text-lg w-full sm:w-auto sm:px-12 flex items-center justify-center gap-3 mx-auto"
+              className="btn-coral text-base w-full sm:w-auto sm:px-10 flex items-center justify-center gap-2 mx-auto"
             >
-              Launch Your Journey <ArrowRight size={20} />
-            </motion.button>
+              Get Started <ArrowRight size={18} />
+            </button>
           </motion.div>
 
-          {/* Accent badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 }}
-            className="flex flex-wrap gap-2 justify-center"
-          >
-            {["🤖 AI Coach", "🎮 Fun Missions", "🏆 Earn Badges", "🌍 30+ Careers"].map((tag) => (
-              <span key={tag} className="px-3 py-1.5 rounded-full bg-card/40 backdrop-blur-sm text-foreground/70 text-xs font-medium border border-glass-border">
+          <motion.div {...stagger(0.4)} className="flex flex-wrap gap-2 justify-center">
+            {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((tag) => (
+              <span key={tag} className="px-3 py-1.5 rounded-full bg-card/40 backdrop-blur-sm text-foreground/60 text-xs border border-glass-border">
                 {tag}
               </span>
             ))}
           </motion.div>
-        </motion.div>
+        </div>
+      </VideoBackground>
 
-        {/* Scroll indicator — bouncing like a springboard */}
-        <motion.div
-          animate={{ y: [0, 12, -4, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-        >
-          <div className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center pt-2">
-            <motion.div
-              animate={{ y: [0, 14, 0], opacity: [1, 0.3, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-1.5 h-1.5 rounded-full bg-primary/70"
-            />
+      {/* ===== CAREER PROFILES — Social-style cards ===== */}
+      <section className="py-16 px-5">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+              Real people. Real careers.
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Hover to see them in action. Tap to explore the path.
+            </p>
+          </motion.div>
+
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-5 px-5">
+            {careerProfiles.map((profile, idx) => (
+              <motion.div key={profile.name} {...stagger(idx * 0.05)}>
+                <CareerProfileCard
+                  {...profile}
+                  onClick={() => navigate("/onboarding")}
+                />
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ===== FEATURES SECTION ===== */}
-      <section className="py-20 px-5">
+      {/* ===== CAREER CATEGORIES — Video tiles ===== */}
+      <section className="py-16 px-5">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12 space-y-3"
-          >
-            <span className="badge-lime">🏊 Your Launchpad</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground font-display">
-              Everything you need to<br />
-              <span className="gradient-text">
-                springboard into your dream career
-              </span>
+          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+              Explore career worlds
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              See what each field looks like from the inside.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {categoryTiles.map((tile) => (
+              <CategoryVideoTile
+                key={tile.label}
+                label={tile.label}
+                emoji={tile.emoji}
+                videoUrl={tile.videoUrl}
+                fallbackImage={tile.fallback}
+                onClick={() => navigate("/career-universe")}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FEATURES — Calm grid ===== */}
+      <section className="py-16 px-5">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fadeIn} className="text-center mb-10 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+              Everything you need to get started
             </h2>
           </motion.div>
 
@@ -253,17 +305,13 @@ export default function Index() {
             {featureCards.map((card, idx) => (
               <motion.div
                 key={card.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, type: "spring", stiffness: 150, damping: 15 }}
-                whileHover={{ y: -6 }}
-                className="landing-card group cursor-pointer"
+                {...stagger(idx * 0.05)}
+                className="landing-card group"
               >
-                <div className={`w-14 h-14 rounded-2xl ${card.bg} flex items-center justify-center ${card.color} mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-xl ${card.bg} flex items-center justify-center ${card.color} mb-3`}>
                   {card.icon}
                 </div>
-                <h3 className="text-lg font-bold text-foreground mb-1 font-display">{card.title}</h3>
+                <h3 className="text-base font-bold text-foreground mb-1 font-display">{card.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
               </motion.div>
             ))}
@@ -271,141 +319,92 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ===== CAREER PREVIEW SECTION ===== */}
-      <section className="py-16 px-5 overflow-hidden">
+      {/* ===== TESTIMONIALS — Real young people ===== */}
+      <section className="py-16 px-5">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-10 space-y-3"
-          >
-            <span className="badge-lime">🔥 Where Will You Land?</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground font-display">
-              Careers you didn't know<br />you'd love
+          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+              Students who took the leap
             </h2>
-            <p className="text-sm text-muted-foreground">Explore 30+ paths. Find where you'll make your biggest splash.</p>
+            <p className="text-sm text-muted-foreground">
+              Their words, not ours.
+            </p>
           </motion.div>
 
-          {/* Swipeable preview cards */}
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-5 px-5">
-            {careerPreviews.map((career, idx) => (
-              <motion.div
-                key={career.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, type: "spring", stiffness: 200 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="flex-shrink-0 w-[160px] sm:w-[200px] rounded-3xl overflow-hidden cursor-pointer group border border-glass-border"
-                style={{ boxShadow: "var(--shadow-card)" }}
-                onClick={() => navigate("/onboarding")}
-              >
-                <div className={`bg-gradient-to-br ${career.color} p-6 pb-8 text-center`}>
-                  <motion.span
-                    animate={{ y: [0, -8, 0], scale: [1, 1.1, 1] }}
-                    transition={{ repeat: Infinity, duration: 2, delay: idx * 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-                    className="text-5xl block mb-2"
-                  >
-                    {career.emoji}
-                  </motion.span>
-                  <p className="text-foreground font-bold text-sm">{career.title}</p>
-                </div>
-                <div className="bg-card p-3 text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Star size={12} className="text-primary fill-primary" />
-                    <span className="text-sm font-bold text-foreground">{career.match}% match</span>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Based on your profile</p>
-                </div>
-              </motion.div>
+            {testimonials.map((t) => (
+              <TestimonialCard key={t.name} {...t} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== SOCIAL PROOF / CTA SECTION ===== */}
-      <section className="py-20 px-5">
-        <div className="max-w-lg mx-auto">
+      {/* ===== FINAL CTA ===== */}
+      <section className="py-16 px-5 pb-8">
+        <div className="max-w-md mx-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="rounded-3xl overflow-hidden border border-glass-border"
-            style={{ boxShadow: "var(--shadow-card)" }}
+            {...fadeIn}
+            className="rounded-2xl border border-glass-border bg-card p-8 text-center space-y-5"
           >
-            <div className="hero-gradient-animated p-10 text-center space-y-6">
-              {/* Avatars */}
-              <div className="flex justify-center">
-                <div className="flex -space-x-3">
-                  {["🧑‍💻", "👩‍🎨", "👨‍⚕️", "👩‍🔬", "🧑‍🚀"].map((e, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
-                      className="w-10 h-10 rounded-full bg-card/30 backdrop-blur-sm flex items-center justify-center text-lg border-2 border-glass-border"
-                    >
-                      {e}
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
+            {/* Faces */}
+            <div className="flex justify-center -space-x-2">
+              {testimonials.slice(0, 4).map((t, i) => (
+                <img
+                  key={i}
+                  src={t.photoUrl}
+                  alt={t.name}
+                  className="w-9 h-9 rounded-full object-cover border-2 border-card"
+                  loading="lazy"
+                />
+              ))}
+            </div>
 
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight font-display">
-                  Join 10,000+ students<br />
-                  who took the leap.
-                </h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  One quiz. One springboard. A whole new future.
-                </p>
-              </div>
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-foreground font-display leading-tight">
+                Join 10,000+ students<br />
+                who found their path.
+              </h2>
+              <p className="text-muted-foreground text-sm mt-2">
+                One quiz. One roadmap. A clearer future.
+              </p>
+            </div>
 
-              <motion.button
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.96, y: 4 }}
-                onClick={handleCTA}
-                className="btn-coral text-base px-10 mx-auto flex items-center gap-2"
-              >
-                <Sparkles size={18} /> Take the Leap <ArrowRight size={18} />
-              </motion.button>
+            <button
+              onClick={handleCTA}
+              className="btn-coral text-base px-8 mx-auto flex items-center gap-2"
+            >
+              <Sparkles size={16} /> Take the Quiz <ArrowRight size={16} />
+            </button>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((t) => (
-                  <span key={t} className="text-[10px] text-muted-foreground font-medium">{t}</span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((t) => (
+                <span key={t} className="text-[11px] text-muted-foreground">{t}</span>
+              ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ===== AI MENTOR TEASER ===== */}
-      <section className="py-16 px-5 pb-32">
-        <div className="max-w-lg mx-auto">
+      {/* ===== AI MENTOR ===== */}
+      <section className="py-8 px-5 pb-24">
+        <div className="max-w-md mx-auto">
           <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            whileHover={{ scale: 1.02, y: -2 }}
+            {...fadeIn}
             onClick={() => setChatOpen(true)}
-            className="w-full landing-card flex items-center gap-4 !p-5 cursor-pointer group"
+            className="w-full landing-card flex items-center gap-4 !p-4 cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-landing-violet to-landing-mint">
-              <Bot size={28} className="text-foreground" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-landing-violet to-landing-mint">
+              <Bot size={24} className="text-foreground" />
             </div>
             <div className="text-left flex-1">
-              <p className="text-base font-bold text-foreground group-hover:text-primary transition-colors font-display">
-                Chat with SpringBoard AI 🏊
+              <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors font-display">
+                Chat with SpringBoard AI
               </p>
               <p className="text-xs text-muted-foreground">
-                Got career questions? Your AI coach is ready to launch you forward.
+                Got career questions? Your AI coach is ready.
               </p>
             </div>
-            <ChevronRight size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
           </motion.button>
         </div>
       </section>
