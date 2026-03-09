@@ -100,37 +100,37 @@ const categoryTiles = [
     label: "Technology",
     emoji: "💻",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Healthcare",
     emoji: "🏥",
     videoUrl: "https://videos.pexels.com/video-files/7579956/7579956-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Creative Arts",
     emoji: "🎨",
     videoUrl: "https://videos.pexels.com/video-files/3209265/3209265-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Business",
     emoji: "💼",
     videoUrl: "https://videos.pexels.com/video-files/3205567/3205567-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Engineering",
     emoji: "⚙️",
     videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Science",
     emoji: "🔬",
     videoUrl: "https://videos.pexels.com/video-files/3209214/3209214-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop&q=90",
   },
 ];
 
