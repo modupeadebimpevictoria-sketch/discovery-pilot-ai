@@ -432,13 +432,15 @@ export default function CareerExploration() {
         )}
 
         {/* Role Models */}
-        <Card title="People who made it 🌟" icon={<Users size={16} className="text-glow-purple" />}>
-          <div className="flex flex-wrap gap-2">
-            {career.roleModels.map((rm) => (
-              <span key={rm} className="fact-pill">⭐ {rm}</span>
-            ))}
-          </div>
-        </Card>
+        {career.roleModels.length > 0 && (
+          <Card title="People who made it 🌟" icon={<Users size={16} className="text-glow-purple" />}>
+            <div className="flex flex-wrap gap-2">
+              {career.roleModels.map((rm) => (
+                <span key={rm} className="fact-pill">⭐ {rm}</span>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Future Self */}
         <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
