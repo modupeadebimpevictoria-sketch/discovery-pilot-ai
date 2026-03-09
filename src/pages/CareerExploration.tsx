@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { getCareerById, type Career } from "@/data/careers";
 import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
 import { getMissionsByCareer } from "@/data/missions";
-import { getCareerDetails, getDefaultRoleModels, getDefaultDetailedSkills, getDefaultImagineYou } from "@/data/careerDetails";
 
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
@@ -15,7 +14,7 @@ import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModa
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
-  Target, Briefcase, Bot, CheckCircle, Lock, Shield, ExternalLink
+  Target, Briefcase, Bot, CheckCircle, Lock, Shield
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -134,13 +133,8 @@ export default function CareerExploration() {
   const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getDefaultMatch(career.id);
   const currentAge = profile?.age || 15;
   const missions = getMissionsByCareer(career.id);
+  
   const internshipList = getInternshipsByCareer(career.id);
-
-  // Rich career details
-  const details = getCareerDetails(career.id);
-  const roleModels = details?.roleModels || getDefaultRoleModels(career.title, career.roleModels);
-  const detailedSkills = details?.detailedSkills || getDefaultDetailedSkills(career.skills, career.title);
-  const imagineYouSnapshots = details?.imagineYou || getDefaultImagineYou(career, currentAge);
 
   const timeline = [
     { age: currentAge, label: "Pick the right subjects now", emoji: "📚" },
@@ -267,6 +261,7 @@ export default function CareerExploration() {
         </div>
       </motion.div>
 
+
       <div className="px-5 space-y-4">
         {/* 1. Quick Stats: Salary / Years / Difficulty */}
         <div className="grid grid-cols-3 gap-2">
@@ -325,9 +320,9 @@ export default function CareerExploration() {
         </Card>
 
         {/* 4. Try This Career — Fun Missions (GATED) */}
-        <Card title="🎯 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
-          <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
-          {missions.length > 0 ? (
+        {missions.length > 0 && (
+          <Card title="🎮 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
+            <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
             <div className="space-y-3">
               {missions.map((m) => {
                 const done = completedMissions.includes(m.id);
@@ -338,7 +333,7 @@ export default function CareerExploration() {
                         <span className="text-2xl">{m.emoji}</span>
                         <div>
                           <p className="text-sm font-bold text-foreground">{m.title}</p>
-                          <p className="text-[10px] text-muted-foreground">⏱️ {m.timeMinutes} min • ⚡ {m.xpReward} XP{m.badge ? ` • 🏆 ${m.badge}` : ""}</p>
+                          <p className="text-[10px] text-muted-foreground">⏱️ {m.timeMinutes} min • ⚡ {m.xpReward} XP</p>
                         </div>
                       </div>
                       {done && <CheckCircle size={20} className="text-primary" />}
@@ -369,42 +364,34 @@ export default function CareerExploration() {
                 );
               })}
             </div>
-          ) : (
-            <LockedOverlay label="Set Active Path to unlock missions">
-              <div className="glass-card p-6 rounded-xl text-center space-y-2">
-                <span className="text-4xl">🎮</span>
-                <p className="text-sm font-bold text-foreground">Missions coming soon!</p>
-                <p className="text-xs text-muted-foreground">Set this as your Active Path to unlock hands-on career challenges.</p>
-              </div>
-            </LockedOverlay>
-          )}
-        </Card>
+          </Card>
+        )}
 
         {/* 5. Skills You'll Need */}
-        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
-          <div className="space-y-3">
-            {detailedSkills.map((skill) => (
-              <div key={skill.name} className="glass-card p-3 rounded-xl space-y-1.5">
-                <p className="text-sm font-bold text-foreground">{skill.name}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{skill.why}</p>
-                <a
-                  href={skill.resourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[10px] font-bold text-primary hover:underline"
-                >
-                  <ExternalLink size={10} /> Start free: {skill.resource}
-                </a>
-              </div>
+        <Card title="Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
+          <div className="flex flex-wrap gap-2">
+            {career.skills.map((s) => (
+              <span key={s} className="fact-pill border-primary/20 text-primary">{s}</span>
             ))}
           </div>
         </Card>
 
         {/* 6. Subjects that help */}
         <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-secondary" />}>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {career.recommendedSubjects.map((s) => (
               <span key={s} className="fact-pill text-secondary border-secondary/20">{s}</span>
+            ))}
+          </div>
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">How do you get started?</p>
+          <div className="space-y-2">
+            {career.educationPath.map((step, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <div className="w-6 h-6 rounded-full gradient-bg flex-shrink-0 flex items-center justify-center text-xs font-bold text-primary-foreground">
+                  {i + 1}
+                </div>
+                <span className="text-sm text-muted-foreground">{step}</span>
+              </div>
             ))}
           </div>
         </Card>
@@ -477,41 +464,28 @@ export default function CareerExploration() {
         )}
 
         {/* 9. People who made it */}
-        <Card title="👤 People who made it" icon={<Users size={16} className="text-glow-purple" />}>
-          <div className="space-y-4">
-            {roleModels.map((rm) => (
-              <div key={rm.name} className="glass-card p-4 rounded-xl space-y-3">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={rm.photoUrl}
-                    alt={rm.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-primary/20"
-                    loading="lazy"
-                  />
-                  <div>
-                    <p className="text-sm font-bold text-foreground">{rm.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{rm.title}</p>
-                    <p className="text-[10px] font-semibold text-primary">{rm.company}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{rm.fact}</p>
-                <p className="text-xs text-foreground/80 italic leading-relaxed">"{rm.quote}"</p>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {career.roleModels.length > 0 && (
+          <Card title="People who made it 🌟" icon={<Users size={16} className="text-glow-purple" />}>
+            <div className="flex flex-wrap gap-2">
+              {career.roleModels.map((rm) => (
+                <span key={rm} className="fact-pill">⭐ {rm}</span>
+              ))}
+            </div>
+          </Card>
+        )}
 
-        {/* 10. Imagine you at age ... */}
-        <Card title="🔮 Imagine you at..." icon={<Star size={16} className="text-accent" />}>
-          <div className="space-y-4">
-            {imagineYouSnapshots.map((snap) => (
-              <div key={snap.age} className="glass-card p-4 rounded-xl space-y-2 neon-border">
-                <p className="text-xs font-bold text-primary">Age {snap.age}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{snap.scenario}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* 10. Imagine you at age 26 */}
+        <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
+          <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
+            🔮 Imagine you at age {currentAge + career.timelineYears + 5}
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Picture this: You wake up as a {career.title}. {career.dailyLife.split(".")[0]}.
+            You earn around {career.salaryRange.mid} and love what you do.
+            Your {career.skills[0]} and {career.skills[1]} skills set you apart.
+            {career.worldImpact.split(".")[0]}.
+          </p>
+        </div>
 
         {/* 11. Career Roadmap & Opportunities buttons */}
         <div className="grid grid-cols-2 gap-3">
