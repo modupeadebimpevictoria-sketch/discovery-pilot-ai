@@ -76,7 +76,7 @@ export default function Index() {
           transition={{ duration: 0.6 }}
           className="absolute top-6 left-6 z-20"
         >
-          <span className="text-2xl font-bold font-display text-primary tracking-tight">Orbit</span>
+          <span className="text-2xl font-bold font-display text-primary tracking-tight">SpringBoard</span>
         </motion.div>
 
         {/* Floating emoji badges */}
@@ -366,7 +366,7 @@ export default function Index() {
             </div>
             <div className="text-left flex-1">
               <p className="text-base font-bold text-foreground group-hover:text-primary transition-colors font-display">
-                Chat with Orbit AI 🚀
+                Chat with SpringBoard AI 🚀
               </p>
               <p className="text-xs text-muted-foreground">
                 Got career questions? Your AI mentor has answers.

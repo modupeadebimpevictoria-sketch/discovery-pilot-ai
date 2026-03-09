@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are Orbit AI — a friendly, supportive career mentor for high school students aged 14-18. 
+const SYSTEM_PROMPT = `You are SpringBoard AI — a friendly, supportive career mentor for high school students aged 14-18. 
 
 Your personality:
 - You speak like a cool, encouraging older sibling or mentor
