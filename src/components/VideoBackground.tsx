@@ -28,7 +28,7 @@ export default function VideoBackground({
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ playbackRate: 0.75 }}
+          
           onError={() => setVideoFailed(true)}
           onLoadedMetadata={() => {
             if (videoRef.current) videoRef.current.playbackRate = 0.75;
