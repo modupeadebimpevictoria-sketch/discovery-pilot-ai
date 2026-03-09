@@ -53,7 +53,7 @@ export default function Dashboard() {
   // Weekly quest progress for active pathway
   const weekNumber = getCurrentWeekNumber();
   const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber) : [];
-  const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id, 0) : [];
+  const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id) : [];
 
   // Not logged in / no assessment
   if (!profile) {
