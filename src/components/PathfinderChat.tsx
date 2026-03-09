@@ -156,12 +156,12 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
         {messages.length === 0 && (
           <div className="space-y-4 pt-8">
             <div className="text-center space-y-2">
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }} className="text-6xl">
-                🧭
+              <motion.div animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 2, ease: [0.34, 1.56, 0.64, 1] }} className="text-6xl">
+                🏊
               </motion.div>
               <h3 className="text-lg font-bold gradient-text">Hey there! I'm SpringBoard AI</h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                I'm here to help you figure out careers, subjects, and your future. Ask me anything! 💬
+                I'm here to springboard you into the right career. Ask me anything about your future! 💬
               </p>
             </div>
             <div className="space-y-2">
