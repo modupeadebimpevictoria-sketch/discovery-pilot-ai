@@ -9,7 +9,7 @@ export default function TopBar() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-40 px-5 py-3 bg-background/80 backdrop-blur-xl border-b border-glass-border/30">
-      <span className="text-lg font-bold font-display text-primary tracking-tight">Orbit</span>
+      <span className="text-lg font-bold font-display text-primary tracking-tight">SpringBoard</span>
     </div>
   );
 }

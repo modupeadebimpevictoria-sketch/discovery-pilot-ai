@@ -13,10 +13,10 @@ interface ShareModalProps {
 
 export default function ShareModal({ isOpen, onClose, careerTitle, careerEmoji, score, archetype }: ShareModalProps) {
   const shareText = score
-    ? `I'm a Future ${careerTitle} ${careerEmoji} with ${score}% match on Orbit! 🚀`
+    ? `I'm a Future ${careerTitle} ${careerEmoji} with ${score}% match on SpringBoard! 🚀`
     : archetype
-    ? `I'm ${archetype} ${careerEmoji} according to Orbit! ✨`
-    : `Check out ${careerTitle} ${careerEmoji} on Orbit! 🔥`;
+    ? `I'm ${archetype} ${careerEmoji} according to SpringBoard! ✨`
+    : `Check out ${careerTitle} ${careerEmoji} on SpringBoard! 🔥`;
 
   const shareUrl = window.location.origin;
 

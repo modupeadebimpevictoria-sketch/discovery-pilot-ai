@@ -366,7 +366,7 @@ export default function Index() {
             </div>
             <div className="text-left flex-1">
               <p className="text-base font-bold text-foreground group-hover:text-primary transition-colors font-display">
-                Chat with Orbit AI 🚀
+                Chat with SpringBoard AI 🚀
               </p>
               <p className="text-xs text-muted-foreground">
                 Got career questions? Your AI mentor has answers.
