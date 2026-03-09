@@ -143,7 +143,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <h2 className="text-sm font-bold text-foreground">SpringBoard AI</h2>
-            <p className="text-[10px] text-muted-foreground">Your career mentor 🧭</p>
+            <p className="text-[10px] text-muted-foreground">Your career launchpad 🏊</p>
           </div>
         </div>
         <button onClick={onClose} className="p-2 rounded-xl bg-muted/50">
