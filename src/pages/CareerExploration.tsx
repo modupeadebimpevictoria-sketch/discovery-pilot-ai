@@ -328,13 +328,13 @@ export default function CareerExploration() {
         </Card>
 
         {/* Subjects that help you get this job */}
-        <Card title="Subjects that help you get this job" icon={<GraduationCap size={16} className="text-secondary" />}>
+        <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-secondary" />}>
           <div className="flex flex-wrap gap-1.5 mb-3">
             {career.recommendedSubjects.map((s) => (
               <span key={s} className="fact-pill text-secondary border-secondary/20">{s}</span>
             ))}
           </div>
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">What you need to study to become this:</p>
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">How do you get started?</p>
           <div className="space-y-2">
             {career.educationPath.map((step, i) => (
               <div key={i} className="flex items-start gap-2.5">
