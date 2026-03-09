@@ -60,7 +60,7 @@ const careerProfiles = [
     name: "Nia O.",
     title: "AI Engineer",
     quote: "I build apps used by millions — and I started in my bedroom.",
-    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face&q=90",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
     match: 94,
   },
@@ -68,28 +68,28 @@ const careerProfiles = [
     name: "Kwame A.",
     title: "Dentist",
     quote: "Every day I help someone smile again. That never gets old.",
-    photoUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop&crop=face&q=90",
     match: 87,
   },
   {
     name: "Adaeze N.",
     title: "Aerospace Engineer",
     quote: "I'm designing things that will fly beyond Earth. How cool is that?",
-    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=400&h=500&fit=crop&crop=face&q=90",
     match: 82,
   },
   {
     name: "Jamal T.",
     title: "Music Producer",
     quote: "I turned beats in my garage into a full-time career.",
-    photoUrl: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=400&h=500&fit=crop&crop=face&q=90",
     match: 79,
   },
   {
     name: "Amara D.",
     title: "Architect",
     quote: "I design the spaces where life happens.",
-    photoUrl: "https://images.unsplash.com/photo-1589568484476-ab57f5b1dee8?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1611432579699-484f7990b127?w=400&h=500&fit=crop&crop=face&q=90",
     match: 76,
   },
 ];
@@ -100,37 +100,37 @@ const categoryTiles = [
     label: "Technology",
     emoji: "💻",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Healthcare",
     emoji: "🏥",
     videoUrl: "https://videos.pexels.com/video-files/7579956/7579956-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Creative Arts",
     emoji: "🎨",
     videoUrl: "https://videos.pexels.com/video-files/3209265/3209265-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Business",
     emoji: "💼",
     videoUrl: "https://videos.pexels.com/video-files/3205567/3205567-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Engineering",
     emoji: "⚙️",
     videoUrl: "https://videos.pexels.com/video-files/3205828/3205828-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Science",
     emoji: "🔬",
     videoUrl: "https://videos.pexels.com/video-files/3209214/3209214-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop&q=90",
   },
 ];
 
@@ -140,25 +140,25 @@ const testimonials = [
     name: "Zara O.",
     role: "UX Designer, 23",
     quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
-    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Marcus A.",
     role: "Data Analyst, 24",
     quote: "The quiz nailed it. I always liked patterns and numbers but never connected that to a career. Now I'm a data analyst and I love it.",
-    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Aisha K.",
     role: "Biomedical Researcher, 22",
     quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
-    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Tunde B.",
     role: "Filmmaker, 25",
     quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
-    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face&q=90",
   },
 ];
 
@@ -185,7 +185,7 @@ export default function Index() {
       {/* ===== HERO SECTION — Video Background ===== */}
       <VideoBackground
         videoUrl="https://videos.pexels.com/video-files/3205828/3205828-sd_960_506_25fps.mp4"
-        fallbackImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&h=1080&fit=crop"
+        fallbackImage="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&h=1080&fit=crop&q=90"
         overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
