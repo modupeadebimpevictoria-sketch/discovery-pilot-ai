@@ -140,25 +140,25 @@ const testimonials = [
     name: "Zara O.",
     role: "UX Designer, 23",
     quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
-    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Marcus A.",
     role: "Data Analyst, 24",
     quote: "The quiz nailed it. I always liked patterns and numbers but never connected that to a career. Now I'm a data analyst and I love it.",
-    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Aisha K.",
     role: "Biomedical Researcher, 22",
     quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
-    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Tunde B.",
     role: "Filmmaker, 25",
     quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
-    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face&q=90",
   },
 ];
 
