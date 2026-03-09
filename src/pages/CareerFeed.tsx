@@ -1,29 +1,53 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { careers } from "@/data/careers";
+import { careerListings, getCareerFamilyById } from "@/data/careerFamilies";
 import { useApp } from "@/contexts/AppContext";
-import { Heart, ArrowRight, ChevronUp, Play, DollarSign, TrendingUp, Pause } from "lucide-react";
+import { Heart, ArrowRight, ChevronUp, DollarSign, TrendingUp, Star } from "lucide-react";
 
-const shuffled = [...careers].sort(() => Math.random() - 0.5);
+const shuffled = [...careerListings].sort(() => Math.random() - 0.5);
 
-const demandClass: Record<string, string> = {
-  "High Demand": "demand-high",
-  Growing: "demand-growing",
-  Emerging: "demand-emerging",
-  Stable: "demand-stable",
+const familyGradients: Record<string, string> = {
+  "creative-design": "from-purple-500/20 via-background to-background",
+  "media-content": "from-red-500/20 via-background to-background",
+  "entertainment-performance": "from-fuchsia-500/20 via-background to-background",
+  "technology": "from-cyan-500/20 via-background to-background",
+  "product-tech": "from-indigo-500/20 via-background to-background",
+  "healthcare-medicine": "from-emerald-500/20 via-background to-background",
+  "mental-health": "from-violet-500/20 via-background to-background",
+  "science-research": "from-blue-500/20 via-background to-background",
+  "environment-sustainability": "from-green-500/20 via-background to-background",
+  "engineering-architecture": "from-orange-500/20 via-background to-background",
+  "trades-technical": "from-amber-500/20 via-background to-background",
+  "business-entrepreneurship": "from-sky-500/20 via-background to-background",
+  "finance-investment": "from-emerald-500/20 via-background to-background",
+  "marketing-communications": "from-pink-500/20 via-background to-background",
+  "law-justice": "from-slate-500/20 via-background to-background",
+  "education-academia": "from-amber-500/20 via-background to-background",
+  "social-impact": "from-rose-500/20 via-background to-background",
+  "government-public-service": "from-blue-600/20 via-background to-background",
+  "international-development": "from-teal-500/20 via-background to-background",
+  "travel-hospitality": "from-sky-500/20 via-background to-background",
+  "food-culinary": "from-red-500/20 via-background to-background",
+  "sport-fitness": "from-lime-500/20 via-background to-background",
+  "animals-nature": "from-green-600/20 via-background to-background",
+  "space-future-tech": "from-violet-600/20 via-background to-background",
+  "beauty-wellness": "from-pink-400/20 via-background to-background",
+  "real-estate-property": "from-amber-600/20 via-background to-background",
 };
 
-const gradientMap: Record<string, string> = {
-  primary: "from-primary/20 via-background to-background",
-  secondary: "from-secondary/20 via-background to-background",
-  accent: "from-accent/20 via-background to-background",
-  purple: "from-glow-purple/20 via-background to-background",
-};
+function getMatchScore(careerId: string): number {
+  let hash = 0;
+  for (let i = 0; i < careerId.length; i++) {
+    hash = ((hash << 5) - hash) + careerId.charCodeAt(i);
+    hash |= 0;
+  }
+  return 55 + Math.abs(hash % 40);
+}
 
 export default function CareerFeed() {
   const navigate = useNavigate();
-  const { savedCareers, toggleSavedCareer } = useApp();
+  const { savedCareers, toggleSavedCareer, matchedCareers } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showHint, setShowHint] = useState(true);
@@ -63,7 +87,9 @@ export default function CareerFeed() {
       >
         {shuffled.map((career, index) => {
           const saved = savedCareers.includes(career.id);
-          const gradient = gradientMap[career.color] || gradientMap.primary;
+          const family = getCareerFamilyById(career.familyId);
+          const gradient = familyGradients[career.familyId] || "from-primary/20 via-background to-background";
+          const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getMatchScore(career.id);
 
           return (
             <div key={career.id} className="feed-card snap-start">
@@ -72,7 +98,7 @@ export default function CareerFeed() {
 
               {/* Large emoji background */}
               <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] opacity-10 pointer-events-none select-none">
-                {career.emoji}
+                {family?.emoji || "💼"}
               </div>
 
               {/* Content overlay */}
@@ -84,26 +110,35 @@ export default function CareerFeed() {
                   viewport={{ once: true }}
                   className="space-y-2"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className={`${demandClass[career.jobOutlook] || "demand-stable"}`}>
-                      {career.jobOutlook}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {career.growthTag && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        career.growthTag.includes("Emerging")
+                          ? "bg-accent/20 text-accent"
+                          : "bg-primary/20 text-primary"
+                      }`}>
+                        {career.growthTag}
+                      </span>
+                    )}
                     <span className="fact-pill">
-                      <DollarSign size={12} /> {career.salaryRange.mid}
+                      <DollarSign size={12} /> {career.salaryRange}
+                    </span>
+                    <span className="fact-pill border-primary/30 text-primary font-bold">
+                      <Star size={10} className="fill-primary" /> {matchScore}% Match
                     </span>
                   </div>
 
                   <h2 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                    <span>{career.emoji}</span>
+                    <span>{family?.emoji || "💼"}</span>
                     {career.title}
                   </h2>
 
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {career.description}
                   </p>
                 </motion.div>
 
-                {/* Quick facts */}
+                {/* Family tag */}
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -111,36 +146,25 @@ export default function CareerFeed() {
                   transition={{ delay: 0.1 }}
                   className="space-y-2"
                 >
-                  <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Quick Facts</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {career.skills.slice(0, 3).map((s) => (
-                      <span key={s} className="fact-pill">{s}</span>
-                    ))}
-                    <span className="fact-pill">
-                      <TrendingUp size={12} /> {career.difficulty}
+                  {family && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-muted/50 text-muted-foreground">
+                      {family.emoji} {family.name}
                     </span>
-                  </div>
+                  )}
                 </motion.div>
 
-                {/* Day in the life video link */}
-                <motion.a
+                {/* Search terms as quick tags */}
+                <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.15 }}
-                  href={career.dayInLifeVideo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-card p-3 flex items-center gap-3 rounded-xl active:scale-[0.98] transition-transform"
+                  className="flex flex-wrap gap-1.5"
                 >
-                  <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center flex-shrink-0">
-                    <Play size={18} className="text-primary-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Day in the Life</p>
-                    <p className="text-xs text-muted-foreground truncate">Watch what {career.title}s actually do</p>
-                  </div>
-                </motion.a>
+                  {career.searchTerms.slice(0, 4).map((tag) => (
+                    <span key={tag} className="fact-pill capitalize">{tag}</span>
+                  ))}
+                </motion.div>
 
                 {/* Action buttons */}
                 <div className="flex gap-3">
@@ -148,7 +172,7 @@ export default function CareerFeed() {
                     onClick={() => navigate(`/career/${career.id}`)}
                     className="flex-1 btn-primary-glow flex items-center justify-center gap-2 text-sm py-3"
                   >
-                    Explore <ArrowRight size={16} />
+                    Explore this path <ArrowRight size={16} />
                   </button>
                   <button
                     onClick={() => toggleSavedCareer(career.id)}
