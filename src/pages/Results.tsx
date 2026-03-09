@@ -160,7 +160,7 @@ export default function Results() {
         </div>
 
         <p className="absolute top-14 text-sm text-muted-foreground">
-          Match {cardIndex + 1} of {matchedCareers.length}
+          Path {cardIndex + 1} of {matchedCareers.length}
         </p>
 
         {/* Card */}
