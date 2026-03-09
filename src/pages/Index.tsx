@@ -54,59 +54,59 @@ const featureCards = [
   },
 ];
 
-// Career profile cards — real people, real quotes
+// Career profile cards — young professionals at work
 const careerProfiles = [
   {
-    name: "Amara T.",
+    name: "Nia O.",
     title: "AI Engineer",
     quote: "I build apps used by millions — and I started in my bedroom.",
-    photoUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
     match: 94,
   },
   {
-    name: "Carlos M.",
+    name: "Kwame A.",
     title: "Dentist",
     quote: "Every day I help someone smile again. That never gets old.",
-    photoUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop&crop=face",
     match: 87,
   },
   {
-    name: "Priya K.",
+    name: "Adaeze N.",
     title: "Aerospace Engineer",
     quote: "I'm designing things that will fly beyond Earth. How cool is that?",
-    photoUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=400&h=500&fit=crop&crop=face",
     match: 82,
   },
   {
-    name: "Jordan L.",
+    name: "Jamal T.",
     title: "Music Producer",
     quote: "I turned beats in my garage into a full-time career.",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=400&h=500&fit=crop&crop=face",
     match: 79,
   },
   {
-    name: "Mei W.",
+    name: "Amara D.",
     title: "Architect",
     quote: "I design the spaces where life happens.",
-    photoUrl: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&h=500&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589568484476-ab57f5b1dee8?w=400&h=500&fit=crop&crop=face",
     match: 76,
   },
 ];
 
-// Category tiles with video backgrounds
+// Category tiles with video backgrounds — young professionals in action
 const categoryTiles = [
   {
     label: "Technology",
     emoji: "💻",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop",
   },
   {
     label: "Healthcare",
     emoji: "🏥",
     videoUrl: "https://videos.pexels.com/video-files/7579956/7579956-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=400&fit=crop",
   },
   {
     label: "Creative Arts",
@@ -118,7 +118,7 @@ const categoryTiles = [
     label: "Business",
     emoji: "💼",
     videoUrl: "https://videos.pexels.com/video-files/3205567/3205567-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop",
   },
   {
     label: "Engineering",
@@ -130,35 +130,35 @@ const categoryTiles = [
     label: "Science",
     emoji: "🔬",
     videoUrl: "https://videos.pexels.com/video-files/3209214/3209214-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=400&fit=crop",
+    fallback: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=400&fit=crop",
   },
 ];
 
-// Testimonials — real young people, real quotes
+// Testimonials — young Black and African professionals
 const testimonials = [
   {
-    name: "Zara J.",
+    name: "Zara O.",
     role: "UX Designer, 23",
     quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
     photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Marcus D.",
+    name: "Marcus A.",
     role: "Data Analyst, 24",
     quote: "The quiz nailed it. I always liked patterns and numbers but never connected that to a career. Now I'm a data analyst and I love it.",
-    photoUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1507152927220-18c1d754d44f?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Aisha R.",
+    name: "Aisha K.",
     role: "Biomedical Researcher, 22",
     quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
-    photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face",
   },
   {
-    name: "Liam C.",
+    name: "Tunde B.",
     role: "Filmmaker, 25",
     quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
-    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face",
   },
 ];
 
@@ -185,7 +185,7 @@ export default function Index() {
       {/* ===== HERO SECTION — Video Background ===== */}
       <VideoBackground
         videoUrl="https://videos.pexels.com/video-files/3205828/3205828-sd_960_506_25fps.mp4"
-        fallbackImage="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=1080&fit=crop"
+        fallbackImage="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&h=1080&fit=crop"
         overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
