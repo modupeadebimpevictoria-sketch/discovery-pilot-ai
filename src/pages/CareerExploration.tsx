@@ -261,22 +261,6 @@ export default function CareerExploration() {
         </div>
       </motion.div>
 
-      {/* Set as Active Path button */}
-      <div className="px-5 mb-4">
-        {!isActivePath ? (
-          <button
-            onClick={handleSetActivePath}
-            className="w-full btn-primary-glow text-sm py-3 flex items-center justify-center gap-2"
-          >
-            <Shield size={16} /> Set as Active Path
-          </button>
-        ) : (
-          <div className="w-full glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border-primary/30 bg-primary/5">
-            <Shield size={16} className="text-primary" />
-            <span className="text-sm font-bold text-primary">This is your Active Path</span>
-          </div>
-        )}
-      </div>
 
       <div className="px-5 space-y-4">
         {/* 1. Quick Stats: Salary / Years / Difficulty */}
