@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { getCareerById, type Career } from "@/data/careers";
 import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
 import { getMissionsByCareer } from "@/data/missions";
-import { getSkillBuilders } from "@/data/skillBuilders";
+
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
 import { useState } from "react";
