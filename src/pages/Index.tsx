@@ -100,7 +100,7 @@ const categoryTiles = [
     label: "Technology",
     emoji: "💻",
     videoUrl: "https://videos.pexels.com/video-files/5765610/5765610-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop&q=90",
+    fallback: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Healthcare",
