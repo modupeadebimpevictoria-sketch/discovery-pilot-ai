@@ -116,7 +116,7 @@ export default function CareerUniverse() {
               className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                 familyFilter === pill.id
                   ? "bg-[#AAED4E] text-[#1a1a2e] shadow-sm"
-                  : "bg-white text-muted-foreground border border-border/60 hover:border-border"
+                  : "bg-transparent text-muted-foreground border border-border/60 hover:border-border"
               }`}
             >
               <span>{pill.emoji}</span>
