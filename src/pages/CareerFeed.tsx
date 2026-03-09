@@ -1,10 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { careers } from "@/data/careers";
-import { getCareerImages, getProfessionalName } from "@/data/careerImages";
 import { useApp } from "@/contexts/AppContext";
-import { Heart, ArrowRight, ChevronUp, Play, DollarSign, TrendingUp } from "lucide-react";
+import { Heart, ArrowRight, ChevronUp, Play, DollarSign, TrendingUp, Pause } from "lucide-react";
 
 const shuffled = [...careers].sort(() => Math.random() - 0.5);
 
@@ -13,6 +12,13 @@ const demandClass: Record<string, string> = {
   Growing: "demand-growing",
   Emerging: "demand-emerging",
   Stable: "demand-stable",
+};
+
+const gradientMap: Record<string, string> = {
+  primary: "from-primary/20 via-background to-background",
+  secondary: "from-secondary/20 via-background to-background",
+  accent: "from-accent/20 via-background to-background",
+  purple: "from-glow-purple/20 via-background to-background",
 };
 
 export default function CareerFeed() {
@@ -57,43 +63,20 @@ export default function CareerFeed() {
       >
         {shuffled.map((career, index) => {
           const saved = savedCareers.includes(career.id);
-          const images = getCareerImages(career.id);
-          const proName = getProfessionalName(career.id);
+          const gradient = gradientMap[career.color] || gradientMap.primary;
 
           return (
             <div key={career.id} className="feed-card snap-start">
-              {/* Hero photo background */}
-              <div className="absolute inset-0">
-                <img
-                  src={images.hero}
-                  alt={`${career.title} professional at work`}
-                  className="w-full h-full object-cover"
-                  loading={index < 3 ? "eager" : "lazy"}
-                />
-                {/* Dark gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/80" />
+              {/* Background gradient */}
+              <div className={`absolute inset-0 bg-gradient-to-b ${gradient}`} />
+
+              {/* Large emoji background */}
+              <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] opacity-10 pointer-events-none select-none">
+                {career.emoji}
               </div>
 
-              {/* Content overlay — positioned at bottom */}
-              <div className="relative z-10 h-full flex flex-col justify-end p-5 pb-24 space-y-3">
-                {/* Profile avatar + name row */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="flex items-center gap-3"
-                >
-                  <img
-                    src={images.avatar}
-                    alt={proName}
-                    className="w-11 h-11 rounded-2xl object-cover ring-2 ring-white/20"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-white">{proName}</p>
-                    <p className="text-xs text-white/70">{career.title}</p>
-                  </div>
-                </motion.div>
-
+              {/* Content overlay */}
+              <div className="relative z-10 p-5 pb-24 space-y-4">
                 {/* Career identity */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -110,11 +93,12 @@ export default function CareerFeed() {
                     </span>
                   </div>
 
-                  <h2 className="text-2xl font-bold text-white leading-tight">
+                  <h2 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                    <span>{career.emoji}</span>
                     {career.title}
                   </h2>
 
-                  <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
                     {career.description}
                   </p>
                 </motion.div>
@@ -125,17 +109,20 @@ export default function CareerFeed() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 }}
-                  className="flex flex-wrap gap-2"
+                  className="space-y-2"
                 >
-                  {career.skills.slice(0, 3).map((s) => (
-                    <span key={s} className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white backdrop-blur-sm">{s}</span>
-                  ))}
-                  <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/15 text-white backdrop-blur-sm flex items-center gap-1">
-                    <TrendingUp size={12} /> {career.difficulty}
-                  </span>
+                  <h3 className="text-xs font-bold text-primary uppercase tracking-wider">Quick Facts</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {career.skills.slice(0, 3).map((s) => (
+                      <span key={s} className="fact-pill">{s}</span>
+                    ))}
+                    <span className="fact-pill">
+                      <TrendingUp size={12} /> {career.difficulty}
+                    </span>
+                  </div>
                 </motion.div>
 
-                {/* Day in the life */}
+                {/* Day in the life video link */}
                 <motion.a
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -144,14 +131,14 @@ export default function CareerFeed() {
                   href={career.dayInLifeVideo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-2xl bg-white/10 backdrop-blur-md active:scale-[0.98] transition-transform"
+                  className="glass-card p-3 flex items-center gap-3 rounded-xl active:scale-[0.98] transition-transform"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/80 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center flex-shrink-0">
                     <Play size={18} className="text-primary-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white">Day in the Life</p>
-                    <p className="text-xs text-white/60 truncate">Watch what {career.title}s actually do</p>
+                    <p className="text-sm font-semibold text-foreground">Day in the Life</p>
+                    <p className="text-xs text-muted-foreground truncate">Watch what {career.title}s actually do</p>
                   </div>
                 </motion.a>
 
@@ -166,10 +153,10 @@ export default function CareerFeed() {
                   <button
                     onClick={() => toggleSavedCareer(career.id)}
                     className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                      saved ? "bg-accent/20 neon-border-accent" : "bg-white/10 backdrop-blur-md"
+                      saved ? "bg-accent/20 neon-border-accent" : "glass-card"
                     }`}
                   >
-                    <Heart size={22} className={saved ? "fill-accent text-accent" : "text-white"} />
+                    <Heart size={22} className={saved ? "fill-accent text-accent" : "text-muted-foreground"} />
                   </button>
                 </div>
               </div>
@@ -180,10 +167,10 @@ export default function CareerFeed() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20"
+                  className="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
                 >
-                  <ChevronUp size={20} className="swipe-hint text-white" />
-                  <span className="text-xs text-white/70">Swipe up to explore more</span>
+                  <ChevronUp size={20} className="swipe-hint" />
+                  <span className="text-xs text-muted-foreground">Swipe up to explore more</span>
                 </motion.div>
               )}
             </div>
@@ -197,17 +184,17 @@ export default function CareerFeed() {
           onClick={() => toggleSavedCareer(shuffled[currentIndex]?.id)}
           className="flex flex-col items-center gap-0.5"
         >
-          <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+          <div className="w-11 h-11 rounded-full glass-heavy flex items-center justify-center">
             <Heart
               size={22}
               className={
                 savedCareers.includes(shuffled[currentIndex]?.id)
                   ? "fill-accent text-accent"
-                  : "text-white"
+                  : "text-foreground"
               }
             />
           </div>
-          <span className="text-[10px] text-white/70">{savedCareers.length}</span>
+          <span className="text-[10px] text-muted-foreground">{savedCareers.length}</span>
         </button>
       </div>
     </div>
