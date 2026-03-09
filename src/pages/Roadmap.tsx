@@ -68,7 +68,7 @@ export default function Roadmap() {
       addXp(milestone.xpReward);
       toast.success(`+${milestone.xpReward} XP! "${milestone.title}" completed! 🎉`);
       if (progress >= 90) {
-        addBadge(`${careerTitle} Orbit Master`);
+        addBadge(`${careerTtle} Orbit Master`);
       }
     }
   };
@@ -81,7 +81,7 @@ export default function Roadmap() {
           <ChevronLeft size={18} /> Back
         </button>
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{career.emoji}</span>
+          <span className="text-4xl">{career.Eoji}</span>
           <div>
             <h1 className="text-xl font-bold text-foreground">Your Roadmap</h1>
             <p className="text-sm text-muted-foreground">Path to becoming a {career.title}</p>
