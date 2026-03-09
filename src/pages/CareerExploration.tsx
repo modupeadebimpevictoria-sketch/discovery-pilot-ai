@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getCareerById } from "@/data/careers";
+import { getCareerById, type Career } from "@/data/careers";
+import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
 import { getMissionsByCareer } from "@/data/missions";
 import { getSkillBuilders } from "@/data/skillBuilders";
 import { getInternshipsByCareer } from "@/data/internships";
@@ -16,6 +17,91 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+// Convert a CareerListing into a full Career object with sensible defaults
+function listingToCareer(id: string): Career | undefined {
+  const listing = getCareerListingById(id);
+  if (!listing) return undefined;
+  const family = getCareerFamilyById(listing.familyId);
+
+  // Parse salary range for entry/mid/senior
+  const salaryParts = listing.salaryRange.replace(/\$/g, "").split("–").map((s) => s.trim());
+  const entryPay = salaryParts[0] ? `$${salaryParts[0].replace(/\s/g, "")}` : "$30,000";
+  const seniorPay = salaryParts[1] ? `$${salaryParts[1].replace(/\s/g, "")}` : "$100,000+";
+  // Estimate mid from the range
+  const entryNum = parseInt(salaryParts[0]?.replace(/[^0-9]/g, "") || "30") * 1000;
+  const seniorNum = parseInt(salaryParts[1]?.replace(/[^0-9+]/g, "") || "100") * 1000;
+  const midNum = Math.round((entryNum + seniorNum) / 2);
+  const midPay = `$${(midNum / 1000).toFixed(0)}k`;
+
+  const outlook: Career["jobOutlook"] = listing.growthTag?.includes("Emerging")
+    ? "Emerging"
+    : listing.growthTag?.includes("High demand")
+    ? "High Demand"
+    : "Growing";
+
+  const categoryMap: Record<string, Career["category"]> = {
+    "creative-design": "Creative Arts",
+    "media-content": "Media",
+    "entertainment-performance": "Creative Arts",
+    "technology": "Technology",
+    "product-tech": "Technology",
+    "healthcare-medicine": "Healthcare",
+    "mental-health": "Healthcare",
+    "science-research": "Science",
+    "environment-sustainability": "Environment",
+    "engineering-architecture": "Engineering",
+    "trades-technical": "Engineering",
+    "business-entrepreneurship": "Business",
+    "finance-investment": "Business",
+    "marketing-communications": "Media",
+    "law-justice": "Government",
+    "education-academia": "Government",
+    "social-impact": "Government",
+    "government-public-service": "Government",
+    "international-development": "Government",
+    "travel-hospitality": "Business",
+    "food-culinary": "Creative Arts",
+    "sport-fitness": "Sports",
+    "animals-nature": "Science",
+    "space-future-tech": "Science",
+    "beauty-wellness": "Creative Arts",
+    "real-estate-property": "Business",
+  };
+
+  return {
+    id: listing.id,
+    title: listing.title,
+    category: categoryMap[listing.familyId] || "Business",
+    description: listing.description,
+    dailyLife: `As a ${listing.title}, you spend your days working on tasks related to ${listing.searchTerms.slice(0, 3).join(", ")}. Every day is different and you're always learning something new.`,
+    worldImpact: `${listing.title}s make a real difference in the world of ${family?.name || "their field"}. This career helps shape how people live, work and thrive.`,
+    skills: listing.searchTerms.slice(0, 6).map((t) => t.charAt(0).toUpperCase() + t.slice(1)),
+    personalityFit: ["Curious", "Dedicated", "Problem-solver", "Collaborative"],
+    recommendedSubjects: ["English", "Mathematics", "ICT", "Related specialist subjects"],
+    educationPath: [
+      "Research this career and speak to people in the field",
+      "Choose relevant subjects at school / college",
+      "Pursue further education, apprenticeship or self-study",
+      `Start building experience as a ${listing.title}`,
+    ],
+    certifications: ["Industry-specific certifications available"],
+    salaryRange: { entry: entryPay, mid: midPay, senior: seniorPay },
+    jobOutlook: outlook,
+    futureGrowth: listing.growthTag
+      ? `This field is ${listing.growthTag.includes("Emerging") ? "an emerging area with exciting new opportunities" : "in high demand with strong job prospects"}.`
+      : "This field offers stable career prospects with room for growth.",
+    difficulty: "Moderate",
+    timelineYears: 4,
+    dayInLifeVideo: `https://www.youtube.com/results?search_query=day+in+the+life+${encodeURIComponent(listing.title)}`,
+    encouragementVideo: `https://www.youtube.com/results?search_query=${encodeURIComponent(listing.title)}+career+advice`,
+    encouragementFigure: "Industry leaders",
+    roleModels: [],
+    emoji: family?.emoji || "💼",
+    color: "primary" as const,
+    tags: listing.searchTerms,
+  };
+}
+
 export default function CareerExploration() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,7 +109,8 @@ export default function CareerExploration() {
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
-  const career = getCareerById(id || "");
+  // Try detailed career first, then fall back to listing conversion
+  const career = getCareerById(id || "") || listingToCareer(id || "");
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   const saved = savedCareers.includes(career.id);
