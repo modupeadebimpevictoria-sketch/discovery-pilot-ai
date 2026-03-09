@@ -118,7 +118,7 @@ const categoryTiles = [
     label: "Business",
     emoji: "💼",
     videoUrl: "https://videos.pexels.com/video-files/3205567/3205567-sd_640_360_25fps.mp4",
-    fallback: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=400&fit=crop&q=90",
+    fallback: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=600&h=400&fit=crop&q=90",
   },
   {
     label: "Engineering",
