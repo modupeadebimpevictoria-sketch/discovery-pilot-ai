@@ -450,10 +450,10 @@ export function matchCareers(answers: Record<number, string | number>) {
     scores[career.id] = score;
   });
 
-  // Sort and return top 5
+  // Sort and return top 3 — students get exactly 3 matched paths
   const sorted = Object.entries(scores)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
+    .slice(0, 3);
 
   const maxScore = sorted[0]?.[1] || 1;
 

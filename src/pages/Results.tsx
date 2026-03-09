@@ -160,7 +160,7 @@ export default function Results() {
         </div>
 
         <p className="absolute top-14 text-sm text-muted-foreground">
-          Match {cardIndex + 1} of {matchedCareers.length}
+          Path {cardIndex + 1} of {matchedCareers.length}
         </p>
 
         {/* Card */}
@@ -251,7 +251,7 @@ export default function Results() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{profile?.name}'s results</p>
-            <h1 className="text-2xl font-bold gradient-text">Your Best Career Matches 🎯</h1>
+            <h1 className="text-2xl font-bold gradient-text">Your Top 3 Paths 🎯</h1>
           </div>
           <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
             <Share2 size={18} className="text-foreground" />
@@ -309,11 +309,11 @@ export default function Results() {
                 </button>
               </div>
 
-              {/* Score bar */}
+              {/* Fit indicator */}
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground font-medium">How well it fits you</span>
-                  <span className="text-primary font-bold text-lg">{match.score}%</span>
+                  <span className="text-primary font-bold text-lg">{match.score}% fit</span>
                 </div>
                 <div className="progress-bar h-3 rounded-full">
                   <motion.div
@@ -350,7 +350,7 @@ export default function Results() {
       {/* Bottom actions */}
       <div className="px-5 mt-6 space-y-3">
         <button onClick={() => navigate("/feed")} className="w-full btn-glass text-center flex items-center justify-center gap-2">
-          🔥 Explore More Careers
+          🔥 See Your Career Feed
         </button>
       </div>
 

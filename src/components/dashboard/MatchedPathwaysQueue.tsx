@@ -1,4 +1,4 @@
-import { Lock, X } from "lucide-react";
+import { Lock, X, Sparkles } from "lucide-react";
 import { getCareerById } from "@/data/careers";
 
 interface MatchedPathwaysQueueProps {
@@ -17,7 +17,8 @@ export default function MatchedPathwaysQueue({ matchedCareers, activePathwayId, 
 
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-bold text-foreground">🔮 Your Other Matches</h2>
+      <h2 className="text-sm font-bold text-foreground">🔮 Your Other Paths</h2>
+      <p className="text-xs text-muted-foreground">These are waiting for you when you're ready</p>
       <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
         {queuedCareers.map((match) => {
           const career = getCareerById(match.careerId);
@@ -42,11 +43,11 @@ export default function MatchedPathwaysQueue({ matchedCareers, activePathwayId, 
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground truncate">{career.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{match.score}% match</p>
+                  <p className="text-[10px] text-muted-foreground">{match.score}% fit</p>
                 </div>
                 <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
                   <Lock size={10} />
-                  <span>Locked</span>
+                  <span>Waiting</span>
                 </div>
               </div>
             </div>
