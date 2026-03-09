@@ -251,7 +251,7 @@ export default function Results() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{profile?.name}'s results</p>
-            <h1 className="text-2xl font-bold gradient-text">Your Best Career Matches 🎯</h1>
+            <h1 className="text-2xl font-bold gradient-text">Your Top 3 Paths 🎯</h1>
           </div>
           <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
             <Share2 size={18} className="text-foreground" />
