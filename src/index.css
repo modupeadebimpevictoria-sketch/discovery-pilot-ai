@@ -257,8 +257,6 @@
 
   .hero-gradient-animated {
     background: radial-gradient(ellipse at 30% 20%, hsl(var(--landing-violet) / 0.5), hsl(var(--landing-bg)) 70%);
-    background-size: 200% 200%;
-    animation: gradient-shift 6s ease infinite;
   }
 
   .btn-coral {
