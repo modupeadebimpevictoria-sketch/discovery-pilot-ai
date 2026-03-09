@@ -55,7 +55,23 @@ export default function Dashboard() {
   const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber) : [];
   const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id) : [];
 
-  // Not logged in / no assessment
+  // Not logged in
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4 max-w-xs">
+          <span className="text-6xl">🔐</span>
+          <h2 className="text-2xl font-bold gradient-text">Sign In to Continue</h2>
+          <p className="text-sm text-muted-foreground">Create an account or sign in to save your progress and track your journey.</p>
+          <button onClick={() => navigate("/auth")} className="btn-primary-glow w-full flex items-center justify-center gap-2">
+            <Sparkles size={18} /> Sign In / Sign Up
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // No assessment yet
   if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
