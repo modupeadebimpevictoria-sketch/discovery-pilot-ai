@@ -192,11 +192,11 @@ export default function Index() {
         {/* Logo — top left */}
         <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
           <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="hsl(72, 100%, 50%)" />
-            <rect x="14" y="20" width="4" height="10" rx="1" fill="hsl(164, 100%, 48%)" />
-            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="hsl(271, 91%, 65%)" />
-            <circle cx="16" cy="10" r="3" fill="hsl(72, 100%, 50%)" opacity="0.9" />
-            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="hsl(72, 100%, 50%)" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
+            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="#AAED4E" />
+            <rect x="14" y="20" width="4" height="10" rx="1" fill="#2D6A00" />
+            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="#2D6A00" />
+            <circle cx="16" cy="10" r="3" fill="#AAED4E" opacity="0.9" />
+            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="#AAED4E" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
           </svg>
           <SpringBoardLogo />
         </div>
