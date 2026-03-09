@@ -68,7 +68,7 @@ export default function Roadmap() {
       addXp(milestone.xpReward);
       toast.success(`+${milestone.xpReward} XP! "${milestone.title}" completed! 🎉`);
       if (progress >= 90) {
-        addBadge(`${careerTle} Orbit Master`);
+        addBadge(`${careerTitle} Orbit Master`);
       }
     }
   };
