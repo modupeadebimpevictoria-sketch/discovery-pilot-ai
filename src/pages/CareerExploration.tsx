@@ -14,7 +14,7 @@ import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModa
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
-  Target, Briefcase, Bot, CheckCircle, ExternalLink, Lock, Shield
+  Target, Briefcase, Bot, CheckCircle, Lock, Shield
 } from "lucide-react";
 import { toast } from "sonner";
 
