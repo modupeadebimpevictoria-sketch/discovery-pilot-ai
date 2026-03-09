@@ -28,29 +28,29 @@ const featureCards = [
     icon: <Zap size={24} />,
     title: "Launch Pad Missions",
     desc: "Try mini challenges that show what careers actually feel like.",
-    color: "text-primary",
-    bg: "bg-primary/10",
+    color: "text-primary-foreground",
+    bg: "bg-primary/20",
   },
   {
     icon: <Briefcase size={24} />,
     title: "Internship Launchpad",
     desc: "Find real internships matched to your strengths and interests.",
-    color: "text-landing-coral",
-    bg: "bg-landing-coral/10",
+    color: "text-secondary",
+    bg: "bg-secondary/10",
   },
   {
     icon: <Bot size={24} />,
     title: "AI Career Coach",
     desc: "Ask anything about your future — get honest, personalized answers.",
-    color: "text-landing-mint",
-    bg: "bg-landing-mint/10",
+    color: "text-primary-foreground",
+    bg: "bg-highlight",
   },
   {
     icon: <Award size={24} />,
     title: "Skill Builder & Passport",
     desc: "Level up, earn badges, and track your career readiness.",
-    color: "text-landing-violet",
-    bg: "bg-landing-violet/10",
+    color: "text-accent-foreground",
+    bg: "bg-accent/20",
   },
 ];
 
@@ -165,8 +165,8 @@ const testimonials = [
 // SpringBoard logo — clean, no animation
 function SpringBoardLogo({ size = "text-2xl" }: { size?: string }) {
   return (
-    <span className={`font-bold font-display text-primary tracking-tight ${size}`}>
-      Spring<span className="text-landing-mint">Board</span>
+    <span className={`font-bold font-display text-secondary tracking-tight ${size}`}>
+      Spring<span className="text-primary-foreground">Board</span>
     </span>
   );
 }
@@ -176,7 +176,7 @@ export default function Index() {
   const [chatOpen, setChatOpen] = useState(false);
 
   const handleCTA = () => {
-    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4"] });
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#AAED4E", "#2D6A00", "#FFE14D", "#1A1A1A"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
@@ -192,11 +192,11 @@ export default function Index() {
         {/* Logo — top left */}
         <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
           <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="hsl(72, 100%, 50%)" />
-            <rect x="14" y="20" width="4" height="10" rx="1" fill="hsl(164, 100%, 48%)" />
-            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="hsl(271, 91%, 65%)" />
-            <circle cx="16" cy="10" r="3" fill="hsl(72, 100%, 50%)" opacity="0.9" />
-            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="hsl(72, 100%, 50%)" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
+            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="#AAED4E" />
+            <rect x="14" y="20" width="4" height="10" rx="1" fill="#2D6A00" />
+            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="#2D6A00" />
+            <circle cx="16" cy="10" r="3" fill="#AAED4E" opacity="0.9" />
+            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="#AAED4E" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
           </svg>
           <SpringBoardLogo />
         </div>
@@ -393,8 +393,8 @@ export default function Index() {
             onClick={() => setChatOpen(true)}
             className="w-full landing-card flex items-center gap-4 !p-4 cursor-pointer group"
           >
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-landing-violet to-landing-mint">
-              <Bot size={24} className="text-foreground" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary">
+              <Bot size={24} className="text-primary-foreground" />
             </div>
             <div className="text-left flex-1">
               <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors font-display">
