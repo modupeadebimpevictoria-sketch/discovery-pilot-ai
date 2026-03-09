@@ -279,7 +279,7 @@ export default function CareerExploration() {
       </div>
 
       <div className="px-5 space-y-4">
-        {/* Quick Stats */}
+        {/* 1. Quick Stats: Salary / Years / Difficulty */}
         <div className="grid grid-cols-3 gap-2">
           <div className="glass-card p-3 text-center rounded-2xl">
             <DollarSign size={16} className="text-primary mx-auto mb-1" />
@@ -298,14 +298,12 @@ export default function CareerExploration() {
           </div>
         </div>
 
-        {/* What is it */}
+        {/* 2. What is this job? */}
         <Card title="What is this job?" icon={<BookOpen size={16} className="text-primary" />}>
           <p className="text-sm text-muted-foreground leading-relaxed">{career.description}</p>
-        </Card>
-
-        {/* What people actually do */}
-        <Card title="What people in this job actually do" icon={<Zap size={16} className="text-accent" />}>
-          <div className="space-y-2">
+          {/* What people actually do */}
+          <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">What people in this job actually do</p>
             {career.dailyLife.split(", ").slice(0, 3).map((task, i) => (
               <div key={i} className="flex items-start gap-2">
                 <span className="text-primary font-bold text-sm">{i + 1}.</span>
@@ -313,32 +311,31 @@ export default function CareerExploration() {
               </div>
             ))}
           </div>
+          {/* Videos */}
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <a href={career.dayInLifeVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover p-4 rounded-2xl space-y-2 text-center">
+              <div className="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center mx-auto">
+                <Play size={20} className="text-primary-foreground" />
+              </div>
+              <p className="text-xs font-bold text-foreground">A Day in the Life</p>
+              <p className="text-[10px] text-muted-foreground">See what it's really like</p>
+            </a>
+            <a href={career.encouragementVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover p-4 rounded-2xl space-y-2 text-center">
+              <div className="w-12 h-12 rounded-2xl gradient-bg-warm flex items-center justify-center mx-auto">
+                <Play size={20} className="text-accent-foreground" />
+              </div>
+              <p className="text-xs font-bold text-foreground">Get Inspired</p>
+              <p className="text-[10px] text-muted-foreground">by {career.encouragementFigure}</p>
+            </a>
+          </div>
         </Card>
 
-        {/* Videos */}
-        <div className="grid grid-cols-2 gap-3">
-          <a href={career.dayInLifeVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover p-4 rounded-2xl space-y-2 text-center">
-            <div className="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center mx-auto">
-              <Play size={20} className="text-primary-foreground" />
-            </div>
-            <p className="text-xs font-bold text-foreground">A Day in the Life</p>
-            <p className="text-[10px] text-muted-foreground">See what it's really like</p>
-          </a>
-          <a href={career.encouragementVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover p-4 rounded-2xl space-y-2 text-center">
-            <div className="w-12 h-12 rounded-2xl gradient-bg-warm flex items-center justify-center mx-auto">
-              <Play size={20} className="text-accent-foreground" />
-            </div>
-            <p className="text-xs font-bold text-foreground">Get Inspired</p>
-            <p className="text-[10px] text-muted-foreground">by {career.encouragementFigure}</p>
-          </a>
-        </div>
-
-        {/* Why it matters */}
+        {/* 3. Why this job matters */}
         <Card title="Why this job matters 🌍" icon={<Star size={16} className="text-secondary" />}>
           <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
         </Card>
 
-        {/* 🎮 Career Missions — GATED */}
+        {/* 4. Try This Career — Fun Missions (GATED) */}
         {missions.length > 0 && (
           <Card title="🎮 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
             <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
@@ -386,37 +383,7 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* 🛠️ Skill Builder — GATED */}
-        {skills.length > 0 && (
-          <Card title="🛠️ Start Building Skills Now" icon={<TrendingUp size={16} className="text-primary" />}>
-            <p className="text-xs text-muted-foreground mb-3">Things you can do RIGHT NOW to get closer to this career:</p>
-            <LockedOverlay label="Set Active Path to start skills">
-              <div className="space-y-2">
-                {skills.map((s) => (
-                  <div key={s.id} className="glass-card p-3 rounded-xl flex items-start gap-3">
-                    <span className="text-2xl">{s.emoji}</span>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-foreground">{s.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
-                      <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        s.difficulty === "Easy" ? "bg-primary/10 text-primary" :
-                        s.difficulty === "Medium" ? "bg-secondary/10 text-secondary" :
-                        "bg-accent/10 text-accent"
-                      }`}>{s.difficulty}</span>
-                    </div>
-                    {s.link && (
-                      <a href={s.link} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-muted/50">
-                        <ExternalLink size={14} className="text-muted-foreground" />
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </LockedOverlay>
-          </Card>
-        )}
-
-        {/* Skills you'll need */}
+        {/* 5. Skills You'll Need */}
         <Card title="Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
           <div className="flex flex-wrap gap-2">
             {career.skills.map((s) => (
@@ -425,7 +392,7 @@ export default function CareerExploration() {
           </div>
         </Card>
 
-        {/* Subjects that help you get this job */}
+        {/* 6. Subjects that help */}
         <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-secondary" />}>
           <div className="flex flex-wrap gap-1.5 mb-3">
             {career.recommendedSubjects.map((s) => (
@@ -445,7 +412,7 @@ export default function CareerExploration() {
           </div>
         </Card>
 
-        {/* Your Roadmap */}
+        {/* 7. Step-by-Step Plan */}
         <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-accent" />}>
           <div className="space-y-0">
             {timeline.map((t, i) => (
@@ -465,32 +432,7 @@ export default function CareerExploration() {
           </div>
         </Card>
 
-        {/* How much can you earn? */}
-        <Card title="How much can you earn? 💰" icon={<DollarSign size={16} className="text-primary" />}>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: "Starting Out", value: career.salaryRange.entry, color: "bg-muted/50" },
-              { label: "With Experience", value: career.salaryRange.mid, color: "bg-primary/10 border border-primary/20" },
-              { label: "Top Level", value: career.salaryRange.senior, color: "bg-muted/50" },
-            ].map((s) => (
-              <div key={s.label} className={`text-center p-3 rounded-2xl ${s.color}`}>
-                <p className="text-[10px] text-muted-foreground font-medium">{s.label}</p>
-                <p className="text-sm font-bold text-foreground">{s.value}</p>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 mt-3">
-            <TrendingUp size={14} className="text-primary flex-shrink-0" />
-            <p className="text-xs text-muted-foreground">{career.futureGrowth}</p>
-          </div>
-        </Card>
-
-        {/* Is this job growing? */}
-        <Card title="Is this job growing in the future?" icon={<TrendingUp size={16} className="text-secondary" />}>
-          <p className="text-sm text-muted-foreground leading-relaxed">{career.futureGrowth}</p>
-        </Card>
-
-        {/* 🏢 Try This Career in Real Life — GATED */}
+        {/* 8. Opportunities / Internships (GATED) */}
         {internshipList.length > 0 && (
           <Card title="🏢 Try This Career in Real Life" icon={<Briefcase size={16} className="text-glow-purple" />}>
             <p className="text-xs text-muted-foreground mb-3">Shadow opportunities and internships for Year 10+ students:</p>
@@ -537,7 +479,7 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* Role Models */}
+        {/* 9. People who made it */}
         {career.roleModels.length > 0 && (
           <Card title="People who made it 🌟" icon={<Users size={16} className="text-glow-purple" />}>
             <div className="flex flex-wrap gap-2">
@@ -548,7 +490,7 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* Future Self */}
+        {/* 10. Imagine you at age 26 */}
         <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
           <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
             🔮 Imagine you at age {currentAge + career.timelineYears + 5}
@@ -561,7 +503,7 @@ export default function CareerExploration() {
           </p>
         </div>
 
-        {/* Career Journey Actions */}
+        {/* 11. Career Roadmap & Opportunities buttons */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate(`/roadmap/${career.id}`)}
@@ -585,7 +527,7 @@ export default function CareerExploration() {
           </button>
         </div>
 
-        {/* Ask AI Mentor */}
+        {/* 12. Ask AI Mentor */}
         <button
           onClick={() => setChatOpen(true)}
           className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3"
@@ -600,21 +542,36 @@ export default function CareerExploration() {
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
 
-        {/* Share & Save */}
-        <div className="flex gap-3">
-          <button onClick={() => setShareOpen(true)} className="flex-1 btn-outline-glow flex items-center justify-center gap-2 text-sm">
-            <Share2 size={16} /> Share
-          </button>
+        {/* 13. Share */}
+        <button onClick={() => setShareOpen(true)} className="w-full btn-outline-glow flex items-center justify-center gap-2 text-sm">
+          <Share2 size={16} /> Share This Career
+        </button>
+
+        {/* 14. Save Career */}
+        <button
+          onClick={() => toggleSavedCareer(career.id)}
+          className={`w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-2xl px-6 py-3.5 transition-all duration-300 active:scale-95 ${
+            saved ? "bg-accent/20 text-accent border-2 border-accent/30" : "btn-outline-glow"
+          }`}
+        >
+          <Heart size={16} className={saved ? "fill-accent" : ""} />
+          {saved ? "Saved ❤️" : "Save Career"}
+        </button>
+
+        {/* 15. Set as Active Path (bottom) */}
+        {!isActivePath ? (
           <button
-            onClick={() => toggleSavedCareer(career.id)}
-            className={`flex-1 flex items-center justify-center gap-2 text-sm font-semibold rounded-2xl px-6 py-3.5 transition-all duration-300 active:scale-95 ${
-              saved ? "bg-accent/20 text-accent border-2 border-accent/30" : "btn-primary-glow"
-            }`}
+            onClick={handleSetActivePath}
+            className="w-full btn-primary-glow text-sm py-3.5 flex items-center justify-center gap-2"
           >
-            <Heart size={16} className={saved ? "fill-accent" : ""} />
-            {saved ? "Saved ❤️" : "Save Career"}
+            <Shield size={16} /> Set as Active Path
           </button>
-        </div>
+        ) : (
+          <div className="w-full glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border-primary/30 bg-primary/5">
+            <Shield size={16} className="text-primary" />
+            <span className="text-sm font-bold text-primary">This is your Active Path</span>
+          </div>
+        )}
       </div>
 
       <ShareModal
