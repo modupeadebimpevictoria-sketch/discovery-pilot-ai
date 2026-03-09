@@ -241,9 +241,9 @@ export default function Index() {
       </VideoBackground>
 
       {/* ===== CAREER PROFILES — Social-style cards ===== */}
-      <section className="py-16 px-5">
+      <section className="py-10 px-5">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
+          <motion.div {...fadeIn} className="text-center mb-6 space-y-1">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
               Real people. Real careers.
             </h2>
@@ -265,14 +265,14 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ===== CAREER CATEGORIES — Video tiles ===== */}
-      <section className="py-16 px-5">
+      {/* ===== CAREER CATEGORIES — Dark section ===== */}
+      <section className="py-10 px-5 bg-secondary">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+          <motion.div {...fadeIn} className="text-center mb-6 space-y-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-secondary-foreground font-display">
               Explore career worlds
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-secondary-foreground/60">
               See what each field looks like from the inside.
             </p>
           </motion.div>
@@ -292,37 +292,37 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ===== FEATURES — Calm grid ===== */}
-      <section className="py-16 px-5">
+      {/* ===== FEATURES — Dark section ===== */}
+      <section className="py-10 px-5 bg-secondary">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-10 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
+          <motion.div {...fadeIn} className="text-center mb-6 space-y-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-secondary-foreground font-display">
               Everything you need to get started
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {featureCards.map((card, idx) => (
               <motion.div
                 key={card.title}
                 {...stagger(idx * 0.05)}
-                className="landing-card group"
+                className="rounded-2xl border border-secondary-foreground/10 bg-secondary-foreground/5 p-5 group hover:bg-secondary-foreground/10 transition-all duration-300"
               >
-                <div className={`w-12 h-12 rounded-xl ${card.bg} flex items-center justify-center ${card.color} mb-3`}>
+                <div className={`w-11 h-11 rounded-xl ${card.bg} flex items-center justify-center ${card.color} mb-3`}>
                   {card.icon}
                 </div>
-                <h3 className="text-base font-bold text-foreground mb-1 font-display">{card.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
+                <h3 className="text-base font-bold text-secondary-foreground mb-1 font-display">{card.title}</h3>
+                <p className="text-sm text-secondary-foreground/60 leading-relaxed">{card.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS — Real young people ===== */}
-      <section className="py-16 px-5">
+      {/* ===== TESTIMONIALS ===== */}
+      <section className="py-10 px-5">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-8 space-y-2">
+          <motion.div {...fadeIn} className="text-center mb-6 space-y-1">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground font-display">
               Students who took the leap
             </h2>
@@ -339,54 +339,49 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ===== FINAL CTA ===== */}
-      <section className="py-16 px-5 pb-8">
-        <div className="max-w-md mx-auto">
-          <motion.div
-            {...fadeIn}
-            className="rounded-2xl border border-glass-border bg-card p-8 text-center space-y-5"
+      {/* ===== FINAL CTA — Dark ===== */}
+      <section className="py-10 px-5 bg-secondary">
+        <div className="max-w-md mx-auto text-center space-y-5">
+          {/* Faces */}
+          <div className="flex justify-center -space-x-2">
+            {testimonials.slice(0, 4).map((t, i) => (
+              <img
+                key={i}
+                src={t.photoUrl}
+                alt={t.name}
+                className="w-9 h-9 rounded-full object-cover border-2 border-secondary"
+                loading="lazy"
+              />
+            ))}
+          </div>
+
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary-foreground font-display leading-tight">
+              Join 10,000+ students<br />
+              who found their path.
+            </h2>
+            <p className="text-secondary-foreground/60 text-sm mt-2">
+              One quiz. One roadmap. A clearer future.
+            </p>
+          </div>
+
+          <button
+            onClick={handleCTA}
+            className="btn-coral text-base px-8 mx-auto flex items-center gap-2"
           >
-            {/* Faces */}
-            <div className="flex justify-center -space-x-2">
-              {testimonials.slice(0, 4).map((t, i) => (
-                <img
-                  key={i}
-                  src={t.photoUrl}
-                  alt={t.name}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-card"
-                  loading="lazy"
-                />
-              ))}
-            </div>
+            <Sparkles size={16} /> Take the Quiz <ArrowRight size={16} />
+          </button>
 
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold text-foreground font-display leading-tight">
-                Join 10,000+ students<br />
-                who found their path.
-              </h2>
-              <p className="text-muted-foreground text-sm mt-2">
-                One quiz. One roadmap. A clearer future.
-              </p>
-            </div>
-
-            <button
-              onClick={handleCTA}
-              className="btn-coral text-base px-8 mx-auto flex items-center gap-2"
-            >
-              <Sparkles size={16} /> Take the Quiz <ArrowRight size={16} />
-            </button>
-
-            <div className="flex flex-wrap gap-3 justify-center">
-              {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((t) => (
-                <span key={t} className="text-[11px] text-muted-foreground">{t}</span>
-              ))}
-            </div>
-          </motion.div>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {["⚡ 5-min quiz", "🔒 100% free", "🎯 Personalized"].map((t) => (
+              <span key={t} className="text-[11px] text-secondary-foreground/50">{t}</span>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ===== AI MENTOR ===== */}
-      <section className="py-8 px-5 pb-24">
+      <section className="py-6 px-5 pb-24">
         <div className="max-w-md mx-auto">
           <motion.button
             {...fadeIn}
