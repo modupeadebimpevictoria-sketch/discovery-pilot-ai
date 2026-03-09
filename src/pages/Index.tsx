@@ -76,7 +76,7 @@ export default function Index() {
           transition={{ duration: 0.6 }}
           className="absolute top-6 left-6 z-20"
         >
-          <span className="text-2xl font-bold font-display text-primary tracking-tight">Orbit</span>
+          <span className="text-2xl font-bold font-display text-primary tracking-tight">SpringBoard</span>
         </motion.div>
 
         {/* Floating emoji badges */}
