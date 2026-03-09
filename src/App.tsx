@@ -18,6 +18,8 @@ import Roadmap from "./pages/Roadmap";
 import Quests from "./pages/Quests";
 import CareerPassport from "./pages/CareerPassport";
 import Opportunities from "./pages/Opportunities";
+import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/assessment" element={<Assessment />} />
             <Route path="/results" element={<Results />} />
