@@ -196,8 +196,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setArchetypeState(progress.archetype || "");
         setMatchedCareersState((progress.matched_careers as { careerId: string; score: number }[]) || []);
         setAssessmentAnswersState((progress.assessment_answers as Record<number, string | number>) || {});
-        setJournalEntries((progress.journal_entries as JournalEntry[]) || []);
-        setSavedResources((progress.saved_resources as SavedResource[]) || []);
+        setJournalEntries((progress.journal_entries as unknown as JournalEntry[]) || []);
+        setSavedResources((progress.saved_resources as unknown as SavedResource[]) || []);
       }
 
       setDbLoaded(true);
