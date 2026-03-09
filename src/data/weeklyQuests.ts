@@ -77,7 +77,7 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
     { titleFn: (c) => `Study a Famous ${c}'s Portfolio`, descFn: (c) => `Find a professional ${c} online. Study 3 of their best works and write what makes each one effective.`, time: 20, xp: 25, emoji: "🔍", skillFn: () => "Design Analysis", week: 2 },
     { titleFn: (c) => `Redesign Something as a ${c}`, descFn: (c) => `Find a badly-designed item relevant to ${c} work (a poster, product, UI, etc). Redesign it with a ${c}'s eye.`, time: 25, xp: 30, emoji: "🎨", skillFn: () => "Design Critique", week: 3 },
     { titleFn: (c) => `Create a ${c} Mood Board`, descFn: (c) => `Build a mood board on Canva or Pinterest with 10+ images that inspire your style as a ${c}. Write your design philosophy.`, time: 20, xp: 25, emoji: "🎯", skillFn: () => "Creative Direction", week: 4 },
-    { titleFn: (c) => `${c} Client Brief Challenge`, descFn: (c) => `Write a fake client brief asking a ${c} to design something specific. Then complete the brief yourself in 20 minutes.`, time: 25, xp: 30, emoji: "📋", skillFn: () => "Client Work", week: 5 },
+    { titleFn: (c) => `${c} School Project Challenge`, descFn: (c) => `Imagine a teacher asks you to design something as a ${c} for a school event. Write the brief, then complete it yourself in 20 minutes.`, time: 25, xp: 30, emoji: "📋", skillFn: () => "Project Work", week: 5 },
     { titleFn: (c) => `${c} Tool Exploration`, descFn: (c) => `Learn one new tool or technique a ${c} uses daily (Figma, Procreate, Illustrator, or Canva). Create something with it.`, time: 25, xp: 30, emoji: "🛠️", skillFn: () => "Tool Mastery", week: 6 },
   ],
   "media-content": [
@@ -155,9 +155,9 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
   ],
   "business-entrepreneurship": [
     { titleFn: (c) => `${c} Business Idea Sprint`, descFn: (c) => `In 10 minutes, come up with 5 business ideas a ${c} could start. Pick the best one and write a 100-word pitch.`, time: 15, xp: 20, emoji: "💡", skillFn: () => "Business Ideation", week: 1 },
-    { titleFn: (c) => `${c} Competitor Analysis`, descFn: (c) => `Find 3 companies that hire ${c}s. Compare their offerings, culture, and salaries. What makes each one attractive?`, time: 20, xp: 25, emoji: "📊", skillFn: () => "Market Research", week: 2 },
-    { titleFn: (c) => `60-Second ${c} Elevator Pitch`, descFn: (c) => `Write and practice a 60-second pitch explaining why someone should hire you as a ${c}. Record yourself and improve.`, time: 15, xp: 25, emoji: "🎤", skillFn: () => "Pitching", week: 3 },
-    { titleFn: (c) => `${c} Revenue Model`, descFn: (c) => `How does a ${c} make money? Research different revenue streams and pricing models in the ${c} field.`, time: 15, xp: 20, emoji: "💰", skillFn: () => "Business Models", week: 4 },
+    { titleFn: (c) => `${c} Competitor Analysis`, descFn: (c) => `Find 3 successful ${c}s or businesses in that field. Compare what they do differently. What can you learn from each?`, time: 20, xp: 25, emoji: "📊", skillFn: () => "Market Research", week: 2 },
+    { titleFn: (c) => `60-Second ${c} Elevator Pitch`, descFn: (c) => `Write and practice a 60-second pitch about your dream ${c} business or project idea. Record yourself on your phone and watch it back.`, time: 15, xp: 25, emoji: "🎤", skillFn: () => "Pitching", week: 3 },
+    { titleFn: (c) => `${c} Revenue Model`, descFn: (c) => `How do ${c}s earn money? Research different ways people in this career make income — from salary to freelancing to starting their own business.`, time: 15, xp: 20, emoji: "💰", skillFn: () => "Business Models", week: 4 },
     { titleFn: (c) => `${c} SWOT Analysis`, descFn: (c) => `Do a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) on yourself as an aspiring ${c}.`, time: 15, xp: 25, emoji: "📋", skillFn: () => "Strategic Thinking", week: 5 },
   ],
   "finance-investment": [
@@ -165,7 +165,7 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
     { titleFn: (c) => `Budget Like a ${c}`, descFn: (c) => `Track every naira you spend this week. Categorise spending and create a ${c}-quality budget report with insights.`, time: 15, xp: 20, emoji: "💳", skillFn: () => "Budgeting", week: 2 },
     { titleFn: (c) => `${c} Financial News Digest`, descFn: (c) => `Read 3 finance articles that a ${c} should know about. Summarise each and explain the market impact.`, time: 15, xp: 20, emoji: "📰", skillFn: () => "Financial Literacy", week: 3 },
     { titleFn: (c) => `Compound Interest Calculator`, descFn: (c) => `As a ${c}, calculate how much you'd have saving ₦500/week for 10 years at 5%, 10%, and 15% interest. Show your work.`, time: 15, xp: 25, emoji: "🏦", skillFn: () => "Compound Interest", week: 4 },
-    { titleFn: (c) => `${c} Risk Assessment`, descFn: (c) => `Evaluate the risk of 3 different investment types (stocks, bonds, crypto). Write what a ${c} would advise a client.`, time: 20, xp: 25, emoji: "⚠️", skillFn: () => "Risk Management", week: 5 },
+    { titleFn: (c) => `${c} Risk Assessment`, descFn: (c) => `Research 3 types of investments (stocks, bonds, crypto). Rank them from safest to riskiest and explain why — like a ${c} in training.`, time: 20, xp: 25, emoji: "⚠️", skillFn: () => "Risk Management", week: 5 },
   ],
   "marketing-communications": [
     { titleFn: (c) => `${c} Ad Breakdown`, descFn: (c) => `Find 3 ads on social media and analyse them through a ${c}'s lens: target audience, message, call to action, and effectiveness.`, time: 15, xp: 20, emoji: "📣", skillFn: () => "Ad Analysis", week: 1 },
