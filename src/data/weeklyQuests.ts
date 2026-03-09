@@ -155,9 +155,9 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
   ],
   "business-entrepreneurship": [
     { titleFn: (c) => `${c} Business Idea Sprint`, descFn: (c) => `In 10 minutes, come up with 5 business ideas a ${c} could start. Pick the best one and write a 100-word pitch.`, time: 15, xp: 20, emoji: "💡", skillFn: () => "Business Ideation", week: 1 },
-    { titleFn: (c) => `${c} Competitor Analysis`, descFn: (c) => `Find 3 companies that hire ${c}s. Compare their offerings, culture, and salaries. What makes each one attractive?`, time: 20, xp: 25, emoji: "📊", skillFn: () => "Market Research", week: 2 },
-    { titleFn: (c) => `60-Second ${c} Elevator Pitch`, descFn: (c) => `Write and practice a 60-second pitch explaining why someone should hire you as a ${c}. Record yourself and improve.`, time: 15, xp: 25, emoji: "🎤", skillFn: () => "Pitching", week: 3 },
-    { titleFn: (c) => `${c} Revenue Model`, descFn: (c) => `How does a ${c} make money? Research different revenue streams and pricing models in the ${c} field.`, time: 15, xp: 20, emoji: "💰", skillFn: () => "Business Models", week: 4 },
+    { titleFn: (c) => `${c} Competitor Analysis`, descFn: (c) => `Find 3 successful ${c}s or businesses in that field. Compare what they do differently. What can you learn from each?`, time: 20, xp: 25, emoji: "📊", skillFn: () => "Market Research", week: 2 },
+    { titleFn: (c) => `60-Second ${c} Elevator Pitch`, descFn: (c) => `Write and practice a 60-second pitch about your dream ${c} business or project idea. Record yourself on your phone and watch it back.`, time: 15, xp: 25, emoji: "🎤", skillFn: () => "Pitching", week: 3 },
+    { titleFn: (c) => `${c} Revenue Model`, descFn: (c) => `How do ${c}s earn money? Research different ways people in this career make income — from salary to freelancing to starting their own business.`, time: 15, xp: 20, emoji: "💰", skillFn: () => "Business Models", week: 4 },
     { titleFn: (c) => `${c} SWOT Analysis`, descFn: (c) => `Do a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) on yourself as an aspiring ${c}.`, time: 15, xp: 25, emoji: "📋", skillFn: () => "Strategic Thinking", week: 5 },
   ],
   "finance-investment": [
