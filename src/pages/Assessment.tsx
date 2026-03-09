@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { assessmentQuestions } from "@/data/questions";
 import { matchCareers, determineArchetype } from "@/data/questions";
-import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, Sparkles, ChevronLeft } from "lucide-react";
 import { fireBurst } from "@/lib/confetti";
 
 export default function Assessment() {
@@ -77,6 +77,20 @@ export default function Assessment() {
 
       {/* Header */}
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+        <button
+          onClick={() => {
+            if (qIndex > 0) {
+              setQIndex((i) => i - 1);
+              setSliderValue(50);
+            } else {
+              navigate(-1);
+            }
+          }}
+          className="p-1 -ml-1 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Go back"
+        >
+          <ChevronLeft size={20} />
+        </button>
         <span className="text-xs font-medium text-muted-foreground">
           {qIndex + 1} / {total}
         </span>
