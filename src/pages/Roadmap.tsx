@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { getCareerById } from "@/data/careers";
+import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
 import { getOrCreateRoadmap, RoadmapMilestone } from "@/data/roadmaps";
 import { ChevronLeft, CheckCircle, Circle, MapPin, GraduationCap, BookOpen, Trophy, Briefcase, Users, Code } from "lucide-react";
 import { toast } from "sonner";
@@ -31,8 +32,16 @@ export default function Roadmap() {
   const { id } = useParams<{ id: string }>();
   const { completedMilestones, toggleMilestone, addXp, addBadge, xp } = useApp();
 
-  const career = id ? getCareerById(id) : null;
-  if (!career) {
+  // Support both detailed careers and listing-only careers
+  const detailedCareer = id ? getCareerById(id) : null;
+  const listing = !detailedCareer && id ? getCareerListingById(id) : null;
+  const family = listing ? getCareerFamilyById(listing.familyId) : null;
+
+  const careerTitle = detailedCareer?.title || listing?.title;
+  const careerEmoji = detailedCareer?.emoji || family?.emoji || "💼";
+  const familyId = listing?.familyId;
+
+  if (!careerTitle) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Career not found</p>
@@ -40,7 +49,7 @@ export default function Roadmap() {
     );
   }
 
-  const roadmap = getOrCreateRoadmap(career.id, career.title);
+  const roadmap = getOrCreateRoadmap(id!, careerTitle, familyId);
   const milestones = roadmap.milestones;
   const completedCount = milestones.filter((m) => completedMilestones.includes(m.id)).length;
   const progress = Math.round((completedCount / milestones.length) * 100);
