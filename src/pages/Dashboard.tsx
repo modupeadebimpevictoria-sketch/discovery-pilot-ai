@@ -34,6 +34,7 @@ export default function Dashboard() {
     rejectedCareers, rejectCareer,
     journalEntries, addJournalEntry,
     savedResources, removeSavedResource,
+    savedCareers, appliedInternships,
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
