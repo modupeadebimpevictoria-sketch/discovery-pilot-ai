@@ -28,7 +28,7 @@ const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator"
 export default function Dashboard() {
   const navigate = useNavigate();
   const {
-    profile, matchedCareers, archetype, badges,
+    user, signOut, profile, matchedCareers, archetype, badges,
     completedMissions, xp, completedMilestones,
     completedQuests, selectedCareerPath, setSelectedCareerPath,
     rejectedCareers, rejectCareer,
