@@ -114,7 +114,13 @@ export default function CareerExploration() {
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   const saved = savedCareers.includes(career.id);
-  const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score;
+  // Generate deterministic match score for listing-only careers
+  const getDefaultMatch = (cid: string) => {
+    let hash = 0;
+    for (let i = 0; i < cid.length; i++) { hash = ((hash << 5) - hash) + cid.charCodeAt(i); hash |= 0; }
+    return 55 + Math.abs(hash % 40);
+  };
+  const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getDefaultMatch(career.id);
   const currentAge = profile?.age || 15;
   const missions = getMissionsByCareer(career.id);
   const skills = getSkillBuilders(career.id);
