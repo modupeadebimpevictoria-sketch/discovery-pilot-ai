@@ -4,7 +4,7 @@ import { useApp } from "@/contexts/AppContext";
 import { getCareerById } from "@/data/careers";
 import { archetypes } from "@/data/questions";
 import { getQuestsForCareer, getCurrentWeekNumber } from "@/data/weeklyQuests";
-import { Share2, Sparkles, Bot, ChevronRight } from "lucide-react";
+import { Share2, Sparkles, Bot, ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
