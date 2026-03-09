@@ -77,7 +77,7 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
     { titleFn: (c) => `Study a Famous ${c}'s Portfolio`, descFn: (c) => `Find a professional ${c} online. Study 3 of their best works and write what makes each one effective.`, time: 20, xp: 25, emoji: "🔍", skillFn: () => "Design Analysis", week: 2 },
     { titleFn: (c) => `Redesign Something as a ${c}`, descFn: (c) => `Find a badly-designed item relevant to ${c} work (a poster, product, UI, etc). Redesign it with a ${c}'s eye.`, time: 25, xp: 30, emoji: "🎨", skillFn: () => "Design Critique", week: 3 },
     { titleFn: (c) => `Create a ${c} Mood Board`, descFn: (c) => `Build a mood board on Canva or Pinterest with 10+ images that inspire your style as a ${c}. Write your design philosophy.`, time: 20, xp: 25, emoji: "🎯", skillFn: () => "Creative Direction", week: 4 },
-    { titleFn: (c) => `${c} Client Brief Challenge`, descFn: (c) => `Write a fake client brief asking a ${c} to design something specific. Then complete the brief yourself in 20 minutes.`, time: 25, xp: 30, emoji: "📋", skillFn: () => "Client Work", week: 5 },
+    { titleFn: (c) => `${c} School Project Challenge`, descFn: (c) => `Imagine a teacher asks you to design something as a ${c} for a school event. Write the brief, then complete it yourself in 20 minutes.`, time: 25, xp: 30, emoji: "📋", skillFn: () => "Project Work", week: 5 },
     { titleFn: (c) => `${c} Tool Exploration`, descFn: (c) => `Learn one new tool or technique a ${c} uses daily (Figma, Procreate, Illustrator, or Canva). Create something with it.`, time: 25, xp: 30, emoji: "🛠️", skillFn: () => "Tool Mastery", week: 6 },
   ],
   "media-content": [
