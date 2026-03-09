@@ -4,7 +4,7 @@ import { useApp } from "@/contexts/AppContext";
 import { getCareerById } from "@/data/careers";
 import { archetypes } from "@/data/questions";
 import { getQuestsForCareer, getCurrentWeekNumber } from "@/data/weeklyQuests";
-import { Share2, Sparkles, Bot, ChevronRight } from "lucide-react";
+import { Share2, Sparkles, Bot, ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
@@ -28,12 +28,13 @@ const levelTitles = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator"
 export default function Dashboard() {
   const navigate = useNavigate();
   const {
-    profile, matchedCareers, archetype, badges,
+    user, signOut, profile, matchedCareers, archetype, badges,
     completedMissions, xp, completedMilestones,
     completedQuests, selectedCareerPath, setSelectedCareerPath,
     rejectedCareers, rejectCareer,
     journalEntries, addJournalEntry,
     savedResources, removeSavedResource,
+    savedCareers, appliedInternships,
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
@@ -55,7 +56,23 @@ export default function Dashboard() {
   const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber) : [];
   const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id) : [];
 
-  // Not logged in / no assessment
+  // Not logged in
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4 max-w-xs">
+          <span className="text-6xl">🔐</span>
+          <h2 className="text-2xl font-bold gradient-text">Sign In to Continue</h2>
+          <p className="text-sm text-muted-foreground">Create an account or sign in to save your progress and track your journey.</p>
+          <button onClick={() => navigate("/auth")} className="btn-primary-glow w-full flex items-center justify-center gap-2">
+            <Sparkles size={18} /> Sign In / Sign Up
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // No assessment yet
   if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
@@ -80,9 +97,14 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Welcome back</p>
             <h1 className="text-2xl font-bold text-foreground">Hey {profile.name}! 👋</h1>
           </div>
-          <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
-            <Share2 size={18} className="text-foreground" />
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+              <Share2 size={18} className="text-foreground" />
+            </button>
+            <button onClick={signOut} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+              <LogOut size={18} className="text-foreground" />
+            </button>
+          </div>
         </div>
 
         {/* 6. Streak & XP Bar */}
@@ -121,6 +143,27 @@ export default function Dashboard() {
           badges={badges}
           completedMilestones={completedMilestones}
         />
+
+        {/* Career Progress Tracker */}
+        <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="glass-card p-4 rounded-2xl space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">📊 Your Progress</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: "Milestones", value: completedMilestones.length, emoji: "🏁" },
+              { label: "Quests Done", value: completedQuests.length, emoji: "⚔️" },
+              { label: "Badges", value: badges.length, emoji: "🏅" },
+              { label: "Missions", value: completedMissions.length, emoji: "🎯" },
+              { label: "Applied", value: appliedInternships.length, emoji: "📩" },
+              { label: "Saved", value: savedCareers.length, emoji: "❤️" },
+            ].map((s) => (
+              <div key={s.label} className="text-center p-2 rounded-xl bg-muted/30">
+                <p className="text-lg">{s.emoji}</p>
+                <p className="text-lg font-bold text-foreground">{s.value}</p>
+                <p className="text-[10px] text-muted-foreground">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* 4. Quest Progress */}
         <QuestProgress

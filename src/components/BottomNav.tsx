@@ -17,7 +17,7 @@ export default function BottomNav() {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
 
-  const hideOn = ["/onboarding", "/assessment"];
+  const hideOn = ["/onboarding", "/assessment", "/auth", "/reset-password"];
   if (hideOn.some((p) => location.pathname.startsWith(p))) return null;
 
   return (

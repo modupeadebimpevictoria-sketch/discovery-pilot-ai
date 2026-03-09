@@ -14,7 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          country: string | null
+          created_at: string | null
+          dream_career: string | null
+          grade: string | null
+          id: string
+          interests: string[] | null
+          name: string
+          subjects: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          age?: number | null
+          country?: string | null
+          created_at?: string | null
+          dream_career?: string | null
+          grade?: string | null
+          id: string
+          interests?: string[] | null
+          name?: string
+          subjects?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          age?: number | null
+          country?: string | null
+          created_at?: string | null
+          dream_career?: string | null
+          grade?: string | null
+          id?: string
+          interests?: string[] | null
+          name?: string
+          subjects?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          applied_internships: string[] | null
+          archetype: string | null
+          assessment_answers: Json | null
+          badges: string[] | null
+          completed_milestones: string[] | null
+          completed_missions: string[] | null
+          completed_quests: string[] | null
+          created_at: string | null
+          id: string
+          journal_entries: Json | null
+          last_check_in_date: string | null
+          last_engaged_date: string | null
+          matched_careers: Json | null
+          pathway_start_date: string | null
+          pulse_check: string | null
+          rejected_careers: string[] | null
+          saved_careers: string[] | null
+          saved_resources: Json | null
+          selected_career_path: string | null
+          skill_xp: Json | null
+          streak: number | null
+          updated_at: string | null
+          user_id: string
+          xp: number | null
+        }
+        Insert: {
+          applied_internships?: string[] | null
+          archetype?: string | null
+          assessment_answers?: Json | null
+          badges?: string[] | null
+          completed_milestones?: string[] | null
+          completed_missions?: string[] | null
+          completed_quests?: string[] | null
+          created_at?: string | null
+          id?: string
+          journal_entries?: Json | null
+          last_check_in_date?: string | null
+          last_engaged_date?: string | null
+          matched_careers?: Json | null
+          pathway_start_date?: string | null
+          pulse_check?: string | null
+          rejected_careers?: string[] | null
+          saved_careers?: string[] | null
+          saved_resources?: Json | null
+          selected_career_path?: string | null
+          skill_xp?: Json | null
+          streak?: number | null
+          updated_at?: string | null
+          user_id: string
+          xp?: number | null
+        }
+        Update: {
+          applied_internships?: string[] | null
+          archetype?: string | null
+          assessment_answers?: Json | null
+          badges?: string[] | null
+          completed_milestones?: string[] | null
+          completed_missions?: string[] | null
+          completed_quests?: string[] | null
+          created_at?: string | null
+          id?: string
+          journal_entries?: Json | null
+          last_check_in_date?: string | null
+          last_engaged_date?: string | null
+          matched_careers?: Json | null
+          pathway_start_date?: string | null
+          pulse_check?: string | null
+          rejected_careers?: string[] | null
+          saved_careers?: string[] | null
+          saved_resources?: Json | null
+          selected_career_path?: string | null
+          skill_xp?: Json | null
+          streak?: number | null
+          updated_at?: string | null
+          user_id?: string
+          xp?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
