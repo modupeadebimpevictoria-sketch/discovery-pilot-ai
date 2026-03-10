@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { getCareerById, type Career } from "@/data/careers";
 import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
 import { getMissionsByCareer } from "@/data/missions";
-
+import { getRoleModelProfiles, type RoleModelProfile } from "@/data/roleModelProfiles";
+import { getSkillDetails } from "@/data/skillDetails";
+import { getImagineYouScenarios } from "@/data/imagineYouScenarios";
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
 import { useState } from "react";
@@ -11,6 +13,7 @@ import { AnimatePresence } from "framer-motion";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
 import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModal";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
@@ -133,8 +136,10 @@ export default function CareerExploration() {
   const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getDefaultMatch(career.id);
   const currentAge = profile?.age || 15;
   const missions = getMissionsByCareer(career.id);
-  
   const internshipList = getInternshipsByCareer(career.id);
+  const roleModels = getRoleModelProfiles(career.id, career.title, career.roleModels);
+  const skills = getSkillDetails(career.id, career.skills);
+  const imagineScenarios = getImagineYouScenarios(career.id, career.title, currentAge, career.timelineYears, career);
 
   const timeline = [
     { age: currentAge, label: "Pick the right subjects now", emoji: "📚" },
@@ -151,12 +156,8 @@ export default function CareerExploration() {
     Stable: "demand-stable",
   };
 
-  // Gated action handler — shows modal if not active path
   const requireActivePath = (action: () => void) => {
-    if (isActivePath) {
-      action();
-      return;
-    }
+    if (isActivePath) { action(); return; }
     setShowSetActiveModal(true);
   };
 
@@ -199,14 +200,10 @@ export default function CareerExploration() {
     });
   };
 
-  // Locked button component for gated actions
   const LockedOverlay = ({ children, label }: { children: React.ReactNode; label?: string }) => {
     if (isActivePath) return <>{children}</>;
     return (
-      <button
-        onClick={() => setShowSetActiveModal(true)}
-        className="w-full relative"
-      >
+      <button onClick={() => setShowSetActiveModal(true)} className="w-full relative">
         <div className="pointer-events-none opacity-40">{children}</div>
         <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-xl backdrop-blur-sm">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
@@ -261,9 +258,8 @@ export default function CareerExploration() {
         </div>
       </motion.div>
 
-
       <div className="px-5 space-y-4">
-        {/* 1. Quick Stats: Salary / Years / Difficulty */}
+        {/* 1. Quick Stats */}
         <div className="grid grid-cols-3 gap-2">
           <div className="glass-card p-3 text-center rounded-2xl">
             <DollarSign size={16} className="text-primary mx-auto mb-1" />
@@ -285,7 +281,6 @@ export default function CareerExploration() {
         {/* 2. What is this job? */}
         <Card title="What is this job?" icon={<BookOpen size={16} className="text-primary" />}>
           <p className="text-sm text-muted-foreground leading-relaxed">{career.description}</p>
-          {/* What people actually do */}
           <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">What people in this job actually do</p>
             {career.dailyLife.split(", ").slice(0, 3).map((task, i) => (
@@ -295,7 +290,6 @@ export default function CareerExploration() {
               </div>
             ))}
           </div>
-          {/* Videos */}
           <div className="grid grid-cols-2 gap-3 mt-3">
             <a href={career.dayInLifeVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover p-4 rounded-2xl space-y-2 text-center">
               <div className="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center mx-auto">
@@ -319,10 +313,10 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
         </Card>
 
-        {/* 4. Try This Career — Fun Missions (GATED) */}
-        {missions.length > 0 && (
-          <Card title="🎮 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
-            <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
+        {/* 4. Try This Career — Fun Missions (GATED, always shown) */}
+        <Card title="🎯 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
+          <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges! Each one takes 10-30 minutes.</p>
+          {missions.length > 0 ? (
             <div className="space-y-3">
               {missions.map((m) => {
                 const done = completedMissions.includes(m.id);
@@ -333,7 +327,7 @@ export default function CareerExploration() {
                         <span className="text-2xl">{m.emoji}</span>
                         <div>
                           <p className="text-sm font-bold text-foreground">{m.title}</p>
-                          <p className="text-[10px] text-muted-foreground">⏱️ {m.timeMinutes} min • ⚡ {m.xpReward} XP</p>
+                          <p className="text-[10px] text-muted-foreground">⏱️ {m.timeMinutes} min • ⚡ {m.xpReward} XP{m.badge ? ` • 🏆 ${m.badge}` : ""}</p>
                         </div>
                       </div>
                       {done && <CheckCircle size={20} className="text-primary" />}
@@ -364,34 +358,42 @@ export default function CareerExploration() {
                 );
               })}
             </div>
-          </Card>
-        )}
+          ) : (
+            <div className="glass-card p-4 rounded-xl text-center space-y-2">
+              <p className="text-sm text-muted-foreground">Missions for {career.title} are being created! Check back soon.</p>
+              <p className="text-xs text-muted-foreground">In the meantime, explore the career details below.</p>
+            </div>
+          )}
+        </Card>
 
         {/* 5. Skills You'll Need */}
-        <Card title="Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
-          <div className="flex flex-wrap gap-2">
-            {career.skills.map((s) => (
-              <span key={s} className="fact-pill border-primary/20 text-primary">{s}</span>
+        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
+          <div className="space-y-3">
+            {skills.map((s) => (
+              <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
+                <p className="text-sm font-bold text-foreground">{s.name}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{s.explanation}</p>
+                {s.resourceUrl && (
+                  <a
+                    href={s.resourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1"
+                  >
+                    🔗 {s.resourceLabel || "Start learning free"}
+                    <ChevronRight size={12} />
+                  </a>
+                )}
+              </div>
             ))}
           </div>
         </Card>
 
         {/* 6. Subjects that help */}
         <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-secondary" />}>
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5">
             {career.recommendedSubjects.map((s) => (
               <span key={s} className="fact-pill text-secondary border-secondary/20">{s}</span>
-            ))}
-          </div>
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">How do you get started?</p>
-          <div className="space-y-2">
-            {career.educationPath.map((step, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="w-6 h-6 rounded-full gradient-bg flex-shrink-0 flex items-center justify-center text-xs font-bold text-primary-foreground">
-                  {i + 1}
-                </div>
-                <span className="text-sm text-muted-foreground">{step}</span>
-              </div>
             ))}
           </div>
         </Card>
@@ -448,9 +450,7 @@ export default function CareerExploration() {
                         onClick={() => !applied && handleApplyInternship(intern.id)}
                         disabled={applied}
                         className={`w-full text-xs py-2.5 rounded-xl font-bold transition-all ${
-                          applied
-                            ? "bg-primary/10 text-primary border border-primary/20"
-                            : "btn-primary-glow"
+                          applied ? "bg-primary/10 text-primary border border-primary/20" : "btn-primary-glow"
                         } flex items-center justify-center gap-1`}
                       >
                         {applied ? "✅ Applied!" : "📩 Apply Now"}
@@ -463,28 +463,31 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* 9. People who made it */}
-        {career.roleModels.length > 0 && (
-          <Card title="People who made it 🌟" icon={<Users size={16} className="text-glow-purple" />}>
-            <div className="flex flex-wrap gap-2">
-              {career.roleModels.map((rm) => (
-                <span key={rm} className="fact-pill">⭐ {rm}</span>
-              ))}
-            </div>
-          </Card>
-        )}
+        {/* 9. People who made it (always shown) */}
+        <Card title="👤 People who made it" icon={<Users size={16} className="text-glow-purple" />}>
+          <div className="space-y-3">
+            {roleModels.map((rm) => (
+              <RoleModelCard key={rm.name} profile={rm} />
+            ))}
+          </div>
+        </Card>
 
-        {/* 10. Imagine you at age 26 */}
-        <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
+        {/* 10. Imagine you at age snapshots */}
+        <div className="glass-card p-5 rounded-2xl space-y-4 neon-border">
           <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
-            🔮 Imagine you at age {currentAge + career.timelineYears + 5}
+            🔮 Imagine you at different ages
           </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Picture this: You wake up as a {career.title}. {career.dailyLife.split(".")[0]}.
-            You earn around {career.salaryRange.mid} and love what you do.
-            Your {career.skills[0]} and {career.skills[1]} skills set you apart.
-            {career.worldImpact.split(".")[0]}.
-          </p>
+          <div className="space-y-4">
+            {imagineScenarios.map((scenario, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">Age {scenario.age}</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">{scenario.text}</p>
+                {i < imagineScenarios.length - 1 && <div className="border-t border-border/30 pt-2" />}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 11. Career Roadmap & Opportunities buttons */}
@@ -542,7 +545,7 @@ export default function CareerExploration() {
           {saved ? "Saved ❤️" : "Save Career"}
         </button>
 
-        {/* 15. Set as Active Path (bottom) */}
+        {/* 15. Set as Active Path */}
         {!isActivePath ? (
           <button
             onClick={handleSetActivePath}
@@ -570,7 +573,6 @@ export default function CareerExploration() {
         {chatOpen && <OrbitChat onClose={() => setChatOpen(false)} />}
       </AnimatePresence>
 
-      {/* Active Path Modals */}
       <SetActivePathModal
         open={showSetActiveModal}
         onClose={() => setShowSetActiveModal(false)}
@@ -589,6 +591,50 @@ export default function CareerExploration() {
         newCareerEmoji={career.emoji}
       />
     </div>
+  );
+}
+
+/* --- Sub-components --- */
+
+function RoleModelCard({ profile }: { profile: RoleModelProfile }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="w-full glass-card p-3 rounded-xl flex items-center gap-3 text-left hover:bg-muted/30 transition-colors">
+          <img
+            src={profile.photoUrl}
+            alt={profile.name}
+            className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 flex-shrink-0"
+            loading="lazy"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-foreground truncate">{profile.name}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{profile.title} · {profile.company}</p>
+          </div>
+          <ChevronRight size={14} className="text-muted-foreground flex-shrink-0" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[320px] p-4 space-y-3" side="top" align="center">
+        <div className="flex items-center gap-3">
+          <img
+            src={profile.photoUrl}
+            alt={profile.name}
+            className="w-14 h-14 rounded-full object-cover border-2 border-primary/20"
+          />
+          <div>
+            <p className="text-sm font-bold text-foreground">{profile.name}</p>
+            <p className="text-xs text-muted-foreground">{profile.title}</p>
+            <p className="text-xs text-primary font-semibold">{profile.company}</p>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground leading-relaxed">{profile.journeyFact}</p>
+          <div className="bg-primary/5 border border-primary/10 rounded-lg p-3">
+            <p className="text-xs text-foreground italic leading-relaxed">"{profile.quote}"</p>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
