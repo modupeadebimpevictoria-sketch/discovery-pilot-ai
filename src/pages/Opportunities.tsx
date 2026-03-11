@@ -8,6 +8,38 @@ import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
 import { useOpportunityActions } from "@/hooks/useOpportunityActions";
+import { careerListings } from "@/data/careerFamilies";
+
+// Maps the Firecrawl-extracted career_family_ids values to our app's familyId values
+const FAMILY_ID_MAP: Record<string, string[]> = {
+  technology: ["technology", "product-tech", "space-future-tech"],
+  design: ["creative-design"],
+  science: ["science-research"],
+  business: ["business-entrepreneurship"],
+  engineering: ["engineering-architecture", "trades-technical"],
+  health: ["healthcare-medicine", "mental-health"],
+  law: ["law-justice"],
+  media: ["media-content", "entertainment-performance"],
+  education: ["education-academia"],
+  environment: ["environment-sustainability", "animals-nature"],
+  finance: ["finance-investment"],
+  arts: ["creative-design", "entertainment-performance"],
+  "social-work": ["social-impact", "international-development", "government-public-service"],
+  architecture: ["engineering-architecture", "real-estate-property"],
+  sports: ["sport-fitness"],
+  agriculture: ["environment-sustainability"],
+  hospitality: ["travel-hospitality", "food-culinary", "beauty-wellness"],
+};
+
+function getAppFamilyIds(dbFamilyIds: string[]): string[] {
+  const result: string[] = [];
+  for (const dbId of dbFamilyIds) {
+    const mapped = FAMILY_ID_MAP[dbId];
+    if (mapped) result.push(...mapped);
+    else result.push(dbId);
+  }
+  return result;
+}
 
 export type OpportunityType = "scholarship" | "competition" | "course" | "program" | "workshop" | "internship";
 
@@ -28,6 +60,7 @@ export interface AdminOpportunity {
   deadline: string | null;
   duration: string | null;
   career_family: string | null;
+  career_family_ids: string[];
   is_remote: boolean | null;
   is_active: boolean | null;
   is_link_dead: boolean | null;
@@ -97,15 +130,47 @@ export default function Opportunities() {
     fetchOpps();
   }, [userGrade]);
 
-  // Sort: location-first, then by type relevance
+  // Get the active path's family ID and all matched career family IDs
+  const activePathFamilyId = useMemo(() => {
+    if (!careerId) return null;
+    const listing = careerListings.find((l) => l.id === careerId);
+    return listing?.familyId || null;
+  }, [careerId]);
+
+  const matchedFamilyIds = useMemo(() => {
+    return new Set(
+      matchedCareers
+        .map((m) => careerListings.find((l) => l.id === m.careerId)?.familyId)
+        .filter(Boolean) as string[]
+    );
+  }, [matchedCareers]);
+
+  // Tier: 0 = Active Path match, 1 = any matched career match, 2 = universal (empty), 3 = no match
+  function getCareerTier(opp: AdminOpportunity): number {
+    const raw = Array.isArray(opp.career_family_ids) ? opp.career_family_ids as string[] : [];
+    // Universal (empty array) = Tier 2
+    if (raw.length === 0) return 2;
+    const appFamilies = getAppFamilyIds(raw);
+    // Tier 0: matches Active Path family
+    if (activePathFamilyId && appFamilies.includes(activePathFamilyId)) return 0;
+    // Tier 1: matches any assessed career family
+    if (appFamilies.some((f) => matchedFamilyIds.has(f))) return 1;
+    // Tier 3: no match at all
+    return 3;
+  }
+
+  // Sort: career tier first, then location priority
   const sortedOpps = useMemo(() => {
     const filtered = filter === "all" ? dbOpps : dbOpps.filter((o) => o.type === filter);
     return [...filtered].sort((a, b) => {
+      const tierA = getCareerTier(a);
+      const tierB = getCareerTier(b);
+      if (tierA !== tierB) return tierA - tierB;
       const aPri = getLocationPriority(a.country, userCountry);
       const bPri = getLocationPriority(b.country, userCountry);
       return aPri - bPri;
     });
-  }, [dbOpps, filter, userCountry]);
+  }, [dbOpps, filter, userCountry, activePathFamilyId, matchedFamilyIds]);
 
   const handleApply = (oppId: string) => {
     if (!careerId) {
