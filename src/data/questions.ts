@@ -1,260 +1,282 @@
 import { careers as careerData } from "./careers";
 
-export type QuestionType = "multiple-choice" | "scenario" | "slider" | "personality";
+// ─── RIASEC Types ───
+export type RIASECCode = "R" | "I" | "A" | "S" | "E" | "C";
+
+export type InputType =
+  | "swipe-cards"
+  | "emoji-grid"
+  | "photo-grid"
+  | "two-cards"
+  | "slider"
+  | "tap-select"
+  | "drag-rank"
+  | "tap-photo-cards"
+  | "three-way"
+  | "emoji-slider"
+  | "pill-grid"
+  | "free-text";
+
+export interface QuestionOption {
+  label: string;
+  value: string;
+  emoji?: string;
+  photoUrl?: string;
+  riasec?: RIASECCode[];
+  /** For role model cards */
+  personName?: string;
+  personRole?: string;
+}
 
 export interface AssessmentQuestion {
   id: number;
-  type: QuestionType;
-  category: string;
-  question: string;
-  emoji: string;
-  options?: { label: string; value: string; emoji?: string }[];
-  sliderLabels?: { left: string; right: string };
+  round: number;
+  type: InputType;
+  prompt: string;
+  maxSelect?: number; // for multi-select
+  options?: QuestionOption[];
+  sliderLabels?: { left: string; right: string; leftEmoji?: string; rightEmoji?: string };
+  sliderPoints?: number;
+  placeholder?: string;
+  skippable?: boolean;
 }
 
+export interface RoundIntro {
+  round: number;
+  headline: string;
+  emoji: string;
+  subtext: string;
+  cta: string;
+}
+
+export const roundIntros: RoundIntro[] = [
+  { round: 1, headline: "What gets you going?", emoji: "🔥", subtext: "No right answers here. Just go with your gut.", cta: "Let's go →" },
+  { round: 2, headline: "How do you actually work?", emoji: "🧠", subtext: "There's no better or worse here — just honest.", cta: "Keep going →" },
+  { round: 3, headline: "Your strengths", emoji: "💪", subtext: "Not just school stuff — the things people genuinely come to you for.", cta: "Let's find out →" },
+  { round: 4, headline: "What actually matters to you?", emoji: "🌍", subtext: "Your future job should feel worth it. Let's figure out what that means for you.", cta: "Next →" },
+  { round: 5, headline: "A little about you", emoji: "🪞", subtext: "The best careers fit who you actually are — not just what you're good at.", cta: "Almost there →" },
+  { round: 6, headline: "Last stretch!", emoji: "🏁", subtext: "Just 3 more. You're doing great.", cta: "Finish strong →" },
+];
+
+export const roundCelebrations: Record<number, string> = {
+  1: "Round 1 done! 💥 You're on a roll.",
+  2: "Nailed it! 🔥 Halfway there.",
+  3: "Strengths unlocked! ⚡ Keep going.",
+  4: "Values locked in! 🌟 Almost done.",
+  5: "Nearly there! 🚀 One more round.",
+};
+
 export const assessmentQuestions: AssessmentQuestion[] = [
+  // ═══ ROUND 1: Interests → RIASEC ═══
   {
-    id: 1,
-    type: "multiple-choice",
-    category: "interests",
-    question: "What sounds like the most exciting way to spend a Saturday?",
-    emoji: "🌟",
+    id: 1, round: 1, type: "swipe-cards",
+    prompt: "Which of these would you most want to spend a whole day doing?",
     options: [
-      { label: "Building something with my hands or code", value: "building", emoji: "🔧" },
-      { label: "Helping someone solve a problem", value: "helping", emoji: "🤝" },
-      { label: "Creating art, music, or content", value: "creating", emoji: "🎨" },
-      { label: "Exploring nature or doing sports", value: "exploring", emoji: "🌿" },
+      { label: "Building or fixing something with your hands", value: "building", emoji: "🔧", riasec: ["R"], photoUrl: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&h=800&fit=crop&q=80" },
+      { label: "Researching something you're curious about", value: "researching", emoji: "🔬", riasec: ["I"], photoUrl: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=800&fit=crop&q=80" },
+      { label: "Making something creative — art, music, writing, design", value: "creating", emoji: "🎨", riasec: ["A"], photoUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=800&fit=crop&q=80" },
+      { label: "Helping or teaching someone work through a problem", value: "helping", emoji: "🤝", riasec: ["S"], photoUrl: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=600&h=800&fit=crop&q=80" },
+      { label: "Leading a project and getting people moving", value: "leading", emoji: "📣", riasec: ["E"], photoUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=800&fit=crop&q=80" },
+      { label: "Organising a system so everything runs perfectly", value: "organising", emoji: "📋", riasec: ["C"], photoUrl: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=800&fit=crop&q=80" },
     ],
   },
   {
-    id: 2,
-    type: "scenario",
-    category: "strengths",
-    question: "Your school asks you to lead a big project. What's your move?",
-    emoji: "🎯",
+    id: 2, round: 1, type: "emoji-grid", maxSelect: 3,
+    prompt: "Which of these do you find yourself doing even when nobody asked you to?",
     options: [
-      { label: "I plan everything out and organize the team", value: "organizer", emoji: "📋" },
-      { label: "I come up with creative ideas and inspire people", value: "visionary", emoji: "💡" },
-      { label: "I dive into the details and do the hard work", value: "executor", emoji: "⚡" },
-      { label: "I research everything first to make smart decisions", value: "researcher", emoji: "🔍" },
+      { label: "Taking things apart to see how they work", value: "tinker", emoji: "🛠️", riasec: ["R"] },
+      { label: "Reading about random topics just because", value: "reading", emoji: "📚", riasec: ["I"] },
+      { label: "Making playlists, moodboards, or art", value: "moodboards", emoji: "🎵", riasec: ["A"] },
+      { label: "Listening to friends' problems and helping", value: "listening", emoji: "💬", riasec: ["S"] },
+      { label: "Coming up with ideas and pitching them", value: "pitching", emoji: "💡", riasec: ["E"] },
+      { label: "Making spreadsheets or lists for fun", value: "lists", emoji: "📊", riasec: ["C"] },
+      { label: "Spending time outdoors or with animals", value: "outdoors", emoji: "🌿", riasec: ["R"] },
+      { label: "Writing stories, scripts, or captions", value: "writing", emoji: "✍️", riasec: ["A"] },
+      { label: "Solving puzzles or logic games", value: "puzzles", emoji: "🧩", riasec: ["I"] },
     ],
   },
   {
-    id: 3,
-    type: "slider",
-    category: "thinking-style",
-    question: "How do you prefer to solve problems?",
-    emoji: "🧠",
-    sliderLabels: { left: "Logic & Analysis 🔬", right: "Creativity & Intuition 🎨" },
-  },
-  {
-    id: 4,
-    type: "multiple-choice",
-    category: "academic",
-    question: "Which school subject genuinely excites you?",
-    emoji: "📚",
+    id: 3, round: 1, type: "photo-grid",
+    prompt: "Your school just gave everyone a free afternoon. You immediately think...",
     options: [
-      { label: "Math or Physics — I love solving puzzles", value: "stem", emoji: "🔢" },
-      { label: "English or History — I love stories and ideas", value: "humanities", emoji: "📖" },
-      { label: "Art or Music — I love expressing myself", value: "arts", emoji: "🎵" },
-      { label: "Biology or Chemistry — I love understanding life", value: "life-sciences", emoji: "🧬" },
+      { label: "I'm going to make something", value: "make", emoji: "🎨", riasec: ["A"], photoUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop&q=80" },
+      { label: "I want to figure out how something works", value: "figure-out", emoji: "🔬", riasec: ["I"], photoUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&q=80" },
+      { label: "I want to help organise something for the school", value: "organise", emoji: "📋", riasec: ["S", "E"], photoUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop&q=80" },
+      { label: "I want to get outside and do something physical", value: "physical", emoji: "🏃", riasec: ["R"], photoUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop&q=80" },
+    ],
+  },
+
+  // ═══ ROUND 2: Work Style & Personality ═══
+  {
+    id: 4, round: 2, type: "two-cards",
+    prompt: "Be honest — which sounds more like you?",
+    options: [
+      { label: "I do my best work solo, in my own zone", value: "solo", emoji: "🎧", photoUrl: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=400&h=500&fit=crop&q=80" },
+      { label: "I come alive when I'm collaborating with others", value: "collab", emoji: "🤝", photoUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=500&fit=crop&q=80" },
+      { label: "Honestly, it depends", value: "mixed", emoji: "🤷" },
     ],
   },
   {
-    id: 5,
-    type: "personality",
-    category: "personality",
-    question: "At a party, you're most likely to...",
-    emoji: "🎉",
+    id: 5, round: 2, type: "slider", sliderPoints: 5,
+    prompt: "When you get a task, you prefer...",
+    sliderLabels: { left: "Clear steps and a plan", right: "Total freedom to figure it out my way", leftEmoji: "📋", rightEmoji: "🌊" },
+  },
+  {
+    id: 6, round: 2, type: "photo-grid",
+    prompt: "Which of these work situations sounds most like you on a good day?",
     options: [
-      { label: "Talk to everyone and be the center of energy", value: "extrovert", emoji: "🗣️" },
-      { label: "Have deep conversations with a few people", value: "ambivert", emoji: "💬" },
-      { label: "Observe and enjoy the vibe quietly", value: "introvert", emoji: "👀" },
-      { label: "Be organizing the playlist or food", value: "organizer", emoji: "🎧" },
+      { label: "Working outdoors — on a site, in a field, in nature", value: "outdoors", emoji: "🌿", riasec: ["R"], photoUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=400&fit=crop&q=80" },
+      { label: "At a creative desk — sketchbooks, screens, colour everywhere", value: "creative-desk", emoji: "🎨", riasec: ["A"], photoUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop&q=80" },
+      { label: "In a busy room talking to people — a clinic, classroom, or office", value: "social-room", emoji: "🗣️", riasec: ["S", "E"], photoUrl: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&h=400&fit=crop&q=80" },
+      { label: "Alone at a clean desk deep in focused work", value: "focused-desk", emoji: "🧠", riasec: ["I", "C"], photoUrl: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400&h=400&fit=crop&q=80" },
+    ],
+  },
+
+  // ═══ ROUND 3: Strengths ═══
+  {
+    id: 7, round: 3, type: "emoji-grid", maxSelect: 3,
+    prompt: "What do people actually come to you for?",
+    options: [
+      { label: "Explaining things so they make sense", value: "explaining", emoji: "🗣️", riasec: ["S"] },
+      { label: "Coming up with fresh ideas", value: "ideas", emoji: "💡", riasec: ["A", "E"] },
+      { label: "Staying calm when things go wrong", value: "calm", emoji: "🧘", riasec: ["S"] },
+      { label: "Spotting details others miss", value: "details", emoji: "🔍", riasec: ["C", "I"] },
+      { label: "Getting people excited and moving", value: "energising", emoji: "⚡", riasec: ["E"] },
+      { label: "Making people feel heard and understood", value: "empathy", emoji: "❤️", riasec: ["S"] },
+      { label: "Building, fixing, or making things work", value: "building", emoji: "🔧", riasec: ["R"] },
+      { label: "Spotting patterns in data or situations", value: "patterns", emoji: "📈", riasec: ["I"] },
+      { label: "Performing or presenting in front of others", value: "performing", emoji: "🎤", riasec: ["E", "A"] },
+      { label: "Keeping things organised and on track", value: "organising", emoji: "🗂️", riasec: ["C"] },
     ],
   },
   {
-    id: 6,
-    type: "multiple-choice",
-    category: "work-environment",
-    question: "Where would you love to work?",
-    emoji: "🏢",
+    id: 8, round: 3, type: "tap-select",
+    prompt: "When you're working on something hard, which describes you best?",
     options: [
-      { label: "A high-tech office with the latest gadgets", value: "tech-office", emoji: "💻" },
-      { label: "Outdoors — labs, fields, or the ocean", value: "outdoors", emoji: "🌊" },
-      { label: "A creative studio or workshop", value: "studio", emoji: "🎨" },
-      { label: "A hospital, school, or community center", value: "community", emoji: "🏥" },
+      { label: "I zoom out — I care about the big picture and the overall vision", value: "big-picture", emoji: "🌐", riasec: ["E"] },
+      { label: "I zoom in — I want every detail to be exactly right", value: "detail", emoji: "🔍", riasec: ["C"] },
+      { label: "I switch between both depending on the situation", value: "balanced", emoji: "⚖️" },
     ],
   },
   {
-    id: 7,
-    type: "slider",
-    category: "work-style",
-    question: "Do you prefer working alone or with a team?",
-    emoji: "👥",
-    sliderLabels: { left: "Solo — I do my best work alone 🎯", right: "Team — I thrive with others 🤝" },
-  },
-  {
-    id: 8,
-    type: "scenario",
-    category: "goals",
-    question: "You just won $10 million. What do you do first?",
-    emoji: "💰",
+    id: 9, round: 3, type: "two-cards",
+    prompt: "Your friend asks for help on a project. What do you naturally do?",
     options: [
-      { label: "Start a business that changes the world", value: "entrepreneur", emoji: "🚀" },
-      { label: "Fund research to solve a huge problem", value: "researcher", emoji: "🔬" },
-      { label: "Create something beautiful — a film, album, or building", value: "creator", emoji: "🎬" },
-      { label: "Travel and learn from different cultures", value: "explorer", emoji: "✈️" },
+      { label: "I jump in with ideas, energy, and plans — let's make something great", value: "creative-jump", emoji: "🚀", riasec: ["A", "E"], photoUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=500&fit=crop&q=80" },
+      { label: "I ask questions, do the research, and make sure we're doing it properly", value: "research-careful", emoji: "📖", riasec: ["I", "C"], photoUrl: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=400&h=500&fit=crop&q=80" },
+    ],
+  },
+
+  // ═══ ROUND 4: Values ═══
+  {
+    id: 10, round: 4, type: "drag-rank",
+    prompt: "Drag these into your personal order — most important at the top.",
+    options: [
+      { label: "Earning really good money", value: "money", emoji: "💰" },
+      { label: "Making a genuine difference in people's lives", value: "impact", emoji: "❤️" },
+      { label: "Doing something creative every day", value: "creativity", emoji: "🎨" },
+      { label: "Feeling stable and secure — knowing the job is safe", value: "stability", emoji: "🔒" },
+      { label: "Being challenged and always growing", value: "growth", emoji: "🚀" },
+      { label: "Freedom — flexible hours, be your own boss", value: "freedom", emoji: "🗽" },
     ],
   },
   {
-    id: 9,
-    type: "multiple-choice",
-    category: "impact",
-    question: "What kind of impact do you want to make?",
-    emoji: "🌍",
+    id: 11, round: 4, type: "tap-select",
+    prompt: "Which of these would bother you most in a future job?",
     options: [
-      { label: "Save lives or improve health", value: "health", emoji: "❤️" },
-      { label: "Push technology forward", value: "technology", emoji: "🤖" },
-      { label: "Make people feel something through art", value: "art", emoji: "🎭" },
-      { label: "Protect the planet and nature", value: "environment", emoji: "🌱" },
+      { label: "Being stuck doing the same thing every day", value: "no-variety", emoji: "🔄" },
+      { label: "Never knowing if I'd have work next month", value: "no-stability", emoji: "😰" },
+      { label: "Having no say in how or when I do things", value: "no-autonomy", emoji: "🔗" },
+      { label: "Doing work that doesn't help anyone", value: "no-impact", emoji: "😞" },
+      { label: "Never being recognised or respected", value: "no-status", emoji: "👻" },
+      { label: "Not being able to express my creativity", value: "no-creativity", emoji: "🚫" },
     ],
   },
   {
-    id: 10,
-    type: "slider",
-    category: "risk-tolerance",
-    question: "How much risk are you willing to take in your career?",
-    emoji: "🎲",
-    sliderLabels: { left: "Play it safe — I want stability 🛡️", right: "Go big — I'll risk it all 🎰" },
+    id: 12, round: 4, type: "tap-photo-cards",
+    prompt: "If you could work on any of these right now, which would you pick?",
+    options: [
+      { label: "Making healthcare reach people who need it most", value: "healthcare", emoji: "🏥", riasec: ["S", "I"], photoUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop&q=80" },
+      { label: "Building tech that changes how people live", value: "tech", emoji: "💻", riasec: ["R", "I"], photoUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=300&fit=crop&q=80" },
+      { label: "Creating stories, art, or culture that moves people", value: "culture", emoji: "🎭", riasec: ["A"], photoUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&h=300&fit=crop&q=80" },
+      { label: "Fighting for fairness and justice", value: "justice", emoji: "⚖️", riasec: ["S", "E"], photoUrl: "https://images.unsplash.com/photo-1589578527966-fdac0f44566c?w=400&h=300&fit=crop&q=80" },
+    ],
+  },
+
+  // ═══ ROUND 5: Personality & Risk ═══
+  {
+    id: 13, round: 5, type: "emoji-slider", sliderPoints: 5,
+    prompt: "How do you feel about trying something new that might not work out?",
+    sliderLabels: { left: "Makes me anxious", right: "I live for it", leftEmoji: "😬", rightEmoji: "😎" },
   },
   {
-    id: 11,
-    type: "personality",
-    category: "personality",
-    question: "Friends would describe you as...",
-    emoji: "✨",
+    id: 14, round: 5, type: "three-way",
+    prompt: "At a party or social event, you usually...",
     options: [
-      { label: "The brains — always solving problems", value: "analytical", emoji: "🧠" },
-      { label: "The heart — always caring for others", value: "empathetic", emoji: "💖" },
-      { label: "The spark — always generating ideas", value: "creative", emoji: "⚡" },
-      { label: "The rock — always reliable and strong", value: "steady", emoji: "🪨" },
+      { label: "End up talking to lots of new people — I get energy from it", value: "extrovert", emoji: "🔥" },
+      { label: "Stick with people I already know and have deeper chats", value: "ambivert", emoji: "🤝" },
+      { label: "I'd honestly rather not be there — I recharge alone", value: "introvert", emoji: "🎧" },
     ],
   },
   {
-    id: 12,
-    type: "multiple-choice",
-    category: "interests",
-    question: "Which YouTube rabbit hole do you fall into?",
-    emoji: "📱",
+    id: 15, round: 5, type: "tap-select",
+    prompt: "If your friend described you in one word, which would they pick?",
     options: [
-      { label: "Tech reviews and coding tutorials", value: "tech", emoji: "💻" },
-      { label: "True crime, documentaries, psychology", value: "investigation", emoji: "🔍" },
-      { label: "Music production, art, or design", value: "creative", emoji: "🎨" },
-      { label: "Sports highlights and fitness", value: "sports", emoji: "🏅" },
+      { label: "Energetic — I bring the hype", value: "energetic", emoji: "🔥", riasec: ["E"] },
+      { label: "Thoughtful — I think before I speak", value: "thoughtful", emoji: "🤔", riasec: ["I"] },
+      { label: "Caring — people feel safe with me", value: "caring", emoji: "❤️", riasec: ["S"] },
+      { label: "Driven — I always have a goal", value: "driven", emoji: "🎯", riasec: ["E", "C"] },
+      { label: "Creative — I see things differently", value: "creative", emoji: "🌀", riasec: ["A"] },
+      { label: "Curious — I always want to know more", value: "curious", emoji: "🔬", riasec: ["I"] },
+    ],
+  },
+
+  // ═══ ROUND 6: Subjects & Role Models ═══
+  {
+    id: 16, round: 6, type: "pill-grid", maxSelect: 4,
+    prompt: "Which subjects do you actually enjoy — even a little?",
+    options: [
+      { label: "English", value: "english", emoji: "📝" },
+      { label: "Maths", value: "maths", emoji: "🔢" },
+      { label: "Biology", value: "biology", emoji: "🧬" },
+      { label: "Chemistry", value: "chemistry", emoji: "⚗️" },
+      { label: "Physics", value: "physics", emoji: "⚛️" },
+      { label: "Geography", value: "geography", emoji: "🌍" },
+      { label: "Economics", value: "economics", emoji: "📈" },
+      { label: "Art", value: "art", emoji: "🎨" },
+      { label: "Computer Science", value: "cs", emoji: "💻" },
+      { label: "Business Studies", value: "business", emoji: "💼" },
+      { label: "Drama", value: "drama", emoji: "🎭" },
+      { label: "Music", value: "music", emoji: "🎵" },
+      { label: "History", value: "history", emoji: "📜" },
+      { label: "Physical Education", value: "pe", emoji: "🏃" },
+      { label: "Literature", value: "literature", emoji: "📖" },
+      { label: "Civics", value: "civics", emoji: "🏛️" },
+      { label: "Environmental Science", value: "env-sci", emoji: "🌱" },
+      { label: "Food & Nutrition", value: "food", emoji: "🍳" },
+      { label: "Further Maths", value: "further-maths", emoji: "➕" },
     ],
   },
   {
-    id: 13,
-    type: "scenario",
-    category: "strengths",
-    question: "A friend is starting a business and needs help. You offer to...",
-    emoji: "🤝",
+    id: 17, round: 6, type: "swipe-cards",
+    prompt: "Which of these people sounds most like someone you'd want to be?",
     options: [
-      { label: "Build their website or app", value: "technical", emoji: "🖥️" },
-      { label: "Design their brand and marketing", value: "design", emoji: "✏️" },
-      { label: "Handle the finances and strategy", value: "business", emoji: "📊" },
-      { label: "Connect them with the right people", value: "networking", emoji: "🌐" },
+      { label: "An engineer who builds bridges and infrastructure in developing cities", value: "engineer-role", emoji: "🔧", riasec: ["R"], personName: "David Adjei", personRole: "Civil Engineer, Accra", photoUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=800&fit=crop&q=80" },
+      { label: "A scientist researching a cure for a disease", value: "scientist-role", emoji: "🔬", riasec: ["I"], personName: "Dr. Nneka Abulokwe", personRole: "Medical Researcher, Lagos", photoUrl: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&h=800&fit=crop&q=80" },
+      { label: "A filmmaker telling African stories to the world", value: "filmmaker-role", emoji: "🎬", riasec: ["A"], personName: "Akin Omotoso", personRole: "Film Director, Cape Town", photoUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&h=800&fit=crop&q=80" },
+      { label: "A doctor running a free clinic in a rural community", value: "doctor-role", emoji: "🏥", riasec: ["S"], personName: "Dr. Ola Brown", personRole: "Flying Doctors Nigeria", photoUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=800&fit=crop&q=80" },
+      { label: "A founder who built a company from nothing and scaled it across Africa", value: "founder-role", emoji: "🚀", riasec: ["E"], personName: "Shola Akinlade", personRole: "CEO, Paystack", photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop&q=80" },
+      { label: "A financial analyst helping businesses grow their money", value: "analyst-role", emoji: "📊", riasec: ["C"], personName: "Acha Leke", personRole: "Senior Partner, McKinsey Africa", photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=800&fit=crop&q=80" },
     ],
   },
   {
-    id: 14,
-    type: "slider",
-    category: "leadership",
-    question: "Are you more of a leader or an independent contributor?",
-    emoji: "👑",
-    sliderLabels: { left: "Independent expert 🎯", right: "Team leader 👑" },
-  },
-  {
-    id: 15,
-    type: "multiple-choice",
-    category: "academic",
-    question: "What kind of project would you ace?",
-    emoji: "🏆",
-    options: [
-      { label: "A science experiment or engineering challenge", value: "stem-project", emoji: "🔬" },
-      { label: "A creative writing or film project", value: "creative-project", emoji: "📝" },
-      { label: "A business plan or debate competition", value: "business-project", emoji: "💼" },
-      { label: "A community service or environmental project", value: "service-project", emoji: "🌍" },
-    ],
-  },
-  {
-    id: 16,
-    type: "personality",
-    category: "motivation",
-    question: "What motivates you the most?",
-    emoji: "🔥",
-    options: [
-      { label: "Making a lot of money", value: "wealth", emoji: "💵" },
-      { label: "Making a real difference in the world", value: "impact", emoji: "🌟" },
-      { label: "Being famous or influential", value: "fame", emoji: "⭐" },
-      { label: "Having freedom and work-life balance", value: "freedom", emoji: "🕊️" },
-    ],
-  },
-  {
-    id: 17,
-    type: "multiple-choice",
-    category: "work-environment",
-    question: "What's your ideal daily routine?",
-    emoji: "⏰",
-    options: [
-      { label: "Structured 9-5 with clear tasks", value: "structured", emoji: "📋" },
-      { label: "Flexible hours, work from anywhere", value: "flexible", emoji: "🏠" },
-      { label: "Always different — travel and variety", value: "varied", emoji: "✈️" },
-      { label: "High-intensity, fast-paced environment", value: "intense", emoji: "🔥" },
-    ],
-  },
-  {
-    id: 18,
-    type: "scenario",
-    category: "impact",
-    question: "If you could fix ONE world problem, which would it be?",
-    emoji: "🌎",
-    options: [
-      { label: "Climate change and environmental destruction", value: "environment", emoji: "🌡️" },
-      { label: "Healthcare access and disease", value: "health", emoji: "🏥" },
-      { label: "Education inequality", value: "education", emoji: "📚" },
-      { label: "Poverty and economic inequality", value: "poverty", emoji: "🤲" },
-    ],
-  },
-  {
-    id: 19,
-    type: "slider",
-    category: "thinking-style",
-    question: "Big picture or fine details?",
-    emoji: "🔎",
-    sliderLabels: { left: "Zoom in — I love the details 🔍", right: "Zoom out — I see the big picture 🌐" },
-  },
-  {
-    id: 20,
-    type: "multiple-choice",
-    category: "interests",
-    question: "Which superpower would you choose?",
-    emoji: "🦸",
-    options: [
-      { label: "Super intelligence — know everything instantly", value: "intelligence", emoji: "🧠" },
-      { label: "Healing — cure any illness or injury", value: "healing", emoji: "✨" },
-      { label: "Time travel — explore past and future", value: "time-travel", emoji: "⏰" },
-      { label: "Telepathy — understand everyone's feelings", value: "telepathy", emoji: "💫" },
-    ],
+    id: 18, round: 6, type: "free-text", skippable: true,
+    prompt: "Is there a job or career you've always been curious about — even if it sounds random? Type it here (or skip).",
+    placeholder: "e.g. forensic scientist, game developer, fashion designer...",
   },
 ];
 
-export interface AssessmentResult {
-  answers: Record<number, string | number>;
-}
-
-// Archetype definitions
+// ─── Archetype definitions (kept for backward compat) ───
 export interface Archetype {
   name: string;
   emoji: string;
@@ -263,246 +285,239 @@ export interface Archetype {
 }
 
 export const archetypes: Record<string, Archetype> = {
-  builder: {
-    name: "The Builder",
-    emoji: "🔧",
-    description: "You love creating things from scratch and solving technical challenges.",
-    color: "primary",
-  },
-  visionary: {
-    name: "The Visionary",
-    emoji: "🔮",
-    description: "You see the big picture and inspire others with bold ideas.",
-    color: "secondary",
-  },
-  creator: {
-    name: "The Creator",
-    emoji: "🎨",
-    description: "You express yourself through art, design, and creative work.",
-    color: "purple",
-  },
-  analyst: {
-    name: "The Analyst",
-    emoji: "📊",
-    description: "You thrive on data, logic, and finding patterns others miss.",
-    color: "secondary",
-  },
-  healer: {
-    name: "The Healer",
-    emoji: "💚",
-    description: "You're driven by caring for others and making lives better.",
-    color: "accent",
-  },
-  explorer: {
-    name: "The Explorer",
-    emoji: "🧭",
-    description: "You seek adventure, new experiences, and understanding the world.",
-    color: "primary",
-  },
+  builder: { name: "The Builder", emoji: "🔧", description: "You love creating things from scratch and solving technical challenges.", color: "primary" },
+  visionary: { name: "The Visionary", emoji: "🔮", description: "You see the big picture and inspire others with bold ideas.", color: "secondary" },
+  creator: { name: "The Creator", emoji: "🎨", description: "You express yourself through art, design, and creative work.", color: "purple" },
+  analyst: { name: "The Analyst", emoji: "📊", description: "You thrive on data, logic, and finding patterns others miss.", color: "secondary" },
+  healer: { name: "The Healer", emoji: "💚", description: "You're driven by caring for others and making lives better.", color: "accent" },
+  explorer: { name: "The Explorer", emoji: "🧭", description: "You seek adventure, new experiences, and understanding the world.", color: "primary" },
 };
 
-// Simple career matching algorithm
-export function matchCareers(answers: Record<number, string | number>) {
-  const scores: Record<string, number> = {};
-  
-  const { careers: careerList } = { careers: careerData };
+// ─── RIASEC Career Tags ───
+// Maps career tags to RIASEC codes for the weighted matching
+const tagToRiasec: Record<string, RIASECCode[]> = {
+  "tech": ["I", "R"], "analytical": ["I", "C"], "innovative": ["I", "E"],
+  "engineering": ["R", "I"], "healthcare": ["S", "I"], "caring": ["S"],
+  "creative": ["A"], "design": ["A", "R"], "business": ["E", "C"],
+  "leadership": ["E"], "research": ["I"], "hands-on": ["R"],
+  "outdoors": ["R"], "public-facing": ["E", "S"], "writing": ["A"],
+  "science": ["I"], "finance": ["C", "E"], "sports": ["R"],
+  "collaborative": ["S", "E"], "independent": ["I", "C"],
+  "adventurous": ["R", "E"], "helping": ["S"], "stable": ["C"],
+  "mission-driven": ["S"], "impactful": ["S", "E"], "cultural": ["A", "S"],
+  "nature": ["R"], "environment": ["I", "R"], "sustainability": ["I", "S"],
+  "high-salary": ["E", "C"], "risk-taking": ["E"], "empathetic": ["S"],
+  "detail-oriented": ["C"], "visionary": ["E", "A"], "life-saving": ["S", "I"],
+  "future-proof": ["I"], "performance": ["A", "E"],
+};
 
-  careerList.forEach((career) => {
-    let score = 0;
+function getCareerRiasecProfile(tags: string[]): Record<RIASECCode, number> {
+  const profile: Record<RIASECCode, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+  tags.forEach(tag => {
+    const codes = tagToRiasec[tag];
+    if (codes) codes.forEach(c => profile[c] += 10);
+  });
+  // Normalise to 0-100
+  const max = Math.max(...Object.values(profile), 1);
+  (Object.keys(profile) as RIASECCode[]).forEach(k => profile[k] = Math.round((profile[k] / max) * 100));
+  return profile;
+}
 
-    // Interest matching
-    const q1 = answers[1];
-    if (q1 === "building" && career.tags.includes("tech")) score += 15;
-    if (q1 === "building" && career.tags.includes("engineering")) score += 15;
-    if (q1 === "helping" && career.tags.includes("healthcare")) score += 15;
-    if (q1 === "helping" && career.tags.includes("caring")) score += 10;
-    if (q1 === "creating" && career.tags.includes("creative")) score += 15;
-    if (q1 === "exploring" && career.tags.includes("adventurous")) score += 15;
-    if (q1 === "exploring" && career.tags.includes("outdoors")) score += 10;
+// ─── Scoring helpers ───
+function computeRiasecFromAnswers(answers: Record<number, any>): Record<RIASECCode, number> {
+  const scores: Record<RIASECCode, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
 
-    // Strength matching
-    const q2 = answers[2];
-    if (q2 === "organizer" && career.tags.includes("leadership")) score += 10;
-    if (q2 === "visionary" && career.tags.includes("innovative")) score += 10;
-    if (q2 === "executor" && career.tags.includes("hands-on")) score += 10;
-    if (q2 === "researcher" && career.tags.includes("analytical")) score += 10;
-    if (q2 === "researcher" && career.tags.includes("research")) score += 10;
+  assessmentQuestions.forEach(q => {
+    const ans = answers[q.id];
+    if (!ans || !q.options) return;
 
-    // Thinking style (slider 0-100)
-    const q3 = typeof answers[3] === "number" ? answers[3] : 50;
-    if (q3 < 40 && career.tags.includes("analytical")) score += 10;
-    if (q3 > 60 && career.tags.includes("creative")) score += 10;
-
-    // Academic interests
-    const q4 = answers[4];
-    if (q4 === "stem" && career.tags.includes("tech")) score += 12;
-    if (q4 === "stem" && career.tags.includes("engineering")) score += 12;
-    if (q4 === "humanities" && career.tags.includes("writing")) score += 12;
-    if (q4 === "humanities" && career.tags.includes("cultural")) score += 8;
-    if (q4 === "arts" && career.tags.includes("creative")) score += 12;
-    if (q4 === "life-sciences" && career.tags.includes("healthcare")) score += 12;
-    if (q4 === "life-sciences" && career.tags.includes("science")) score += 10;
-
-    // Personality
-    const q5 = answers[5];
-    if (q5 === "extrovert" && career.tags.includes("public-facing")) score += 8;
-    if (q5 === "extrovert" && career.tags.includes("leadership")) score += 8;
-    if (q5 === "introvert" && career.tags.includes("research")) score += 8;
-    if (q5 === "introvert" && career.tags.includes("analytical")) score += 5;
-
-    // Work environment
-    const q6 = answers[6];
-    if (q6 === "tech-office" && career.tags.includes("tech")) score += 10;
-    if (q6 === "outdoors" && career.tags.includes("outdoors")) score += 10;
-    if (q6 === "outdoors" && career.tags.includes("nature")) score += 10;
-    if (q6 === "outdoors" && career.tags.includes("adventurous")) score += 8;
-    if (q6 === "studio" && career.tags.includes("creative")) score += 10;
-    if (q6 === "studio" && career.tags.includes("design")) score += 8;
-    if (q6 === "community" && career.tags.includes("healthcare")) score += 10;
-    if (q6 === "community" && career.tags.includes("helping")) score += 8;
-
-    // Work style (slider)
-    const q7 = typeof answers[7] === "number" ? answers[7] : 50;
-    if (q7 < 40 && career.tags.includes("independent")) score += 8;
-    if (q7 > 60 && career.tags.includes("collaborative")) score += 8;
-
-    // Goals
-    const q8 = answers[8];
-    if (q8 === "entrepreneur" && career.tags.includes("business")) score += 10;
-    if (q8 === "entrepreneur" && career.tags.includes("leadership")) score += 8;
-    if (q8 === "researcher" && career.tags.includes("research")) score += 10;
-    if (q8 === "researcher" && career.tags.includes("science")) score += 8;
-    if (q8 === "creator" && career.tags.includes("creative")) score += 10;
-    if (q8 === "explorer" && career.tags.includes("adventurous")) score += 10;
-
-    // Impact
-    const q9 = answers[9];
-    if (q9 === "health" && career.tags.includes("healthcare")) score += 12;
-    if (q9 === "health" && career.tags.includes("life-saving")) score += 10;
-    if (q9 === "technology" && career.tags.includes("tech")) score += 12;
-    if (q9 === "technology" && career.tags.includes("innovative")) score += 8;
-    if (q9 === "art" && career.tags.includes("creative")) score += 12;
-    if (q9 === "environment" && career.tags.includes("environment")) score += 12;
-    if (q9 === "environment" && career.tags.includes("sustainability")) score += 10;
-
-    // Risk tolerance (slider)
-    const q10 = typeof answers[10] === "number" ? answers[10] : 50;
-    if (q10 > 70 && career.tags.includes("risk-taking")) score += 8;
-    if (q10 < 30 && career.tags.includes("stable")) score += 8;
-
-    // Personality q11
-    const q11 = answers[11];
-    if (q11 === "analytical" && career.tags.includes("analytical")) score += 10;
-    if (q11 === "empathetic" && career.tags.includes("caring")) score += 10;
-    if (q11 === "empathetic" && career.tags.includes("empathetic")) score += 10;
-    if (q11 === "creative" && career.tags.includes("creative")) score += 10;
-    if (q11 === "steady" && career.tags.includes("stable")) score += 8;
-
-    // YouTube interests q12
-    const q12 = answers[12];
-    if (q12 === "tech" && career.tags.includes("tech")) score += 8;
-    if (q12 === "investigation" && career.tags.includes("research")) score += 8;
-    if (q12 === "creative" && career.tags.includes("creative")) score += 8;
-    if (q12 === "sports" && career.tags.includes("sports")) score += 8;
-
-    // Skills q13
-    const q13 = answers[13];
-    if (q13 === "technical" && career.tags.includes("tech")) score += 8;
-    if (q13 === "design" && career.tags.includes("design")) score += 8;
-    if (q13 === "business" && career.tags.includes("business")) score += 8;
-    if (q13 === "business" && career.tags.includes("finance")) score += 8;
-    if (q13 === "networking" && career.tags.includes("public-facing")) score += 8;
-
-    // Leadership (slider)
-    const q14 = typeof answers[14] === "number" ? answers[14] : 50;
-    if (q14 > 60 && career.tags.includes("leadership")) score += 8;
-
-    // Academic project q15
-    const q15 = answers[15];
-    if (q15 === "stem-project" && career.tags.includes("engineering")) score += 8;
-    if (q15 === "stem-project" && career.tags.includes("tech")) score += 5;
-    if (q15 === "creative-project" && career.tags.includes("creative")) score += 8;
-    if (q15 === "business-project" && career.tags.includes("business")) score += 8;
-    if (q15 === "service-project" && career.tags.includes("mission-driven")) score += 8;
-
-    // Motivation q16
-    const q16 = answers[16];
-    if (q16 === "wealth" && career.tags.includes("high-salary")) score += 8;
-    if (q16 === "impact" && career.tags.includes("mission-driven")) score += 8;
-    if (q16 === "impact" && career.tags.includes("impactful")) score += 8;
-
-    // World problem q18
-    const q18 = answers[18];
-    if (q18 === "environment" && career.tags.includes("environment")) score += 10;
-    if (q18 === "health" && career.tags.includes("healthcare")) score += 10;
-
-    // Big picture vs details (slider)
-    const q19 = typeof answers[19] === "number" ? answers[19] : 50;
-    if (q19 < 40 && career.tags.includes("detail-oriented")) score += 5;
-    if (q19 > 60 && career.tags.includes("visionary")) score += 5;
-
-    // Superpower q20
-    const q20 = answers[20];
-    if (q20 === "intelligence" && career.tags.includes("analytical")) score += 8;
-    if (q20 === "healing" && career.tags.includes("healthcare")) score += 8;
-    if (q20 === "telepathy" && career.tags.includes("empathetic")) score += 8;
-
-    scores[career.id] = score;
+    if (Array.isArray(ans)) {
+      // Multi-select
+      ans.forEach((v: string) => {
+        const opt = q.options!.find(o => o.value === v);
+        opt?.riasec?.forEach(c => scores[c] += 2);
+      });
+    } else if (typeof ans === "string") {
+      const opt = q.options!.find(o => o.value === ans);
+      opt?.riasec?.forEach(c => scores[c] += 3);
+    }
   });
 
-  // Sort and return top 3 — students get exactly 3 matched paths
-  const sorted = Object.entries(scores)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 3);
+  // Normalise to 0-100
+  const max = Math.max(...Object.values(scores), 1);
+  (Object.keys(scores) as RIASECCode[]).forEach(k => scores[k] = Math.round((scores[k] / max) * 100));
+  return scores;
+}
 
+function riasecSimilarity(a: Record<RIASECCode, number>, b: Record<RIASECCode, number>): number {
+  // Cosine similarity 0-100
+  let dot = 0, magA = 0, magB = 0;
+  (Object.keys(a) as RIASECCode[]).forEach(k => {
+    dot += a[k] * b[k];
+    magA += a[k] * a[k];
+    magB += b[k] * b[k];
+  });
+  if (magA === 0 || magB === 0) return 0;
+  return Math.round((dot / (Math.sqrt(magA) * Math.sqrt(magB))) * 100);
+}
+
+// ─── Value mappings ───
+const valueCareerTags: Record<string, string[]> = {
+  money: ["high-salary", "finance", "business"],
+  impact: ["mission-driven", "impactful", "caring", "healthcare", "helping"],
+  creativity: ["creative", "design", "writing", "cultural"],
+  stability: ["stable", "healthcare"],
+  growth: ["innovative", "future-proof", "tech"],
+  freedom: ["independent", "risk-taking", "adventurous"],
+};
+
+const botherToValue: Record<string, string> = {
+  "no-variety": "growth", "no-stability": "stability", "no-autonomy": "freedom",
+  "no-impact": "impact", "no-status": "growth", "no-creativity": "creativity",
+};
+
+// ─── Main matching algorithm ───
+export function matchCareers(answers: Record<number, any>): { careerId: string; score: number; rawScore: number }[] {
+  const studentRiasec = computeRiasecFromAnswers(answers);
+  const scores: Record<string, number> = {};
+
+  careerData.forEach(career => {
+    const careerRiasec = getCareerRiasecProfile(career.tags);
+    let total = 0;
+
+    // 1) RIASEC alignment — 30%
+    const riasecScore = riasecSimilarity(studentRiasec, careerRiasec);
+    total += riasecScore * 0.30;
+
+    // 2) Interests (Q1-Q3) — 20%
+    let interestScore = 0;
+    const q1 = answers[1];
+    if (q1 === "building" && career.tags.some(t => ["tech", "engineering", "hands-on"].includes(t))) interestScore += 33;
+    if (q1 === "researching" && career.tags.some(t => ["research", "science", "analytical"].includes(t))) interestScore += 33;
+    if (q1 === "creating" && career.tags.some(t => ["creative", "design", "writing"].includes(t))) interestScore += 33;
+    if (q1 === "helping" && career.tags.some(t => ["healthcare", "caring", "helping"].includes(t))) interestScore += 33;
+    if (q1 === "leading" && career.tags.some(t => ["leadership", "business"].includes(t))) interestScore += 33;
+    if (q1 === "organising" && career.tags.some(t => ["business", "finance", "analytical"].includes(t))) interestScore += 33;
+
+    const q2 = answers[2];
+    if (Array.isArray(q2)) {
+      q2.forEach((v: string) => {
+        const opt = assessmentQuestions[1].options!.find(o => o.value === v);
+        if (opt?.riasec) {
+          opt.riasec.forEach(c => {
+            if (careerRiasec[c] > 40) interestScore += 11;
+          });
+        }
+      });
+    }
+    total += Math.min(interestScore, 100) * 0.20;
+
+    // 3) Values (Q10-Q12) — 20%
+    let valueScore = 0;
+    const q10 = answers[10]; // ranked array
+    if (Array.isArray(q10) && q10.length > 0) {
+      const topValues = q10.slice(0, 2);
+      topValues.forEach((v: string) => {
+        const matchTags = valueCareerTags[v] || [];
+        if (career.tags.some(t => matchTags.includes(t))) valueScore += 25;
+      });
+    }
+    const q11 = answers[11];
+    if (q11) {
+      const mappedValue = botherToValue[q11];
+      if (mappedValue) {
+        const matchTags = valueCareerTags[mappedValue] || [];
+        if (career.tags.some(t => matchTags.includes(t))) valueScore += 25;
+      }
+    }
+    const q12 = answers[12];
+    if (q12 === "healthcare" && career.tags.includes("healthcare")) valueScore += 25;
+    if (q12 === "tech" && career.tags.includes("tech")) valueScore += 25;
+    if (q12 === "culture" && career.tags.includes("creative")) valueScore += 25;
+    if (q12 === "justice" && career.tags.some(t => ["mission-driven", "helping"].includes(t))) valueScore += 25;
+    total += Math.min(valueScore, 100) * 0.20;
+
+    // 4) Work style & personality (Q4-Q6, Q13-Q15) — 15%
+    let personalityScore = 50; // base
+    const q4 = answers[4];
+    if (q4 === "solo" && career.tags.includes("independent")) personalityScore += 15;
+    if (q4 === "collab" && career.tags.some(t => ["collaborative", "public-facing"].includes(t))) personalityScore += 15;
+
+    const q14 = answers[14];
+    if (q14 === "extrovert" && career.tags.includes("public-facing")) personalityScore += 10;
+    if (q14 === "introvert" && career.tags.includes("independent")) personalityScore += 10;
+
+    total += Math.min(personalityScore, 100) * 0.15;
+
+    // 5) Strengths (Q7-Q9) — 10%
+    let strengthScore = 0;
+    const q7 = answers[7];
+    if (Array.isArray(q7)) {
+      q7.forEach((v: string) => {
+        const opt = assessmentQuestions.find(q => q.id === 7)?.options?.find(o => o.value === v);
+        if (opt?.riasec) {
+          opt.riasec.forEach(c => {
+            if (careerRiasec[c] > 40) strengthScore += 15;
+          });
+        }
+      });
+    }
+    total += Math.min(strengthScore, 100) * 0.10;
+
+    // 6) Subjects (Q16) — 5%
+    let subjectScore = 0;
+    const q16 = answers[16];
+    if (Array.isArray(q16)) {
+      const subjectMapping: Record<string, string[]> = {
+        maths: ["tech", "engineering", "finance", "analytical"],
+        physics: ["engineering", "tech", "science"],
+        biology: ["healthcare", "science"],
+        chemistry: ["healthcare", "science"],
+        cs: ["tech"],
+        art: ["creative", "design"],
+        english: ["writing", "cultural"],
+        economics: ["business", "finance"],
+        business: ["business", "leadership"],
+        drama: ["creative", "performance", "public-facing"],
+        music: ["creative"],
+        pe: ["sports"],
+        history: ["cultural"],
+        "env-sci": ["environment", "sustainability"],
+      };
+      q16.forEach((s: string) => {
+        const tags = subjectMapping[s] || [];
+        if (career.tags.some(t => tags.includes(t))) subjectScore += 25;
+      });
+    }
+    total += Math.min(subjectScore, 100) * 0.05;
+
+    scores[career.id] = total;
+  });
+
+  // Q18 free-text boost
+  const q18 = answers[18];
+  if (typeof q18 === "string" && q18.trim()) {
+    const searchTerm = q18.toLowerCase().trim();
+    careerData.forEach(career => {
+      if (career.title.toLowerCase().includes(searchTerm) || career.id.includes(searchTerm.replace(/\s+/g, "-"))) {
+        scores[career.id] = (scores[career.id] || 0) + 15;
+      }
+    });
+  }
+
+  const sorted = Object.entries(scores).sort(([, a], [, b]) => b - a).slice(0, 3);
   const maxScore = sorted[0]?.[1] || 1;
 
   return sorted.map(([id, score]) => ({
     careerId: id,
-    score: Math.min(98, Math.round((score / maxScore) * 100 * 0.95 + 5)),
-    rawScore: score,
+    score: Math.min(98, Math.max(60, Math.round((score / maxScore) * 95 + 3))),
+    rawScore: Math.round(score),
   }));
 }
 
-export function determineArchetype(answers: Record<number, string | number>): string {
-  const counts: Record<string, number> = {
-    builder: 0,
-    visionary: 0,
-    creator: 0,
-    analyst: 0,
-    healer: 0,
-    explorer: 0,
-  };
-
-  if (answers[1] === "building") { counts.builder += 2; counts.analyst += 1; }
-  if (answers[1] === "helping") { counts.healer += 2; }
-  if (answers[1] === "creating") { counts.creator += 2; }
-  if (answers[1] === "exploring") { counts.explorer += 2; }
-
-  if (answers[2] === "organizer") counts.builder += 1;
-  if (answers[2] === "visionary") counts.visionary += 2;
-  if (answers[2] === "executor") counts.builder += 1;
-  if (answers[2] === "researcher") counts.analyst += 2;
-
-  const q3 = typeof answers[3] === "number" ? answers[3] : 50;
-  if (q3 < 40) counts.analyst += 2;
-  if (q3 > 60) counts.creator += 2;
-
-  if (answers[8] === "entrepreneur") counts.visionary += 2;
-  if (answers[8] === "researcher") counts.analyst += 1;
-  if (answers[8] === "creator") counts.creator += 2;
-  if (answers[8] === "explorer") counts.explorer += 2;
-
-  if (answers[9] === "health") counts.healer += 2;
-  if (answers[9] === "technology") { counts.builder += 1; counts.visionary += 1; }
-  if (answers[9] === "art") counts.creator += 2;
-  if (answers[9] === "environment") counts.explorer += 1;
-
-  if (answers[11] === "analytical") counts.analyst += 2;
-  if (answers[11] === "empathetic") counts.healer += 2;
-  if (answers[11] === "creative") counts.creator += 2;
-  if (answers[11] === "steady") counts.builder += 1;
-
-  const sorted = Object.entries(counts).sort(([, a], [, b]) => b - a);
-  return sorted[0][0];
+export function determineArchetype(answers: Record<number, any>): string {
+  const riasec = computeRiasecFromAnswers(answers);
+  const map: Record<RIASECCode, string> = { R: "builder", I: "analyst", A: "creator", S: "healer", E: "visionary", C: "analyst" };
+  const top = (Object.entries(riasec) as [RIASECCode, number][]).sort(([, a], [, b]) => b - a)[0][0];
+  return map[top] || "explorer";
 }
