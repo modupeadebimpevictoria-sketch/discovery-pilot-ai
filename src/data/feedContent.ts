@@ -1,6 +1,6 @@
 import { getCareerById, Career } from "@/data/careers";
 
-export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "quest-nudge";
+export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "mission-nudge";
 
 export interface FeedPost {
   id: string;
