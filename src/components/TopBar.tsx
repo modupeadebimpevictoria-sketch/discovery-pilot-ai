@@ -4,7 +4,7 @@ import NotificationBell from "@/components/NotificationBell";
 import SpringBoardLogo from "@/components/SpringBoardLogo";
 import { useTheme } from "@/hooks/useTheme";
 
-const showOn = ["/dashboard", "/feed", "/quests", "/universe", "/opportunities", "/passport", "/auth"];
+const showOn = ["/dashboard", "/feed", "/quests", "/universe", "/opportunities", "/passport", "/auth", "/me", "/mentor"];
 
 export default function TopBar() {
   const location = useLocation();
