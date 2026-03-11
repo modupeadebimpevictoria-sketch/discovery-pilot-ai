@@ -6,11 +6,12 @@ import { missions } from "@/data/missions";
 import { internships } from "@/data/internships";
 import { weeklyQuests } from "@/data/weeklyQuests";
 import { skillDetails } from "@/data/skillDetails";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ChevronLeft, Award, Briefcase, Trophy, Target,
-  Zap, CheckCircle, Share2, Download, Link2, Stamp, Sparkles
+  Zap, CheckCircle, Share2, Download, Link2, Stamp, Sparkles, ExternalLink, Compass
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ShareModal from "@/components/ShareModal";
 
 const LEVEL_TITLES = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
