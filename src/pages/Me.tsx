@@ -57,10 +57,49 @@ export default function Me() {
       const { data } = supabase.storage
         .from("avatars")
         .getPublicUrl(`${user.id}/avatar`);
-      // Check if file actually exists by appending timestamp
       setAvatarUrl(`${data.publicUrl}?t=${Date.now()}`);
     }
   });
+
+  // Load saved opportunities
+  useEffect(() => {
+    if (!user) return;
+    const fetchSaved = async () => {
+      setSavedOppsLoading(true);
+      const { data: saves } = await supabase
+        .from("user_saved_opportunities")
+        .select("opportunity_id, saved_at")
+        .eq("user_id", user.id)
+        .order("saved_at", { ascending: false });
+
+      if (!saves || saves.length === 0) {
+        setSavedOpps([]);
+        setSavedOppsLoading(false);
+        return;
+      }
+
+      const ids = saves.map((s: any) => s.opportunity_id);
+      const { data: opps } = await supabase
+        .from("admin_opportunities")
+        .select("id, title, organisation, type, application_url, is_link_dead")
+        .in("id", ids);
+
+      setSavedOpps(opps || []);
+      setSavedOppsLoading(false);
+    };
+    fetchSaved();
+  }, [user]);
+
+  const handleUnsave = async (oppId: string) => {
+    if (!user) return;
+    await supabase
+      .from("user_saved_opportunities")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("opportunity_id", oppId);
+    setSavedOpps((prev) => prev.filter((o) => o.id !== oppId));
+    toast.success("Removed from saved ♡");
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
