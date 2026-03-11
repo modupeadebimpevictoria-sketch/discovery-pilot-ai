@@ -245,6 +245,18 @@ export default function Results() {
     );
   }
 
+  // Post-assessment walkthrough (runs once)
+  if (phase === "walkthrough") {
+    return (
+      <PostAssessmentWalkthrough
+        onComplete={() => {
+          localStorage.setItem("sb_walkthrough_seen", "true");
+          navigate("/feed");
+        }}
+      />
+    );
+  }
+
   // Final cards view
   return (
     <div className="min-h-screen bg-background pb-28">
