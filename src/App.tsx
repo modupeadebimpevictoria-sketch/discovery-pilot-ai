@@ -18,6 +18,7 @@ import Roadmap from "./pages/Roadmap";
 import Quests from "./pages/Quests";
 import CareerPassport from "./pages/CareerPassport";
 import Opportunities from "./pages/Opportunities";
+import Mentor from "./pages/Mentor";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/quests" element={<Quests />} />
             <Route path="/passport" element={<CareerPassport />} />
             <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="/mentor" element={<Mentor />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <TopBar />
