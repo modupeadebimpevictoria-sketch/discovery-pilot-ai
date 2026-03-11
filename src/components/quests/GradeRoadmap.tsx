@@ -124,7 +124,7 @@ export default function GradeRoadmap() {
     );
   }
 
-
+  const toggleCollapse = (band: string) => {
     setCollapsedBands((prev) => {
       const next = new Set(prev);
       if (next.has(band)) next.delete(band);
