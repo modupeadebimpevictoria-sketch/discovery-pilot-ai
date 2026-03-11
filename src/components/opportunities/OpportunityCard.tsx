@@ -108,7 +108,10 @@ export default function OpportunityCard({
               </Tooltip>
             </TooltipProvider>
           ) : (
-            <button
+            <a
+              href={opp.application_url}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={handleApplyClick}
               className={`flex-1 text-xs py-2 rounded-2xl font-bold transition-all flex items-center justify-center gap-1 ${
                 applied
@@ -117,7 +120,7 @@ export default function OpportunityCard({
               }`}
             >
               {applied ? "✅ Explored" : "Apply →"}
-            </button>
+            </a>
           )}
 
           {/* View details */}
