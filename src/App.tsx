@@ -56,6 +56,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <TopBar />
+          <OfflineBanner />
           <BottomNav />
         </BrowserRouter>
       </AppProvider>
