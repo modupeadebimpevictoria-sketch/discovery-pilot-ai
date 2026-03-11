@@ -13,7 +13,7 @@ export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const hideOn = ["/onboarding", "/assessment", "/auth", "/reset-password"];
+  const hideOn = ["/onboarding", "/assessment", "/auth", "/reset-password", "/admin"];
   if (hideOn.some((p) => location.pathname.startsWith(p))) return null;
 
   return (

@@ -14,6 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_opportunities: {
+        Row: {
+          application_url: string
+          career_family: string | null
+          city: string | null
+          country: string
+          created_at: string | null
+          deadline: string | null
+          description: string
+          duration: string | null
+          id: string
+          is_active: boolean | null
+          is_link_dead: boolean | null
+          is_remote: boolean | null
+          location: string
+          max_age: number | null
+          max_grade: number
+          min_age: number | null
+          min_grade: number
+          organisation: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          application_url?: string
+          career_family?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string | null
+          deadline?: string | null
+          description?: string
+          duration?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_link_dead?: boolean | null
+          is_remote?: boolean | null
+          location?: string
+          max_age?: number | null
+          max_grade?: number
+          min_age?: number | null
+          min_grade?: number
+          organisation?: string
+          title: string
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          application_url?: string
+          career_family?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string | null
+          deadline?: string | null
+          description?: string
+          duration?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_link_dead?: boolean | null
+          is_remote?: boolean | null
+          location?: string
+          max_age?: number | null
+          max_grade?: number
+          min_age?: number | null
+          min_grade?: number
+          organisation?: string
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      feed_posts: {
+        Row: {
+          author: string | null
+          body_markdown: string | null
+          career_family: string | null
+          content_type: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          published_at: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author?: string | null
+          body_markdown?: string | null
+          career_family?: string | null
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          published_at?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string | null
+          body_markdown?: string | null
+          career_family?: string | null
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          published_at?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -41,6 +155,42 @@ export type Database = {
           title?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      person_spotlights: {
+        Row: {
+          backstory: string | null
+          created_at: string | null
+          id: string
+          is_featured: boolean | null
+          name: string
+          organisation: string | null
+          photo_url: string | null
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          backstory?: string | null
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name: string
+          organisation?: string | null
+          photo_url?: string | null
+          role?: string
+          updated_at?: string | null
+        }
+        Update: {
+          backstory?: string | null
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name?: string
+          organisation?: string | null
+          photo_url?: string | null
+          role?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -164,15 +314,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -299,6 +473,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

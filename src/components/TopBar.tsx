@@ -10,7 +10,7 @@ export default function TopBar() {
   const location = useLocation();
   const { resolvedTheme, toggleTheme } = useTheme();
 
-  if (!showOn.some((p) => location.pathname.startsWith(p))) return null;
+  if (!showOn.some((p) => location.pathname.startsWith(p)) || location.pathname.startsWith("/admin")) return null;
 
   const isDark = resolvedTheme === "dark";
 
