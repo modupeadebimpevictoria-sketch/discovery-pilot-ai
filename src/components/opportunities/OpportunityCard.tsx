@@ -31,14 +31,9 @@ export default function OpportunityCard({
   const gradeTag = `Grade ${opp.min_grade}–${opp.max_grade}`;
   const isDeadLink = opp.is_link_dead === true;
 
-  const openExternal = (url: string) => {
-    const w = window.top || window;
-    w.open(url, "_blank", "noopener,noreferrer");
-  };
 
   const handleApplyClick = () => {
     onApply();
-    openExternal(opp.application_url);
     toast.success("Good luck! 🎯 We've logged this in your Passport.");
   };
 
@@ -113,7 +108,10 @@ export default function OpportunityCard({
               </Tooltip>
             </TooltipProvider>
           ) : (
-            <button
+            <a
+              href={opp.application_url}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={handleApplyClick}
               className={`flex-1 text-xs py-2 rounded-2xl font-bold transition-all flex items-center justify-center gap-1 ${
                 applied
@@ -122,16 +120,18 @@ export default function OpportunityCard({
               }`}
             >
               {applied ? "✅ Explored" : "Apply →"}
-            </button>
+            </a>
           )}
 
           {/* View details */}
-          <button
-            onClick={() => openExternal(opp.application_url)}
+          <a
+            href={opp.application_url}
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-glass text-xs py-2 px-3 flex items-center justify-center gap-1"
           >
             <ExternalLink size={12} />
-          </button>
+          </a>
         </div>
 
         {/* Save for later */}
