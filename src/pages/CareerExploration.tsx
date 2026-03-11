@@ -128,9 +128,62 @@ export default function CareerExploration() {
   const [chatOpen, setChatOpen] = useState(false);
   const [showSetActiveModal, setShowSetActiveModal] = useState(false);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
+  const [dbCareer, setDbCareer] = useState<any>(null);
+
+  // Fetch enriched data from DB
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const { data } = await supabase.from("careers" as any).select("*").eq("is_active", true);
+      if (data) {
+        // Try to match by title (case-insensitive) since hardcoded careers use slug IDs
+        const match = (data as any[]).find((c: any) =>
+          c.id === id ||
+          c.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === id
+        );
+        if (match) setDbCareer(match);
+      }
+    })();
+  }, [id]);
 
   const career = getCareerById(id || "") || listingToCareer(id || "");
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
+
+  // Derive enriched description with fallback chain
+  const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
+  const dayInTheLife = dbCareer?.day_in_the_life || null;
+  const enrichedSkills: { name: string; importance: number }[] | null = dbCareer?.skills || null;
+  const workValues: string[] | null = dbCareer?.work_values || null;
+  const entryRequirements: string | null = dbCareer?.entry_requirements || null;
+  const careerPath: string | null = dbCareer?.career_path || null;
+  const growthOutlook: string | null = dbCareer?.growth_outlook || null;
+  const salaryContext: Record<string, any> = dbCareer?.salary_context || {};
+
+  // Salary lookup based on user's country
+  const userCountry = profile?.country?.toUpperCase() || "";
+  const countryCodeMap: Record<string, string> = {
+    "NIGERIA": "NG", "NG": "NG",
+    "KENYA": "KE", "KE": "KE",
+    "GHANA": "GH", "GH": "GH",
+    "SOUTH AFRICA": "ZA", "ZA": "ZA",
+  };
+  const userCountryCode = countryCodeMap[userCountry] || "";
+  const salaryEntry = salaryContext[userCountryCode] || salaryContext["GLOBAL"] || null;
+  const salaryLabel = salaryEntry
+    ? (userCountryCode && salaryContext[userCountryCode]
+        ? salaryEntry.label
+        : `${salaryEntry.label} (global average)`)
+    : null;
+  const salaryIsEmpty = !salaryLabel;
+
+  // Growth outlook badge
+  const outlookBadge = growthOutlook === "Bright"
+    ? { icon: "🌟", text: "High demand" }
+    : growthOutlook === "Average"
+    ? { icon: "📈", text: "Steady" }
+    : growthOutlook === "Below Average"
+    ? { icon: "⚡", text: "Competitive" }
+    : null;
 
   const saved = savedCareers.includes(career.id);
   const isActivePath = selectedCareerPath === career.id;
@@ -151,7 +204,7 @@ export default function CareerExploration() {
   const roleModels = getRoleModelProfiles(career.id, career.title, career.roleModels);
   const skills = getSkillDetails(career.id, career.skills);
   const imagineScenarios = getImagineYouScenarios(career.id, career.title, currentAge, career.timelineYears, career);
-  const heroPhoto = getCareerPhoto(career.id);
+  const heroPhoto = dbCareer?.unsplash_photo_url || getCareerPhoto(career.id);
 
   const timeline = [
     { age: currentAge, label: "Pick the right subjects now", emoji: "📚" },
