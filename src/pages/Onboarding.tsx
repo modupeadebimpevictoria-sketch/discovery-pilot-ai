@@ -56,8 +56,9 @@ export default function Onboarding() {
     }
   };
 
-  const selectOption = (opt: string) => {
-    setData((d) => ({ ...d, [current.key]: opt }));
+  const selectOption = (opt: string | { label: string; value: string }) => {
+    const val = typeof opt === "object" ? opt.value : opt;
+    setData((d) => ({ ...d, [current.key]: val }));
     // Auto-advance for single-select
     setTimeout(() => {
       if (!isLast) setStep((s) => s + 1);
