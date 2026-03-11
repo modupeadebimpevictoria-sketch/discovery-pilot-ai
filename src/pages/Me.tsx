@@ -11,6 +11,7 @@ import {
   LogOut, Trash2, ChevronRight, Zap, Edit3, Check, X,
   ExternalLink, Bookmark,
 } from "lucide-react";
+import FeedbackSheet from "@/components/FeedbackSheet";
 
 const XP_LEVELS = [
   { name: "Curious", min: 0, max: 199, emoji: "🔍" },
