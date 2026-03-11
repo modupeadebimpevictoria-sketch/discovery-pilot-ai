@@ -112,8 +112,7 @@ export default function Opportunities() {
       toast.error("Set a career as your Active Path to apply");
       return;
     }
-    applyToInternship(oppId);
-    toast.success("Application sent! 🎉");
+    recordClick(oppId);
   };
 
   const locationLabel = (opp: AdminOpportunity) => {
