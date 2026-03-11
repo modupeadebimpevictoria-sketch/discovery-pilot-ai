@@ -8,6 +8,7 @@ import VideoBackground from "@/components/VideoBackground";
 import CareerProfileCard from "@/components/CareerProfileCard";
 import CategoryVideoTile from "@/components/CategoryVideoTile";
 import TestimonialCard from "@/components/TestimonialCard";
+import SpringBoardLogo from "@/components/SpringBoardLogo";
 import confetti from "canvas-confetti";
 
 // Subtle fade-in only — no looping or bouncing
