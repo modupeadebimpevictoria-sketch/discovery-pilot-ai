@@ -159,7 +159,7 @@ export function generateFeedForCareers(
       () => generateFieldUpdate(career, studentName),
       () => generateHistory(career, studentName),
       () => generateSpotlight(career, careerIdx),
-      () => generateQuestNudge(career, studentName),
+      () => generateMissionNudge(career, studentName),
     ];
 
     generators.forEach((gen) => {
