@@ -15,9 +15,9 @@ export default function StreakXpBar({ streak, xp, level, levelTitle, xpProgress 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Streak */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20">
-            <Flame size={14} className="text-secondary" />
-            <span className="text-xs font-bold text-secondary">{streak} day streak</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-glow-pink/10 border border-glow-pink/20">
+            <Flame size={14} className="text-glow-pink" />
+            <span className="text-xs font-bold text-glow-pink">{streak} day streak</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">

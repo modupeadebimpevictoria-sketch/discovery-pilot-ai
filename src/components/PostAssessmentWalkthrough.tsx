@@ -83,7 +83,7 @@ export default function PostAssessmentWalkthrough({ onComplete }: PostAssessment
             className="text-center space-y-6 max-w-sm w-full"
           >
             {/* Mock visual */}
-            <div className="w-32 h-32 rounded-3xl bg-primary/10 border border-primary/20 mx-auto flex items-center justify-center">
+            <div className={`w-32 h-32 rounded-3xl border mx-auto flex items-center justify-center ${screen.bgClass}`}>
               {screen.icon}
             </div>
 

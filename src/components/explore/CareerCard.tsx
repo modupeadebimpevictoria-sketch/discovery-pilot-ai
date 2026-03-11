@@ -94,8 +94,8 @@ export default function CareerCard({ career, matchScore, saved, onToggleSave, on
         {career.growthTag && (
           <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
             career.growthTag.includes("Emerging")
-              ? "bg-accent/10 text-accent"
-              : "bg-primary/10 text-primary"
+              ? "bg-glow-purple/15 text-glow-purple"
+              : "bg-primary/15 text-primary"
           }`}>
             {career.growthTag}
           </span>
