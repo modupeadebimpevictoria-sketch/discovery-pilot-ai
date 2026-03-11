@@ -376,7 +376,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* Why this job matters */}
-        <Card title="Why this job matters 🌍" icon={<Star size={16} className="text-secondary" />}>
+        <Card title="Why this job matters 🌍" icon={<Star size={16} className="text-landing-mint" />}>
           <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
         </Card>
 
