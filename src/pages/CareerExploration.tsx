@@ -381,7 +381,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 8. Try This Career — Missions (GATED) */}
-        <Card title="🎯 Try This Career — Fun Missions!" icon={<Target size={16} className="text-accent" />}>
+        <Card title="🎯 Try This Career — Fun Missions!" icon={<Target size={16} className="text-glow-pink" />}>
           <p className="text-xs text-muted-foreground mb-3">Complete these challenges to earn XP and badges!</p>
           {missions.length > 0 ? (
             <div className="space-y-3">
