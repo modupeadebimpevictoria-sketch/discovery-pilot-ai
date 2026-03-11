@@ -6,6 +6,7 @@ import { getCareerById } from "@/data/careers";
 import { archetypes } from "@/data/questions";
 import { fireConfetti, fireBurst } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";
+import PostAssessmentWalkthrough from "@/components/PostAssessmentWalkthrough";
 import { ArrowRight, Share2, Sparkles, Heart, ChevronDown } from "lucide-react";
 
 const surprisingFacts: Record<string, string> = {
@@ -44,8 +45,9 @@ const surprisingFacts: Record<string, string> = {
 export default function Results() {
   const navigate = useNavigate();
   const { matchedCareers, archetype, savedCareers, toggleSavedCareer, profile } = useApp();
-  const [phase, setPhase] = useState<"archetype" | "reveal" | "cards">("archetype");
+  const [phase, setPhase] = useState<"archetype" | "reveal" | "cards" | "walkthrough">("archetype");
   const [cardIndex, setCardIndex] = useState(0);
+  const [walkthroughSeen] = useState(() => localStorage.getItem("sb_walkthrough_seen") === "true");
   const [dismissed, setDismissed] = useState<string[]>([]);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -243,6 +245,18 @@ export default function Results() {
     );
   }
 
+  // Post-assessment walkthrough (runs once)
+  if (phase === "walkthrough") {
+    return (
+      <PostAssessmentWalkthrough
+        onComplete={() => {
+          localStorage.setItem("sb_walkthrough_seen", "true");
+          navigate("/feed");
+        }}
+      />
+    );
+  }
+
   // Final cards view
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -349,7 +363,16 @@ export default function Results() {
 
       {/* Bottom actions */}
       <div className="px-5 mt-6 space-y-3">
-        <button onClick={() => navigate("/feed")} className="w-full btn-glass text-center flex items-center justify-center gap-2">
+        <button
+          onClick={() => {
+            if (walkthroughSeen) {
+              navigate("/feed");
+            } else {
+              setPhase("walkthrough");
+            }
+          }}
+          className="w-full btn-glass text-center flex items-center justify-center gap-2"
+        >
           🔥 See Your Career Feed
         </button>
       </div>
