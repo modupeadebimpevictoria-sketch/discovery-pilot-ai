@@ -339,7 +339,7 @@ function ArchivedListings({ data, onSave, onDelete }: any) {
   );
 }
 
-
+function OppForm({ data, onSave, onCancel }: any) {
   const [form, setForm] = useState({ ...data, career_family_ids: data.career_family_ids || [] });
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
 
