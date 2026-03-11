@@ -487,6 +487,38 @@ export type Database = {
           },
         ]
       }
+      user_opportunity_applications: {
+        Row: {
+          applied_at: string
+          id: string
+          opportunity_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string
+          id?: string
+          opportunity_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string
+          id?: string
+          opportunity_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_opportunity_applications_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "admin_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress: {
         Row: {
           applied_internships: string[] | null
@@ -623,6 +655,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_saved_opportunities: {
+        Row: {
+          id: string
+          opportunity_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          opportunity_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          opportunity_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_saved_opportunities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "admin_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_skill_progress: {
         Row: {

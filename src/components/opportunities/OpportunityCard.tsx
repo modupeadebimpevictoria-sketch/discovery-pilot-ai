@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { ExternalLink, Lock, Calendar, GraduationCap, MapPin } from "lucide-react";
+import { ExternalLink, Heart, Calendar, GraduationCap, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { AdminOpportunity } from "@/pages/Opportunities";
 
 interface OpportunityCardProps {
@@ -7,10 +9,11 @@ interface OpportunityCardProps {
   index: number;
   typeConfig: Record<string, { emoji: string; label: string; color: string }>;
   locationLabel: string;
-  userGrade: number | null;
   careerId: string | undefined;
   applied: boolean;
+  saved: boolean;
   onApply: () => void;
+  onToggleSave: () => void;
 }
 
 export default function OpportunityCard({
@@ -18,13 +21,25 @@ export default function OpportunityCard({
   index,
   typeConfig,
   locationLabel,
-  userGrade,
   careerId,
   applied,
+  saved,
   onApply,
+  onToggleSave,
 }: OpportunityCardProps) {
   const cfg = typeConfig[opp.type] || typeConfig.internship;
   const gradeTag = `Grade ${opp.min_grade}–${opp.max_grade}`;
+  const isDeadLink = opp.is_link_dead === true;
+
+  const handleApplyClick = () => {
+    // Record the click
+    onApply();
+    // Open external URL
+    window.open(opp.application_url, "_blank", "noopener,noreferrer");
+    toast.success("Good luck! 🎯 We've logged this in your Passport.");
+  };
+
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(opp.organisation + " application")}`;
 
   return (
     <motion.div
@@ -61,31 +76,75 @@ export default function OpportunityCard({
         </div>
       </div>
 
-      <div className="flex gap-2 mt-3">
-        <a
-          href={opp.application_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 btn-glass text-xs py-2 flex items-center justify-center gap-1"
-        >
-          <ExternalLink size={12} /> View Details
-        </a>
-        {careerId ? (
+      <div className="flex flex-col gap-2 mt-3">
+        {/* Primary action row */}
+        <div className="flex gap-2">
+          {isDeadLink ? (
+            <div className="flex-1 flex flex-col gap-1">
+              <div className="text-xs py-2 rounded-2xl font-bold bg-muted/50 text-muted-foreground flex items-center justify-center gap-1">
+                <AlertTriangle size={12} /> Link unavailable
+              </div>
+              <a
+                href={googleSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-muted-foreground text-center hover:text-primary transition-colors"
+              >
+                This link may have expired. Try searching for{" "}
+                <span className="underline">{opp.organisation}</span> directly.
+              </a>
+            </div>
+          ) : !careerId ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex-1 text-xs py-2 rounded-2xl font-bold bg-muted/50 text-muted-foreground flex items-center justify-center gap-1 cursor-default">
+                    Set an Active Path to apply
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] text-center">
+                  <p className="text-xs">
+                    Set a career as your Active Path first — it helps us track your progress and build your Passport.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <button
+              onClick={handleApplyClick}
+              className={`flex-1 text-xs py-2 rounded-2xl font-bold transition-all flex items-center justify-center gap-1 ${
+                applied
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "btn-primary-glow"
+              }`}
+            >
+              {applied ? "✅ Explored" : "Apply →"}
+            </button>
+          )}
+
+          {/* View details */}
+          <a
+            href={opp.application_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-glass text-xs py-2 px-3 flex items-center justify-center gap-1"
+          >
+            <ExternalLink size={12} />
+          </a>
+        </div>
+
+        {/* Save for later */}
+        {!isDeadLink && (
           <button
-            onClick={onApply}
-            disabled={applied}
-            className={`flex-1 text-xs py-2 rounded-2xl font-bold transition-all flex items-center justify-center gap-1 ${
-              applied
-                ? "bg-primary/10 text-primary border border-primary/20"
-                : "btn-primary-glow"
+            onClick={onToggleSave}
+            className={`w-full text-xs py-1.5 rounded-xl font-medium transition-all flex items-center justify-center gap-1 ${
+              saved
+                ? "text-primary bg-primary/5"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {applied ? "✅ Applied" : "📩 Apply"}
+            <Heart size={12} className={saved ? "fill-primary" : ""} /> {saved ? "Saved" : "Save for later"}
           </button>
-        ) : (
-          <div className="flex-1 text-xs py-2 rounded-2xl font-bold bg-muted/50 text-muted-foreground flex items-center justify-center gap-1">
-            <Lock size={12} /> Set Active Path
-          </div>
         )}
       </div>
     </motion.div>

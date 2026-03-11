@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
+import { useOpportunityActions } from "@/hooks/useOpportunityActions";
 
 export type OpportunityType = "scholarship" | "competition" | "course" | "program" | "workshop" | "internship";
 
@@ -29,6 +30,7 @@ export interface AdminOpportunity {
   career_family: string | null;
   is_remote: boolean | null;
   is_active: boolean | null;
+  is_link_dead: boolean | null;
 }
 
 function parseGradeNumber(grade: string | undefined | null): number | null {
@@ -58,10 +60,11 @@ const typeConfig: Record<string, { emoji: string; label: string; color: string }
 
 export default function Opportunities() {
   const navigate = useNavigate();
-  const { selectedCareerPath, matchedCareers, appliedInternships, applyToInternship, profile } = useApp();
+  const { selectedCareerPath, matchedCareers, profile } = useApp();
   const [filter, setFilter] = useState<string>("all");
   const [dbOpps, setDbOpps] = useState<AdminOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
+  const { appliedIds, savedIds, recordClick, toggleSave } = useOpportunityActions();
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const userGrade = parseGradeNumber(profile?.grade);
@@ -109,8 +112,7 @@ export default function Opportunities() {
       toast.error("Set a career as your Active Path to apply");
       return;
     }
-    applyToInternship(oppId);
-    toast.success("Application sent! 🎉");
+    recordClick(oppId);
   };
 
   const locationLabel = (opp: AdminOpportunity) => {
@@ -181,10 +183,11 @@ export default function Opportunities() {
               index={idx}
               typeConfig={typeConfig}
               locationLabel={locationLabel(opp)}
-              userGrade={userGrade}
               careerId={careerId}
-              applied={appliedInternships.includes(opp.id)}
+              applied={appliedIds.has(opp.id)}
+              saved={savedIds.has(opp.id)}
               onApply={() => handleApply(opp.id)}
+              onToggleSave={() => toggleSave(opp.id)}
             />
           ))}
         </div>
