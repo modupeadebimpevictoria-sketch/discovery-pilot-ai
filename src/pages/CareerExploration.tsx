@@ -367,7 +367,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 7. Meet the people — horizontal swipeable */}
-        <Card title="Meet the people" icon={<Users size={16} className="text-accent" />}>
+        <Card title="Meet the people" icon={<Users size={16} className="text-glow-pink" />}>
           <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1" style={{ scrollbarWidth: "none" }}>
             {roleModels.map((rm) => (
               <RoleModelSwipeCard key={rm.name} profile={rm} />
