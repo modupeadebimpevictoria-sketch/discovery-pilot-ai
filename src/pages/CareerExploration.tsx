@@ -450,7 +450,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 10. Step-by-Step Plan */}
-        <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-accent" />}>
+        <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-landing-mint" />}>
           <div className="space-y-0">
             {timeline.map((t, i) => (
               <div key={i} className="flex items-start gap-3 pb-4 relative">
