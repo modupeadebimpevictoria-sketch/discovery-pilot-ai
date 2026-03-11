@@ -149,7 +149,10 @@ function CareerFamilySelect({ value, onChange }: { value: string[]; onChange: (v
 // OPPORTUNITIES MANAGER (with sub-tabs)
 // ═══════════════════════════════════════
 function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: any) {
-  const [subTab, setSubTab] = useState<"listings" | "sources" | "scrape-log">("listings");
+  const [subTab, setSubTab] = useState<"listings" | "archived" | "sources" | "scrape-log">("listings");
+
+  const activeData = data.filter((o: any) => !o.is_archived);
+  const archivedData = data.filter((o: any) => o.is_archived);
 
   return (
     <div className="space-y-6">
@@ -158,9 +161,10 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
       </div>
 
       {/* Sub-tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {([
           { id: "listings" as const, label: "Listings" },
+          { id: "archived" as const, label: `Archived (${archivedData.length})` },
           { id: "sources" as const, label: "Scrape Sources" },
           { id: "scrape-log" as const, label: "Scrape Log" },
         ]).map((t) => (
@@ -175,7 +179,10 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
       </div>
 
       {subTab === "listings" && (
-        <OpportunitiesListings data={data} editing={editing} setEditing={setEditing} onSave={onSave} onDelete={onDelete} />
+        <OpportunitiesListings data={activeData} editing={editing} setEditing={setEditing} onSave={onSave} onDelete={onDelete} />
+      )}
+      {subTab === "archived" && (
+        <ArchivedListings data={archivedData} onSave={onSave} onDelete={onDelete} />
       )}
       {subTab === "sources" && <ScrapeSourcesManager />}
       {subTab === "scrape-log" && <ScrapeLogView />}
@@ -275,6 +282,55 @@ function OpportunitiesListings({ data, editing, setEditing, onSave, onDelete }: 
             ))}
             {data.length === 0 && (
               <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No opportunities yet</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ArchivedListings({ data, onSave, onDelete }: any) {
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{data.length} archived opportunities</p>
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Title</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Type</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Deadline</th>
+              <th className="px-4 py-2 text-muted-foreground font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((opp: any) => (
+              <tr key={opp.id} className="border-t border-border hover:bg-muted/30">
+                <td className="px-4 py-2.5">
+                  <p className="font-medium text-foreground">{opp.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{opp.organisation}</p>
+                </td>
+                <td className="px-4 py-2.5 capitalize text-muted-foreground">{opp.type}</td>
+                <td className="px-4 py-2.5 text-muted-foreground">{opp.deadline || "—"}</td>
+                <td className="px-4 py-2.5 flex gap-1">
+                  <button
+                    onClick={() => onSave({ id: opp.id, is_archived: false })}
+                    className="px-3 py-1 rounded text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary/20"
+                  >
+                    Restore
+                  </button>
+                  <button
+                    onClick={() => { if (confirm("Permanently delete?")) onDelete(opp.id); }}
+                    className="p-1.5 rounded hover:bg-destructive/10"
+                  >
+                    <Trash2 size={14} className="text-destructive" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {data.length === 0 && (
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No archived opportunities</td></tr>
             )}
           </tbody>
         </table>
