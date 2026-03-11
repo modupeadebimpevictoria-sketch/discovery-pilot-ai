@@ -7,7 +7,14 @@ import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 const steps = [
   { key: "name", question: "Hey! What's your name? 👋", placeholder: "Enter your name", emoji: "😊" },
   { key: "age", question: "How old are you?", placeholder: "Your age", emoji: "🎂", type: "number" },
-  { key: "grade", question: "What grade are you in?", emoji: "📚", options: ["Year 9 / Grade 8", "Year 10 / Grade 9", "Year 11 / Grade 10", "Year 12 / Grade 11", "Year 13 / Grade 12"] },
+  { key: "grade", question: "What year are you in?", emoji: "📚", options: [
+    { label: "Grade 9", value: "9" },
+    { label: "Grade 10", value: "10" },
+    { label: "Grade 11", value: "11" },
+    { label: "Grade 12", value: "12" },
+    { label: "University Year 1", value: "uni-1" },
+    { label: "University Year 2", value: "uni-2" },
+  ] as any },
   { key: "country", question: "Where are you from?", placeholder: "Your country", emoji: "🌍" },
   { key: "subjects", question: "What subjects are you taking?", emoji: "📖", multi: true, options: ["Mathematics", "Physics", "Chemistry", "Biology", "Computer Science", "English", "History", "Geography", "Art & Design", "Music", "Drama", "Economics", "Business Studies", "Psychology", "Physical Education", "Languages", "Media Studies", "Design Technology"] },
   { key: "dreamCareer", question: "Dream career? (Optional!)", placeholder: "e.g., Astronaut, Chef, or 'no idea!'", emoji: "💭" },
