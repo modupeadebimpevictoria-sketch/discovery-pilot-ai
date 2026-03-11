@@ -88,6 +88,28 @@ export default function GradeRoadmap() {
   const currentBand = getCurrentBand(studentGrade);
   const currentBandIdx = getBandIndex(currentBand);
 
+  const roadmap = (careerId && careerTitle) ? getOrCreateRoadmap(careerId, careerTitle, listing?.familyId || detailedCareer?.id) : null;
+  const milestones = roadmap?.milestones || [];
+
+  // Group milestones by grade band
+  const bandGroups: Record<string, RoadmapMilestone[]> = {};
+  GRADE_BANDS.forEach((b) => (bandGroups[b] = []));
+  milestones.forEach((m) => {
+    const band = ageRangeToGradeBand(m.ageRange);
+    if (bandGroups[band]) bandGroups[band].push(m);
+  });
+
+  const completedCount = milestones.filter((m) => completedMilestones.includes(m.id)).length;
+  const progress = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
+
+  // Auto-collapse past bands for upper grade students
+  useEffect(() => {
+    const pastBands = GRADE_BANDS.filter((_, i) => i < currentBandIdx);
+    if (pastBands.length > 0) {
+      setCollapsedBands(new Set(pastBands));
+    }
+  }, [currentBandIdx]);
+
   // No Active Path
   if (!careerId || !careerTitle) {
     return (
@@ -101,8 +123,6 @@ export default function GradeRoadmap() {
       </div>
     );
   }
-
-  const roadmap = getOrCreateRoadmap(careerId, careerTitle, listing?.familyId || detailedCareer?.id);
   const milestones = roadmap.milestones;
 
   // Group milestones by grade band
