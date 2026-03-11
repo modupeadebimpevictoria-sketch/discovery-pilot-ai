@@ -149,7 +149,10 @@ function CareerFamilySelect({ value, onChange }: { value: string[]; onChange: (v
 // OPPORTUNITIES MANAGER (with sub-tabs)
 // ═══════════════════════════════════════
 function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: any) {
-  const [subTab, setSubTab] = useState<"listings" | "sources" | "scrape-log">("listings");
+  const [subTab, setSubTab] = useState<"listings" | "archived" | "sources" | "scrape-log">("listings");
+
+  const activeData = data.filter((o: any) => !o.is_archived);
+  const archivedData = data.filter((o: any) => o.is_archived);
 
   return (
     <div className="space-y-6">
@@ -158,9 +161,10 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
       </div>
 
       {/* Sub-tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {([
           { id: "listings" as const, label: "Listings" },
+          { id: "archived" as const, label: `Archived (${archivedData.length})` },
           { id: "sources" as const, label: "Scrape Sources" },
           { id: "scrape-log" as const, label: "Scrape Log" },
         ]).map((t) => (
@@ -175,7 +179,10 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
       </div>
 
       {subTab === "listings" && (
-        <OpportunitiesListings data={data} editing={editing} setEditing={setEditing} onSave={onSave} onDelete={onDelete} />
+        <OpportunitiesListings data={activeData} editing={editing} setEditing={setEditing} onSave={onSave} onDelete={onDelete} />
+      )}
+      {subTab === "archived" && (
+        <ArchivedListings data={archivedData} onSave={onSave} onDelete={onDelete} />
       )}
       {subTab === "sources" && <ScrapeSourcesManager />}
       {subTab === "scrape-log" && <ScrapeLogView />}
