@@ -351,7 +351,16 @@ export default function Results() {
 
       {/* Bottom actions */}
       <div className="px-5 mt-6 space-y-3">
-        <button onClick={() => navigate("/feed")} className="w-full btn-glass text-center flex items-center justify-center gap-2">
+        <button
+          onClick={() => {
+            if (walkthroughSeen) {
+              navigate("/feed");
+            } else {
+              setPhase("walkthrough");
+            }
+          }}
+          className="w-full btn-glass text-center flex items-center justify-center gap-2"
+        >
           🔥 See Your Career Feed
         </button>
       </div>
