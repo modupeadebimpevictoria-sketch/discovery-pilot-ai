@@ -128,16 +128,16 @@ function generateSpotlight(career: Career, idx: number): Omit<FeedPost, "id"> {
   };
 }
 
-function generateQuestNudge(career: Career, studentName: string): Omit<FeedPost, "id"> {
+function generateMissionNudge(career: Career, studentName: string): Omit<FeedPost, "id"> {
   return {
-    type: "quest-nudge",
+    type: "mission-nudge",
     careerId: career.id,
     careerTitle: career.title,
     careerEmoji: career.emoji,
-    headline: `${studentName}, your ${career.title} quest is waiting 🚀`,
-    body: `You're building your skills as a future ${career.title}! Complete your next quest to earn XP and level up your Career Passport. Every small step gets you closer to launch.`,
+    headline: `Complete today's mission 🎯`,
+    body: `Quick ${career.title} mission waiting for you — under 10 minutes. Complete it to earn XP and build your Career Passport.`,
     imageUrl: getFieldPhoto(career.id, 3),
-    ...typeConfig["quest-nudge"],
+    ...typeConfig["mission-nudge"],
   };
 }
 
