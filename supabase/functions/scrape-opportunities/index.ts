@@ -1,114 +1,263 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const EXTRACTION_SCHEMA = {
+  type: "object",
+  properties: {
+    opportunities: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          organisation: { type: "string" },
+          type: {
+            type: "string",
+            enum: ["internship", "competition", "program", "volunteering", "scholarship", "workshop"],
+          },
+          description: { type: "string", description: "2-4 sentence summary" },
+          deadline: { type: "string", nullable: true, description: "ISO date string or null" },
+          application_url: { type: "string", description: "direct link to apply or learn more" },
+          workshop_url: { type: "string", nullable: true, description: "for workshops: the learning page URL" },
+          is_free: { type: "boolean" },
+          is_remote: { type: "boolean" },
+          is_international: { type: "boolean" },
+          country_code: { type: "string", nullable: true },
+          duration: { type: "string", nullable: true },
+          min_age: { type: "number", nullable: true },
+          max_age: { type: "number", nullable: true },
+          min_grade: { type: "number", nullable: true },
+          max_grade: { type: "number", nullable: true },
+          scholarship_amount: { type: "string", nullable: true },
+          scholarship_coverage: {
+            type: "string",
+            enum: ["full", "partial", "varies"],
+            nullable: true,
+          },
+          certificate_awarded: { type: "boolean" },
+          certificate_name: { type: "string", nullable: true },
+          platform: { type: "string", nullable: true },
+          career_family_ids: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "Which career families does this suit? Use these exact values: technology · design · science · business · engineering · health · law · media · education · environment · finance · arts · social-work · architecture · sports · agriculture · hospitality. Use empty array [] if open to all careers.",
+          },
+        },
+        required: ["title", "organisation", "type", "description", "application_url"],
+      },
+    },
+  },
+};
+
+const SYSTEM_PROMPT_CRAWL =
+  "Extract all youth opportunity listings from this page. Each listing should be a separate object. Only extract real specific opportunities — not navigation, categories, or site sections.";
+const SYSTEM_PROMPT_SCRAPE =
+  "Extract the opportunity details from this page. If there are multiple opportunities listed, extract all of them.";
+
+const VALID_TYPES = new Set(["internship", "competition", "program", "volunteering", "scholarship", "workshop"]);
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const { query } = await req.json();
-    const searchQuery = query || "internship";
+  const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
+  if (!firecrawlKey) {
+    return new Response(JSON.stringify({ error: "FIRECRAWL_API_KEY not configured" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-    const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
-    if (!apiKey) {
-      console.error('FIRECRAWL_API_KEY not configured');
-      // Return curated fallback data when Firecrawl isn't available
-      return new Response(
-        JSON.stringify({ success: true, opportunities: getFallbackOpportunities(searchQuery) }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceKey);
+
+  try {
+    // Get all active sources
+    const { data: sources, error: srcErr } = await supabase
+      .from("opportunity_sources")
+      .select("*")
+      .eq("is_active", true);
+
+    if (srcErr) throw srcErr;
+    if (!sources || sources.length === 0) {
+      return new Response(JSON.stringify({ message: "No active sources" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Search for Nigerian internships and opportunities
-    const response = await fetch('https://api.firecrawl.dev/v1/search', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: `${searchQuery} internship opportunity Nigeria students Grade 10 11 12 2025 2026`,
-        limit: 10,
-        lang: 'en',
-        country: 'NG',
-      }),
+    // Get existing application_urls for dedup
+    const { data: existing } = await supabase
+      .from("admin_opportunities")
+      .select("application_url");
+    const existingUrls = new Set((existing || []).map((e: any) => e.application_url));
+
+    let totalNew = 0;
+    let sourcesProcessed = 0;
+    const failedSources: string[] = [];
+
+    for (const source of sources) {
+      try {
+        console.log(`Processing source: ${source.name} (${source.scrape_strategy})`);
+        let firecrawlData: any;
+
+        if (source.scrape_strategy === "crawl") {
+          const resp = await fetch("https://api.firecrawl.dev/v1/crawl", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${firecrawlKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: source.url,
+              limit: 20,
+              scrapeOptions: {
+                formats: ["extract"],
+                extract: {
+                  schema: EXTRACTION_SCHEMA,
+                  systemPrompt: SYSTEM_PROMPT_CRAWL,
+                },
+              },
+            }),
+          });
+          firecrawlData = await resp.json();
+          if (!resp.ok) {
+            console.error(`Firecrawl crawl error for ${source.name}:`, firecrawlData);
+            failedSources.push(source.name);
+            continue;
+          }
+        } else {
+          const resp = await fetch("https://api.firecrawl.dev/v1/scrape", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${firecrawlKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: source.url,
+              formats: ["extract"],
+              extract: {
+                schema: EXTRACTION_SCHEMA,
+                systemPrompt: SYSTEM_PROMPT_SCRAPE,
+              },
+            }),
+          });
+          firecrawlData = await resp.json();
+          if (!resp.ok) {
+            console.error(`Firecrawl scrape error for ${source.name}:`, firecrawlData);
+            failedSources.push(source.name);
+            continue;
+          }
+        }
+
+        // Extract opportunities from response
+        // Crawl returns data as array, scrape returns data as object
+        let opportunities: any[] = [];
+
+        if (source.scrape_strategy === "crawl") {
+          // Crawl response: { data: [{ extract: { opportunities: [...] } }, ...] }
+          const pages = firecrawlData?.data || [];
+          for (const page of pages) {
+            const extracted = page?.extract?.opportunities || [];
+            opportunities.push(...extracted);
+          }
+        } else {
+          // Scrape response: { data: { extract: { opportunities: [...] } } }
+          opportunities = firecrawlData?.data?.extract?.opportunities || [];
+        }
+
+        let sourceNewCount = 0;
+
+        for (const opp of opportunities) {
+          if (!opp.application_url) continue;
+          if (existingUrls.has(opp.application_url)) continue;
+
+          const oppType = VALID_TYPES.has(opp.type) ? opp.type : source.default_type;
+
+          const row = {
+            title: opp.title || "Untitled",
+            organisation: opp.organisation || source.name,
+            type: oppType,
+            description: opp.description || "",
+            application_url: opp.application_url,
+            workshop_url: opp.workshop_url || "",
+            deadline: opp.deadline || null,
+            is_remote: opp.is_remote || false,
+            country: opp.country_code || "",
+            location: opp.is_international ? "Global" : opp.country_code || "Global",
+            duration: opp.duration || "",
+            min_age: opp.min_age || null,
+            max_age: opp.max_age || null,
+            min_grade: opp.min_grade || 9,
+            max_grade: opp.max_grade || 12,
+            scholarship_amount: opp.scholarship_amount || "",
+            scholarship_coverage: opp.scholarship_coverage || null,
+            career_family_ids: opp.career_family_ids || [],
+            source: "firecrawl",
+            is_active: true,
+            flagged: false,
+            is_archived: false,
+            is_link_dead: false,
+          };
+
+          const { error: insertErr } = await supabase.from("admin_opportunities").insert(row);
+          if (insertErr) {
+            console.error(`Insert error for "${opp.title}":`, insertErr.message);
+            continue;
+          }
+
+          existingUrls.add(opp.application_url);
+          sourceNewCount++;
+          totalNew++;
+        }
+
+        // Update source stats
+        await supabase
+          .from("opportunity_sources")
+          .update({
+            last_scraped_at: new Date().toISOString(),
+            last_scraped_count: sourceNewCount,
+          })
+          .eq("id", source.id);
+
+        sourcesProcessed++;
+        console.log(`${source.name}: ${sourceNewCount} new opportunities`);
+      } catch (sourceErr) {
+        console.error(`Error processing ${source.name}:`, sourceErr);
+        failedSources.push(source.name);
+      }
+    }
+
+    // Log the run
+    await supabase.from("scrape_log").insert({
+      sources_processed: sourcesProcessed,
+      total_new_listings: totalNew,
+      failed_sources: failedSources,
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Firecrawl search error:', response.status, errText);
-      // Fall back to curated data
-      return new Response(
-        JSON.stringify({ success: true, opportunities: getFallbackOpportunities(searchQuery) }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const data = await response.json();
-    const results = data.data || [];
-
-    // Parse search results into opportunity format
-    const opportunities = results
-      .filter((r: any) => r.title && r.url)
-      .map((r: any) => ({
-        title: r.title || "Opportunity",
-        company: extractCompany(r.url, r.description),
-        location: "Nigeria",
-        url: r.url,
-        type: categorizeOpportunity(r.title, r.description),
-      }))
-      .slice(0, 8);
-
-    // Mix with curated fallbacks
-    const combined = [...opportunities, ...getFallbackOpportunities(searchQuery).slice(0, 4)];
+    console.log(`Scrape complete: ${sourcesProcessed} sources, ${totalNew} new, ${failedSources.length} failed`);
 
     return new Response(
-      JSON.stringify({ success: true, opportunities: combined }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        success: true,
+        sources_processed: sourcesProcessed,
+        total_new_listings: totalNew,
+        failed_sources: failedSources,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
-    console.error('Error in scrape-opportunities:', error);
+  } catch (err) {
+    console.error("Scrape run failed:", err);
     return new Response(
-      JSON.stringify({ success: true, opportunities: getFallbackOpportunities("internship") }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
-
-function extractCompany(url: string, desc?: string): string {
-  try {
-    const hostname = new URL(url).hostname.replace('www.', '');
-    const parts = hostname.split('.');
-    return parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-  } catch {
-    return "Organisation";
-  }
-}
-
-function categorizeOpportunity(title: string, desc?: string): string {
-  const text = `${title} ${desc || ""}`.toLowerCase();
-  if (text.includes("intern")) return "Internship";
-  if (text.includes("shadow")) return "Job Shadowing";
-  if (text.includes("scholarship")) return "Scholarship";
-  if (text.includes("competition") || text.includes("hackathon")) return "Competition";
-  if (text.includes("program") || text.includes("programme")) return "Program";
-  return "Internship";
-}
-
-function getFallbackOpportunities(query: string) {
-  return [
-    { title: "HNG Internship Programme", company: "HNG Tech", location: "Nigeria (Remote)", url: "https://hng.tech", type: "Internship" },
-    { title: "Andela Learning Community", company: "Andela", location: "Nigeria", url: "https://andela.com", type: "Program" },
-    { title: "Google Africa Developer Scholarship", company: "Google", location: "Nigeria / Remote", url: "https://goo.gle/africa-scholarship", type: "Scholarship" },
-    { title: "CcHub Design Lab Internship", company: "Co-Creation Hub", location: "Lagos, Nigeria", url: "https://cchubnigeria.com", type: "Internship" },
-    { title: "UNICEF Youth Programme", company: "UNICEF Nigeria", location: "Abuja, Nigeria", url: "https://unicef.org/nigeria", type: "Program" },
-    { title: "Tony Elumelu Foundation Entrepreneurship", company: "TEF", location: "Nigeria / Africa", url: "https://tonyelumelufoundation.org", type: "Program" },
-    { title: "GTBank Internship Programme", company: "Guaranty Trust Bank", location: "Lagos, Nigeria", url: "https://gtbank.com", type: "Internship" },
-    { title: "Interswitch Graduate Trainee", company: "Interswitch", location: "Lagos, Nigeria", url: "https://interswitchgroup.com/careers", type: "Internship" },
-    { title: "Shell Nigeria Student Industrial Training", company: "Shell", location: "Nigeria", url: "https://shell.com.ng", type: "Internship" },
-    { title: "Flutterwave Work-Study Programme", company: "Flutterwave", location: "Lagos / Remote", url: "https://flutterwave.com/careers", type: "Internship" },
-  ];
-}
