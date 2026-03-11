@@ -39,9 +39,9 @@ export default function MentorSpotlight() {
   return (
     <div className="space-y-2">
       <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-        <Star size={14} className="text-secondary" /> Mentor Spotlight
+        <Star size={14} className="text-glow-purple" /> Mentor Spotlight
       </h2>
-      <div className="glass-card p-4 rounded-2xl">
+      <div className="glass-card p-4 rounded-2xl border-glow-purple/20">
         <div className="flex items-start gap-3">
           <img
             src={mentor.photoUrl}
@@ -51,7 +51,7 @@ export default function MentorSpotlight() {
           />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-bold text-foreground">{mentor.name}</p>
-            <p className="text-[10px] text-primary font-semibold">{mentor.role}</p>
+            <p className="text-[10px] text-glow-purple font-semibold">{mentor.role}</p>
             <p className="text-xs text-muted-foreground italic leading-relaxed">"{mentor.quote}"</p>
           </div>
         </div>
