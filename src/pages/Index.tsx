@@ -8,6 +8,7 @@ import VideoBackground from "@/components/VideoBackground";
 import CareerProfileCard from "@/components/CareerProfileCard";
 import CategoryVideoTile from "@/components/CategoryVideoTile";
 import TestimonialCard from "@/components/TestimonialCard";
+import SpringBoardLogo from "@/components/SpringBoardLogo";
 import confetti from "canvas-confetti";
 
 // Subtle fade-in only — no looping or bouncing
@@ -162,11 +163,11 @@ const testimonials = [
   },
 ];
 
-// SpringBoard logo — clean, no animation
-function SpringBoardLogo({ size = "text-2xl" }: { size?: string }) {
+// SpringBoard logo — uses the consistent SVG mark
+function SpringBoardWordmark({ size = "text-2xl" }: { size?: string }) {
   return (
-    <span className={`font-bold font-display text-primary tracking-tight ${size}`}>
-      Spring<span className="text-landing-mint">Board</span>
+    <span className={`font-bold tracking-tight ${size}`}>
+      <span className="text-primary">Spring</span><span className="text-foreground">Board</span>
     </span>
   );
 }
@@ -176,7 +177,7 @@ export default function Index() {
   const [chatOpen, setChatOpen] = useState(false);
 
   const handleCTA = () => {
-    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#C8FF00", "#FF4D6D", "#A855F7", "#00F5C4"] });
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 }, colors: ["#AAED4E", "#FF4D6D", "#A855F7", "#00F5C4"] });
     setTimeout(() => navigate("/onboarding"), 400);
   };
 
@@ -190,15 +191,9 @@ export default function Index() {
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
         {/* Logo — top left */}
-        <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="18" width="24" height="3" rx="1.5" fill="hsl(72, 100%, 50%)" />
-            <rect x="14" y="20" width="4" height="10" rx="1" fill="hsl(164, 100%, 48%)" />
-            <rect x="8" y="28" width="16" height="3" rx="1.5" fill="hsl(271, 91%, 65%)" />
-            <circle cx="16" cy="10" r="3" fill="hsl(72, 100%, 50%)" opacity="0.9" />
-            <path d="M16 13 L13 17 M16 13 L19 17 M14 15 L18 15" stroke="hsl(72, 100%, 50%)" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
-          </svg>
-          <SpringBoardLogo />
+        <div className="absolute top-6 left-6 z-20 flex items-center gap-2.5">
+          <SpringBoardLogo size={28} darkBackground />
+          <SpringBoardWordmark />
         </div>
 
         {/* Hero content */}
