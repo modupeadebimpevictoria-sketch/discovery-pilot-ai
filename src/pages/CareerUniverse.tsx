@@ -1,28 +1,24 @@
 import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   careerFamilies,
   careerListings,
   searchCareerListings,
-  getCareerFamilyById,
   type CareerListing,
 } from "@/data/careerFamilies";
 import { useApp } from "@/contexts/AppContext";
-import { careers as detailedCareers } from "@/data/careers";
-import {
-  Search, Heart, X, ChevronRight, Bookmark, Star
-} from "lucide-react";
+import { Search, X, Bookmark, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
+import CareerCard from "@/components/explore/CareerCard";
+import FilterSortSheet, { type SortOption } from "@/components/explore/FilterSortSheet";
 
-// Generate a pseudo-random match score based on career id (deterministic)
 function getMatchScore(careerId: string): number {
   let hash = 0;
   for (let i = 0; i < careerId.length; i++) {
     hash = ((hash << 5) - hash) + careerId.charCodeAt(i);
     hash |= 0;
   }
-  return 55 + Math.abs(hash % 40); // 55-94
+  return 55 + Math.abs(hash % 40);
 }
 
 const familyPills = [
@@ -39,7 +35,9 @@ export default function CareerUniverse() {
   const [search, setSearch] = useState("");
   const [familyFilter, setFamilyFilter] = useState<string>(familyParam || "all");
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
-  const pillsRef = useRef<HTMLDivElement>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("match");
+  const [growthFilter, setGrowthFilter] = useState("all");
 
   const filtered = useMemo(() => {
     let results = search ? searchCareerListings(search) : careerListings;
@@ -51,15 +49,28 @@ export default function CareerUniverse() {
     // Hide rejected
     results = results.filter((l) => !rejectedCareers.includes(l.id));
 
-    // Sort by match %
-    results = [...results].sort((a, b) => getMatchScore(b.id) - getMatchScore(a.id));
+    // Growth filter
+    if (growthFilter === "high") {
+      results = results.filter((l) => l.growthTag?.includes("High demand"));
+    } else if (growthFilter === "emerging") {
+      results = results.filter((l) => l.growthTag?.includes("Emerging"));
+    }
+
+    // Sort
+    if (sortBy === "match") {
+      results = [...results].sort((a, b) => getMatchScore(b.id) - getMatchScore(a.id));
+    } else if (sortBy === "growth") {
+      results = [...results].sort((a, b) => {
+        const aGrowth = a.growthTag ? 1 : 0;
+        const bGrowth = b.growthTag ? 1 : 0;
+        return bGrowth - aGrowth;
+      });
+    } else if (sortBy === "alpha") {
+      results = [...results].sort((a, b) => a.title.localeCompare(b.title));
+    }
 
     return results;
-  }, [search, familyFilter, rejectedCareers]);
-
-  const handleCareerClick = (listing: CareerListing) => {
-    navigate(`/career/${listing.id}`);
-  };
+  }, [search, familyFilter, rejectedCareers, sortBy, growthFilter]);
 
   const handleSaveSearch = (query: string) => {
     if (query && !savedSearches.includes(query)) {
@@ -70,7 +81,6 @@ export default function CareerUniverse() {
 
   const handleFamilySelect = (id: string) => {
     setFamilyFilter(id);
-    // Scroll selected pill into view
     setTimeout(() => {
       const el = document.getElementById(`pill-${id}`);
       el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
@@ -102,9 +112,8 @@ export default function CareerUniverse() {
           </div>
         </div>
 
-        {/* Family filter pills — single horizontal scrollable row */}
+        {/* Family filter pills */}
         <div
-          ref={pillsRef}
           className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
@@ -115,7 +124,7 @@ export default function CareerUniverse() {
               onClick={() => handleFamilySelect(pill.id)}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                 familyFilter === pill.id
-                  ? "bg-[#AAED4E] text-[#1a1a2e] shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-transparent text-muted-foreground border border-border/60 hover:border-border"
               }`}
             >
@@ -127,7 +136,7 @@ export default function CareerUniverse() {
       </div>
 
       {/* Results count */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pt-3 pb-1 flex items-center justify-between">
         <p className="text-[11px] text-muted-foreground">
           {filtered.length} career{filtered.length !== 1 ? "s" : ""}
           {familyFilter !== "all" && !search && (
@@ -139,77 +148,27 @@ export default function CareerUniverse() {
         </p>
       </div>
 
-      {/* Career listings */}
-      <div className="px-4 pt-1 space-y-3">
+      {/* Career grid — 2 col mobile, 3 col desktop */}
+      <div className="px-4 pt-1 grid grid-cols-2 md:grid-cols-3 gap-3">
         {filtered.map((career, i) => {
-          const family = getCareerFamilyById(career.familyId);
           const saved = savedCareers.includes(career.id);
           const matchScore = matchedCareers.find((m) => m.careerId === career.id)?.score || getMatchScore(career.id);
 
           return (
-            <motion.div
+            <CareerCard
               key={career.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.015, 0.3) }}
-              className="relative glass-card-hover rounded-2xl overflow-hidden"
-            >
-              <button
-                onClick={() => handleCareerClick(career)}
-                className="w-full text-left p-4 space-y-2"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-foreground text-sm leading-tight">{career.title}</h3>
-                    <p className="text-[11px] text-muted-foreground leading-snug mt-1">{career.description}</p>
-                  </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 flex-shrink-0">
-                    <Star size={10} className="text-primary fill-primary" />
-                    <span className="text-[10px] font-bold text-primary">{matchScore}%</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {family && (
-                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground">
-                      {family.emoji} {family.name}
-                    </span>
-                  )}
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
-                    💰 {career.salaryRange}
-                  </span>
-                  {career.growthTag && (
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                      career.growthTag.includes("Emerging")
-                        ? "bg-accent/10 text-accent"
-                        : "bg-primary/10 text-primary"
-                    }`}>
-                      {career.growthTag}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] font-bold text-primary flex items-center gap-1">
-                    Explore this path <ChevronRight size={12} />
-                  </span>
-                </div>
-              </button>
-
-              <div className="absolute top-3 right-3">
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSavedCareer(career.id); }}
-                  className="p-1.5"
-                >
-                  <Heart size={14} className={saved ? "fill-accent text-accent" : "text-muted-foreground/40"} />
-                </button>
-              </div>
-            </motion.div>
+              career={career}
+              matchScore={matchScore}
+              saved={saved}
+              onToggleSave={() => toggleSavedCareer(career.id)}
+              onClick={() => navigate(`/career/${career.id}`)}
+              index={i}
+            />
           );
         })}
       </div>
 
-      {/* No results — save search prompt */}
+      {/* No results */}
       {noResults && (
         <div className="text-center py-16 px-6">
           <p className="text-4xl mb-3">🔍</p>
@@ -243,6 +202,25 @@ export default function CareerUniverse() {
           <p className="text-[10px] text-muted-foreground">Showing {filtered.length} of {careerListings.length} careers</p>
         </div>
       )}
+
+      {/* Floating filter/sort button */}
+      <button
+        onClick={() => setSheetOpen(true)}
+        className="fixed bottom-24 right-4 z-20 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+      >
+        <SlidersHorizontal size={20} />
+      </button>
+
+      <FilterSortSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        salaryMin={0}
+        onSalaryMinChange={() => {}}
+        growthFilter={growthFilter}
+        onGrowthFilterChange={setGrowthFilter}
+      />
     </div>
   );
 }
