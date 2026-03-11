@@ -1,290 +1,371 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getQuestsForCareer, getCurrentWeekNumber, WeeklyQuest } from "@/data/weeklyQuests";
-import { getCareerById } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById, careerFamilies } from "@/data/careerFamilies";
-import {
-  Clock, Zap, CheckCircle, Flame, Lock, ChevronRight,
-  Trophy, MapPin, Briefcase, Target, Calendar,
-} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Lock, Clock, CheckCircle, Flame, ChevronRight, Loader2, ExternalLink, Play } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
-// XP Levels
-const XP_LEVELS = [
-  { name: "Curious", min: 0, max: 199, emoji: "🔍" },
-  { name: "Explorer", min: 200, max: 599, emoji: "🧭" },
-  { name: "Trailblazer", min: 600, max: 1199, emoji: "🔥" },
-  { name: "Achiever", min: 1200, max: 2499, emoji: "⭐" },
-  { name: "Springboarder", min: 2500, max: Infinity, emoji: "🚀" },
-];
-
-function getLevel(xp: number) {
-  return XP_LEVELS.find((l) => xp >= l.min && xp <= l.max) || XP_LEVELS[0];
+interface Quest {
+  id: string;
+  career_id: string;
+  family_id: string;
+  title: string;
+  brief: string | null;
+  instructions: string | null;
+  quest_type: "research" | "challenge" | "create" | "watch" | "explore";
+  resource_url: string | null;
+  estimated_minutes: number;
+  xp_reward: number;
+  skill_tag: string;
+  badge_id: string | null;
+  week_number: number;
+  grade_band: string;
+  is_active: boolean;
+  flagged: boolean;
+  created_by: string;
 }
 
-function getNextLevel(xp: number) {
-  const idx = XP_LEVELS.findIndex((l) => xp >= l.min && xp <= l.max);
-  return idx < XP_LEVELS.length - 1 ? XP_LEVELS[idx + 1] : null;
+interface QuestProgress {
+  quest_id: string;
+  status: string;
+  response_text: string | null;
+}
+
+const typeEmojis: Record<string, string> = {
+  research: "🔬",
+  challenge: "🏆",
+  create: "✨",
+  watch: "🎬",
+  explore: "🌍",
+};
+
+function getCurrentWeekNumber(): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  return Math.ceil(diff / (7 * 24 * 60 * 60 * 1000));
 }
 
 export default function QuestsView() {
   const navigate = useNavigate();
-  const {
-    selectedCareerPath, matchedCareers, completedQuests, completeQuest,
-    addXp, addBadge, xp, completedMilestones, badges, completedMissions,
-    appliedInternships, streak, profile,
-  } = useApp();
-  const [expandedQuest, setExpandedQuest] = useState<string | null>(null);
+  const { selectedCareerPath, matchedCareers, user, addXp, addBadge, profile } = useApp();
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [progress, setProgress] = useState<Map<string, QuestProgress>>(new Map());
+  const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [responseText, setResponseText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId || null;
+  const weekNumber = getCurrentWeekNumber();
 
-  // No Active Path gate
+  // Determine grade band from profile
+  const gradeBand = (() => {
+    const g = profile?.grade;
+    if (!g) return "9-10";
+    if (g === "uni-1" || g === "uni-2") return "university-1-2";
+    const num = parseInt(g);
+    if (num <= 10) return "9-10";
+    return "11-12";
+  })();
+
+  useEffect(() => {
+    if (!careerId || !user) return;
+    const fetchData = async () => {
+      setLoading(true);
+      const [questsRes, progressRes] = await Promise.all([
+        supabase
+          .from("quests")
+          .select("*")
+          .eq("is_active", true)
+          .eq("flagged", false)
+          .eq("grade_band", gradeBand)
+          .or(`career_id.eq.${careerId},career_id.eq.`)
+          .order("week_number", { ascending: false })
+          .limit(20),
+        supabase
+          .from("user_quest_progress")
+          .select("quest_id, status, response_text")
+          .eq("user_id", user.id),
+      ]);
+      setQuests((questsRes.data as Quest[]) || []);
+      const progMap = new Map<string, QuestProgress>();
+      (progressRes.data || []).forEach((p: any) => progMap.set(p.quest_id, p));
+      setProgress(progMap);
+      setLoading(false);
+    };
+    fetchData();
+  }, [careerId, user, gradeBand]);
+
   if (!careerId) {
     return (
       <div className="flex items-center justify-center px-6 py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4 max-w-xs">
           <Lock size={48} className="text-muted-foreground mx-auto" />
-          <h2 className="text-xl font-bold text-foreground">Set Your Active Path First</h2>
-          <p className="text-sm text-muted-foreground">Set a career as your Active Path to begin quests and challenges.</p>
+          <h2 className="text-xl font-bold text-foreground">Set Your Active Path</h2>
+          <p className="text-sm text-muted-foreground">Set a career as your Active Path to unlock weekly quests</p>
           <button onClick={() => navigate("/universe")} className="btn-primary-glow w-full">Explore Careers</button>
         </motion.div>
       </div>
     );
   }
 
-  const career = getCareerById(careerId) || (() => {
-    const l = getCareerListingById(careerId);
-    return l ? { id: l.id, title: l.title, emoji: "💼" } : null;
-  })();
+  const startOrCompleteQuest = async (quest: Quest, text?: string) => {
+    if (!user) return;
+    setSubmitting(true);
+    const existing = progress.get(quest.id);
 
-  const listing = getCareerListingById(careerId);
-  const family = listing ? getCareerFamilyById(listing.familyId) : null;
-
-  const weekNumber = getCurrentWeekNumber();
-  const thisWeekQuests = getQuestsForCareer(careerId, weekNumber);
-  const allQuests = getQuestsForCareer(careerId);
-  const completedThisWeek = thisWeekQuests.filter((q) => completedQuests.includes(q.id)).length;
-
-  const level = getLevel(xp);
-  const nextLevel = getNextLevel(xp);
-  const levelProgress = nextLevel ? ((xp - level.min) / (nextLevel.min - level.min)) * 100 : 100;
-
-  const handleComplete = (quest: WeeklyQuest) => {
-    if (completedQuests.includes(quest.id)) return;
-    completeQuest(quest.id);
-    addXp(quest.xpReward);
-    toast.success(`+${quest.xpReward} XP! Quest completed! 🎉`);
-    if (completedQuests.length + 1 >= 5) addBadge("Quest Champion");
-    if (completedQuests.length + 1 >= 10) addBadge("Quest Master");
+    if (!existing) {
+      // Start quest
+      await supabase.from("user_quest_progress").insert({
+        user_id: user.id,
+        quest_id: quest.id,
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+      } as any);
+      setProgress((prev) => {
+        const next = new Map(prev);
+        next.set(quest.id, { quest_id: quest.id, status: "in_progress", response_text: null });
+        return next;
+      });
+      toast.success("Quest started! 🚀");
+    } else if (existing.status === "in_progress") {
+      // Complete quest
+      await supabase
+        .from("user_quest_progress")
+        .update({
+          status: "completed",
+          response_text: text || null,
+          completed_at: new Date().toISOString(),
+        } as any)
+        .eq("user_id", user.id)
+        .eq("quest_id", quest.id);
+      setProgress((prev) => {
+        const next = new Map(prev);
+        next.set(quest.id, { quest_id: quest.id, status: "completed", response_text: text || null });
+        return next;
+      });
+      addXp(quest.xp_reward);
+      toast.success(`+${quest.xp_reward} XP! Quest completed! 🎉`);
+      if (quest.badge_id) addBadge(quest.badge_id);
+    }
+    setSubmitting(false);
+    setResponseText("");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const thisWeek = quests.filter((q) => q.week_number === weekNumber);
+  const pastWeeks = quests.filter((q) => q.week_number !== weekNumber);
 
   return (
     <div className="space-y-6">
-      {/* This Week's Quests */}
+      {/* This Week */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
             <Flame size={16} className="text-glow-pink" /> This Week's Quests
           </h2>
-          <span className="text-[10px] font-bold text-primary">{completedThisWeek}/{thisWeekQuests.length} done</span>
+          <span className="text-[10px] font-bold text-primary">
+            {thisWeek.filter((q) => progress.get(q.id)?.status === "completed").length}/{thisWeek.length} done
+          </span>
         </div>
 
-        {thisWeekQuests.length > 0 ? (
+        {thisWeek.length > 0 ? (
           <div className="space-y-3">
-            {thisWeekQuests.map((quest, idx) => {
-              const done = completedQuests.includes(quest.id);
-              const expanded = expandedQuest === quest.id;
-              return (
-                <motion.div
-                  key={quest.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
-                  className={`glass-card rounded-2xl overflow-hidden ${done ? "border-primary/30 bg-primary/5" : ""}`}
-                >
-                  {/* Quest card header area with gradient accent */}
-                  <div className={`h-1.5 w-full ${done ? "gradient-bg" : "bg-muted"}`} />
-
-                  <button
-                    onClick={() => setExpandedQuest(expanded ? null : quest.id)}
-                    className="w-full p-4 flex items-start gap-3 text-left"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-xl shrink-0">
-                      {quest.emoji}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className={`text-sm font-bold ${done ? "text-primary" : "text-foreground"}`}>{quest.title}</p>
-                        {!done && idx === 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full bg-glow-pink/15 text-glow-pink text-[9px] font-bold">New this week 🎯</span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{quest.description}</p>
-                      <div className="flex items-center gap-3 mt-2 flex-wrap">
-                        {family && (
-                          <span className="px-2 py-0.5 rounded-full bg-glow-purple/15 text-glow-purple text-[9px] font-bold">
-                            {family.emoji} {family.name}
-                          </span>
-                        )}
-                        <span className="px-2 py-0.5 rounded-full bg-muted text-[9px] font-medium text-muted-foreground">{quest.skillTag}</span>
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                          <Clock size={10} /> {quest.timeMinutes} min
-                        </span>
-                        <span className="text-[10px] font-bold text-primary">💎 {quest.xpReward} XP</span>
-                      </div>
-                    </div>
-                    {done && <CheckCircle size={20} className="text-primary mt-1 shrink-0" />}
-                  </button>
-
-                  {expanded && !done && (
-                    <div className="px-4 pb-4">
-                      <button
-                        onClick={() => handleComplete(quest)}
-                        className="w-full btn-primary-glow text-sm flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle size={16} /> Mark as Complete
-                      </button>
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
+            {thisWeek.map((quest, idx) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                index={idx}
+                progress={progress.get(quest.id)}
+                expanded={expandedId === quest.id}
+                onToggle={() => setExpandedId(expandedId === quest.id ? null : quest.id)}
+                onStart={() => startOrCompleteQuest(quest)}
+                onComplete={(text) => startOrCompleteQuest(quest, text)}
+                responseText={responseText}
+                setResponseText={setResponseText}
+                submitting={submitting}
+                isNewThisWeek
+              />
+            ))}
           </div>
         ) : (
           <div className="glass-card p-6 rounded-2xl text-center">
             <span className="text-3xl">🎉</span>
-            <p className="text-sm font-semibold text-foreground mt-2">No quests this week!</p>
+            <p className="text-sm font-semibold text-foreground mt-2">No quests this week</p>
             <p className="text-[10px] text-muted-foreground">Check back next Monday for new challenges</p>
           </div>
         )}
       </div>
 
-      {/* All Career Quests */}
-      <div>
-        <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <Zap size={16} className="text-glow-purple" /> All {career?.title || "Career"} Quests
-        </h2>
-        <div className="space-y-2">
-          {allQuests
-            .filter((q) => !thisWeekQuests.find((tw) => tw.id === q.id))
-            .map((quest) => {
-              const done = completedQuests.includes(quest.id);
-              return (
-                <button
-                  key={quest.id}
-                  onClick={() => !done && handleComplete(quest)}
-                  className={`w-full glass-card p-3 rounded-xl flex items-center gap-3 text-left ${done ? "opacity-50" : ""}`}
-                >
-                  <span className="text-lg">{quest.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-xs font-semibold ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>{quest.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-primary font-bold">💎 {quest.xpReward} XP</span>
-                      <span className="text-[10px] text-muted-foreground">{quest.timeMinutes} min</span>
-                    </div>
-                  </div>
-                  {done ? <CheckCircle size={16} className="text-primary shrink-0" /> : <ChevronRight size={14} className="text-muted-foreground shrink-0" />}
-                </button>
-              );
-            })}
+      {/* Past quests */}
+      {pastWeeks.length > 0 && (
+        <div>
+          <h2 className="text-sm font-bold text-foreground mb-3">Past Quests</h2>
+          <div className="space-y-2">
+            {pastWeeks.map((quest, idx) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                index={idx}
+                progress={progress.get(quest.id)}
+                expanded={expandedId === quest.id}
+                onToggle={() => setExpandedId(expandedId === quest.id ? null : quest.id)}
+                onStart={() => startOrCompleteQuest(quest)}
+                onComplete={(text) => startOrCompleteQuest(quest, text)}
+                responseText={responseText}
+                setResponseText={setResponseText}
+                submitting={submitting}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
 
-      {/* ═══ Progress Hub ═══ */}
-      <div className="space-y-4 pt-2">
-        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-          <Target size={16} className="text-primary" /> Progress Hub
-        </h2>
+function QuestCard({
+  quest,
+  index,
+  progress,
+  expanded,
+  onToggle,
+  onStart,
+  onComplete,
+  responseText,
+  setResponseText,
+  submitting,
+  isNewThisWeek,
+}: {
+  quest: Quest;
+  index: number;
+  progress?: QuestProgress;
+  expanded: boolean;
+  onToggle: () => void;
+  onStart: () => void;
+  onComplete: (text?: string) => void;
+  responseText: string;
+  setResponseText: (t: string) => void;
+  submitting: boolean;
+  isNewThisWeek?: boolean;
+}) {
+  const done = progress?.status === "completed";
+  const inProgress = progress?.status === "in_progress";
 
-        {/* XP Level Card */}
-        <div className="glass-card p-4 rounded-2xl space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{level.emoji}</span>
-              <div>
-                <p className="text-sm font-bold text-foreground">Level {XP_LEVELS.indexOf(level) + 1} — {level.name}</p>
-                <p className="text-[10px] text-muted-foreground">{xp} XP total</p>
-              </div>
-            </div>
-            {nextLevel && (
-              <span className="text-[10px] text-muted-foreground">{nextLevel.min - xp} XP to {nextLevel.name}</span>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className={`glass-card rounded-2xl overflow-hidden ${done ? "border-primary/30 bg-primary/5" : ""}`}
+    >
+      <div className={`h-1.5 w-full ${done ? "gradient-bg" : inProgress ? "bg-accent" : "bg-muted"}`} />
+
+      <button onClick={onToggle} className="w-full p-4 flex items-start gap-3 text-left">
+        <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-xl shrink-0">
+          {typeEmojis[quest.quest_type]}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`text-sm font-bold ${done ? "text-primary" : "text-foreground"}`}>{quest.title}</p>
+            {isNewThisWeek && !done && (
+              <span className="px-1.5 py-0.5 rounded-full bg-glow-pink/15 text-glow-pink text-[9px] font-bold">New this week 🎯</span>
             )}
           </div>
-          <div className="progress-bar">
-            <motion.div
-              className="progress-bar-fill"
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min(levelProgress, 100)}%` }}
-              transition={{ duration: 1 }}
-            />
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
+            {quest.skill_tag && (
+              <span className="px-2 py-0.5 rounded-full bg-muted text-[9px] font-medium text-muted-foreground">{quest.skill_tag}</span>
+            )}
+            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <Clock size={10} /> {quest.estimated_minutes} min
+            </span>
+            <span className="text-[10px] font-bold text-primary">💎 {quest.xp_reward} XP</span>
+            <span className="text-[9px] text-muted-foreground capitalize">{quest.quest_type}</span>
           </div>
         </div>
+        {done ? <CheckCircle size={20} className="text-primary mt-1 shrink-0" /> : <ChevronRight size={14} className="text-muted-foreground mt-2 shrink-0" />}
+      </button>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: "Quests", value: completedQuests.length, icon: <Flame size={14} className="text-glow-pink" /> },
-            { label: "Milestones", value: completedMilestones.length, icon: <MapPin size={14} className="text-glow-purple" /> },
-            { label: "Badges", value: badges.length, icon: <Trophy size={14} className="text-primary" /> },
-            { label: "Missions", value: completedMissions.length, icon: <Target size={14} className="text-secondary" /> },
-            { label: "Internships", value: appliedInternships.length, icon: <Briefcase size={14} className="text-glow-purple" /> },
-            { label: "Streak", value: `${streak}🔥`, icon: <Calendar size={14} className="text-glow-pink" /> },
-          ].map((stat) => (
-            <div key={stat.label} className="glass-card p-3 rounded-xl text-center space-y-1">
-              <div className="flex justify-center">{stat.icon}</div>
-              <p className="text-lg font-bold text-foreground">{stat.value}</p>
-              <p className="text-[9px] text-muted-foreground">{stat.label}</p>
+      {expanded && (
+        <div className="px-4 pb-4 space-y-3">
+          {/* Brief */}
+          {quest.brief && (
+            <div className="prose prose-sm prose-invert max-w-none text-xs text-muted-foreground">
+              <ReactMarkdown>{quest.brief}</ReactMarkdown>
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Streak heatmap (simplified) */}
-        <div className="glass-card p-4 rounded-2xl space-y-2">
-          <p className="text-xs font-bold text-foreground flex items-center gap-2">
-            <Flame size={14} className="text-glow-pink" /> Activity Streak
-          </p>
-          <div className="flex gap-1 flex-wrap">
-            {Array.from({ length: 28 }).map((_, i) => {
-              const active = i >= 28 - streak;
-              return (
-                <div
-                  key={i}
-                  className={`w-3 h-3 rounded-sm ${
-                    active ? "bg-primary" : "bg-muted"
-                  }`}
+          {/* Instructions */}
+          {quest.instructions && (
+            <div className="bg-muted/30 rounded-xl p-3">
+              <p className="text-[10px] font-bold text-foreground mb-1">📋 Instructions</p>
+              <div className="prose prose-sm prose-invert max-w-none text-xs text-muted-foreground">
+                <ReactMarkdown>{quest.instructions}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {/* Resource URL for watch/explore */}
+          {quest.resource_url && (quest.quest_type === "watch" || quest.quest_type === "explore") && (
+            <a
+              href={quest.resource_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-primary font-semibold"
+            >
+              {quest.quest_type === "watch" ? <Play size={14} /> : <ExternalLink size={14} />}
+              {quest.quest_type === "watch" ? "Watch Video" : "Open Resource"}
+            </a>
+          )}
+
+          {/* Action buttons */}
+          {!progress && (
+            <button onClick={onStart} disabled={submitting} className="w-full btn-primary-glow text-sm flex items-center justify-center gap-2">
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : "Start Quest →"}
+            </button>
+          )}
+
+          {inProgress && (
+            <div className="space-y-2">
+              {(quest.quest_type === "research" || quest.quest_type === "create" || quest.quest_type === "watch" || quest.quest_type === "explore") && (
+                <textarea
+                  value={responseText}
+                  onChange={(e) => setResponseText(e.target.value)}
+                  placeholder={
+                    quest.quest_type === "research" ? "Write your reflections here..."
+                      : quest.quest_type === "watch" ? "What did you learn from the video?"
+                      : "Describe what you created or observed..."
+                  }
+                  className="w-full bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary min-h-[100px]"
                 />
-              );
-            })}
-          </div>
-          <p className="text-[10px] text-muted-foreground">Last 4 weeks</p>
-        </div>
-
-        {/* People Like You */}
-        {profile && (
-          <div className="glass-card p-4 rounded-2xl space-y-3">
-            <p className="text-xs font-bold text-foreground">🫂 People Like You</p>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar">
-              {[
-                { name: "Amara", path: "UX Designer" },
-                { name: "Kofi", path: "AI Engineer" },
-                { name: "Zainab", path: "Film Director" },
-              ].map((peer) => (
-                <div key={peer.name} className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-full bg-muted/50 border border-glass-border">
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
-                    {peer.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold text-foreground">{peer.name}</p>
-                    <p className="text-[8px] text-muted-foreground">{peer.path}</p>
-                  </div>
-                </div>
-              ))}
+              )}
+              <button
+                onClick={() => onComplete(responseText)}
+                disabled={submitting}
+                className="w-full btn-primary-glow text-sm flex items-center justify-center gap-2"
+              >
+                {submitting ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle size={16} /> Complete Quest</>}
+              </button>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+
+          {done && (
+            <div className="bg-primary/10 rounded-xl p-3 text-center">
+              <p className="text-xs font-bold text-primary">✅ Quest completed!</p>
+            </div>
+          )}
+        </div>
+      )}
+    </motion.div>
   );
 }
