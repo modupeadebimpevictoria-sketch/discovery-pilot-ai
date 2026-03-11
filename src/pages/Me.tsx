@@ -11,6 +11,7 @@ import {
   LogOut, Trash2, ChevronRight, Zap, Edit3, Check, X,
   ExternalLink, Bookmark,
 } from "lucide-react";
+import FeedbackSheet from "@/components/FeedbackSheet";
 
 const XP_LEVELS = [
   { name: "Curious", min: 0, max: 199, emoji: "🔍" },
@@ -431,6 +432,9 @@ export default function Me() {
             </div>
             <ChevronRight size={14} className="text-muted-foreground" />
           </button>
+
+          {/* Send Feedback */}
+          <FeedbackSheet userId={user.id} />
 
           {/* Retake Assessment */}
           <button
