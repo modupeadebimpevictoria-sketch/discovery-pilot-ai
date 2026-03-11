@@ -143,6 +143,57 @@ export type Database = {
         }
         Relationships: []
       }
+      missions: {
+        Row: {
+          career_id: string
+          created_at: string | null
+          created_by: string
+          description: string
+          estimated_minutes: number
+          family_id: string
+          id: string
+          is_active: boolean
+          mission_type: string
+          reviewed_by_admin: boolean
+          task: string
+          title: string
+          week_number: number | null
+          xp_reward: number
+        }
+        Insert: {
+          career_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string
+          estimated_minutes?: number
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          mission_type?: string
+          reviewed_by_admin?: boolean
+          task?: string
+          title: string
+          week_number?: number | null
+          xp_reward?: number
+        }
+        Update: {
+          career_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string
+          estimated_minutes?: number
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          mission_type?: string
+          reviewed_by_admin?: boolean
+          task?: string
+          title?: string
+          week_number?: number | null
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -248,6 +299,194 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_generation_log: {
+        Row: {
+          career_family_id: string
+          error_message: string | null
+          generated_at: string | null
+          grade_band: string
+          id: string
+          model: string | null
+          prompt_used: string | null
+          quest_ids_created: Json | null
+          status: string
+          week_number: number
+        }
+        Insert: {
+          career_family_id?: string
+          error_message?: string | null
+          generated_at?: string | null
+          grade_band?: string
+          id?: string
+          model?: string | null
+          prompt_used?: string | null
+          quest_ids_created?: Json | null
+          status?: string
+          week_number: number
+        }
+        Update: {
+          career_family_id?: string
+          error_message?: string | null
+          generated_at?: string | null
+          grade_band?: string
+          id?: string
+          model?: string | null
+          prompt_used?: string | null
+          quest_ids_created?: Json | null
+          status?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
+      quests: {
+        Row: {
+          badge_id: string | null
+          brief: string | null
+          career_id: string
+          created_at: string | null
+          created_by: string
+          estimated_minutes: number
+          family_id: string
+          flagged: boolean
+          generation_context: Json | null
+          grade_band: string | null
+          id: string
+          instructions: string | null
+          is_active: boolean
+          quest_type: string
+          resource_url: string | null
+          skill_tag: string | null
+          title: string
+          week_number: number
+          xp_reward: number
+        }
+        Insert: {
+          badge_id?: string | null
+          brief?: string | null
+          career_id?: string
+          created_at?: string | null
+          created_by?: string
+          estimated_minutes?: number
+          family_id?: string
+          flagged?: boolean
+          generation_context?: Json | null
+          grade_band?: string | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          quest_type?: string
+          resource_url?: string | null
+          skill_tag?: string | null
+          title: string
+          week_number?: number
+          xp_reward?: number
+        }
+        Update: {
+          badge_id?: string | null
+          brief?: string | null
+          career_id?: string
+          created_at?: string | null
+          created_by?: string
+          estimated_minutes?: number
+          family_id?: string
+          flagged?: boolean
+          generation_context?: Json | null
+          grade_band?: string | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          quest_type?: string
+          resource_url?: string | null
+          skill_tag?: string | null
+          title?: string
+          week_number?: number
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      skill_prompts: {
+        Row: {
+          career_id: string
+          created_at: string | null
+          estimated_minutes: number
+          family_id: string
+          id: string
+          is_active: boolean
+          level: number
+          prompt_format: string
+          prompt_text: string
+          skill_name: string
+          sort_order: number
+          xp_reward: number
+        }
+        Insert: {
+          career_id?: string
+          created_at?: string | null
+          estimated_minutes?: number
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          level?: number
+          prompt_format?: string
+          prompt_text: string
+          skill_name: string
+          sort_order?: number
+          xp_reward?: number
+        }
+        Update: {
+          career_id?: string
+          created_at?: string | null
+          estimated_minutes?: number
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          level?: number
+          prompt_format?: string
+          prompt_text?: string
+          skill_name?: string
+          sort_order?: number
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      user_mission_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          mission_id: string
+          photo_url: string | null
+          response_text: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          mission_id: string
+          photo_url?: string | null
+          response_text?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          mission_id?: string
+          photo_url?: string | null
+          response_text?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_mission_progress_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress: {
         Row: {
           applied_internships: string[] | null
@@ -329,6 +568,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_quest_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          quest_id: string
+          response_text: string | null
+          started_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          quest_id: string
+          response_text?: string | null
+          started_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          quest_id?: string
+          response_text?: string | null
+          started_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_quest_progress_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -343,6 +620,36 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_skill_progress: {
+        Row: {
+          career_id: string
+          id: string
+          last_completed_at: string | null
+          level_reached: number
+          prompts_completed: number
+          skill_name: string
+          user_id: string
+        }
+        Insert: {
+          career_id?: string
+          id?: string
+          last_completed_at?: string | null
+          level_reached?: number
+          prompts_completed?: number
+          skill_name: string
+          user_id: string
+        }
+        Update: {
+          career_id?: string
+          id?: string
+          last_completed_at?: string | null
+          level_reached?: number
+          prompts_completed?: number
+          skill_name?: string
           user_id?: string
         }
         Relationships: []
