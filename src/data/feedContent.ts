@@ -22,7 +22,7 @@ const typeConfig: Record<FeedContentType, { typeEmoji: string; typeLabel: string
   "field-update": { typeEmoji: "🌍", typeLabel: "Field Update" },
   "history": { typeEmoji: "🏛️", typeLabel: "History & Context" },
   "spotlight": { typeEmoji: "💬", typeLabel: "Inspiration" },
-  "quest-nudge": { typeEmoji: "🧭", typeLabel: "Quest Nudge" },
+  "mission-nudge": { typeEmoji: "🎯", typeLabel: "Mission Nudge" },
 };
 
 // Real professional portrait photos from Unsplash
