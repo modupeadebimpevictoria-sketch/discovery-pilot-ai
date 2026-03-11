@@ -356,7 +356,7 @@ export default function CareerExploration() {
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">3–5 years</p>
-              <p className="text-sm font-bold text-primary">{career.salaryRange.mid}</p>
+              <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Senior</p>
