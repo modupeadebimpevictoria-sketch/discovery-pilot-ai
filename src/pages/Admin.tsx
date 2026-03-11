@@ -6,7 +6,7 @@ import { useApp } from "@/contexts/AppContext";
 import {
   Briefcase, FileText, Users, BarChart3, Plus, Pencil, Trash2,
   ToggleLeft, ToggleRight, AlertTriangle, ChevronLeft, RefreshCw,
-  Target, Flame, Zap, Flag, Loader2,
+  Target, Flame, Zap, Flag, Loader2, Globe, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,12 @@ const sectionConfig = [
   { id: "quests" as Section, label: "Quests", icon: Flame },
   { id: "skills" as Section, label: "Skills", icon: Zap },
   { id: "analytics" as Section, label: "Analytics", icon: BarChart3 },
+];
+
+const ALL_CAREER_FAMILIES = [
+  "technology", "design", "science", "business", "engineering", "health",
+  "law", "media", "education", "environment", "finance", "arts",
+  "social-work", "architecture", "sports", "agriculture", "hospitality",
 ];
 
 export default function Admin() {
@@ -102,23 +108,107 @@ export default function Admin() {
 }
 
 // ═══════════════════════════════════════
-// OPPORTUNITIES MANAGER
+// CAREER FAMILY MULTI-SELECT
+// ═══════════════════════════════════════
+function CareerFamilySelect({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [open, setOpen] = useState(false);
+  const toggle = (f: string) => {
+    onChange(value.includes(f) ? value.filter((x) => x !== f) : [...value, f]);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none text-left flex items-center gap-2"
+      >
+        <Globe size={12} className="text-muted-foreground shrink-0" />
+        <span className="truncate">
+          {value.length === 0 ? "Universal (all careers)" : `${value.length} families`}
+        </span>
+      </button>
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-lg shadow-lg p-2 max-h-48 overflow-auto">
+          {ALL_CAREER_FAMILIES.map((f) => (
+            <label key={f} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-muted/50 cursor-pointer">
+              <input type="checkbox" checked={value.includes(f)} onChange={() => toggle(f)} className="accent-primary" />
+              <span className="text-xs text-foreground capitalize">{f}</span>
+            </label>
+          ))}
+          <button onClick={() => { onChange([]); setOpen(false); }} className="w-full mt-1 text-[10px] text-muted-foreground hover:text-foreground py-1">
+            Clear all (universal)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// OPPORTUNITIES MANAGER (with sub-tabs)
 // ═══════════════════════════════════════
 function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: any) {
-  const emptyOpp = {
-    title: "", organisation: "", type: "internship", description: "", location: "Global",
-    country: "", city: "", min_grade: 9, max_grade: 12, application_url: "", deadline: "",
-    duration: "", career_family: "", is_remote: false, is_active: true, is_link_dead: false,
-  };
-  const deadLinks = data.filter((o: any) => o.is_link_dead);
+  const [subTab, setSubTab] = useState<"listings" | "sources" | "scrape-log">("listings");
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-foreground">Opportunities Manager</h2>
-          <p className="text-sm text-muted-foreground">{data.length} total · {deadLinks.length} dead links</p>
-        </div>
+        <h2 className="text-xl font-bold text-foreground">Opportunities</h2>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex gap-2">
+        {([
+          { id: "listings" as const, label: "Listings" },
+          { id: "sources" as const, label: "Scrape Sources" },
+          { id: "scrape-log" as const, label: "Scrape Log" },
+        ]).map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setSubTab(t.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold ${subTab === t.id ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {subTab === "listings" && (
+        <OpportunitiesListings data={data} editing={editing} setEditing={setEditing} onSave={onSave} onDelete={onDelete} />
+      )}
+      {subTab === "sources" && <ScrapeSourcesManager />}
+      {subTab === "scrape-log" && <ScrapeLogView />}
+    </div>
+  );
+}
+
+function OpportunitiesListings({ data, editing, setEditing, onSave, onDelete }: any) {
+  const [editFamiliesId, setEditFamiliesId] = useState<string | null>(null);
+  const [editFamiliesValue, setEditFamiliesValue] = useState<string[]>([]);
+
+  const emptyOpp = {
+    title: "", organisation: "", type: "internship", description: "", location: "Global",
+    country: "", city: "", min_grade: 9, max_grade: 12, application_url: "", deadline: "",
+    duration: "", career_family: "", career_family_ids: [], is_remote: false, is_active: true, is_link_dead: false,
+  };
+  const deadLinks = data.filter((o: any) => o.is_link_dead);
+
+  const startEditFamilies = (opp: any) => {
+    setEditFamiliesId(opp.id);
+    setEditFamiliesValue(opp.career_family_ids || []);
+  };
+
+  const saveFamilies = async () => {
+    if (!editFamiliesId) return;
+    await onSave({ id: editFamiliesId, career_family_ids: editFamiliesValue });
+    setEditFamiliesId(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{data.length} total · {deadLinks.length} dead links</p>
         <button onClick={() => setEditing(emptyOpp)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
           <Plus size={16} /> Add Opportunity
         </button>
@@ -142,8 +232,8 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
             <tr>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Title</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Type</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Families</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Grade</th>
-              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Location</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Active</th>
               <th className="px-4 py-2"></th>
             </tr>
@@ -153,11 +243,25 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
               <tr key={opp.id} className="border-t border-border hover:bg-muted/30">
                 <td className="px-4 py-2.5">
                   <p className="font-medium text-foreground">{opp.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{opp.organisation}</p>
+                  <p className="text-[10px] text-muted-foreground">{opp.organisation} {opp.source === "firecrawl" ? "· 🤖" : ""}</p>
                 </td>
                 <td className="px-4 py-2.5 capitalize text-muted-foreground">{opp.type}</td>
+                <td className="px-4 py-2.5">
+                  {editFamiliesId === opp.id ? (
+                    <div className="flex items-center gap-1">
+                      <CareerFamilySelect value={editFamiliesValue} onChange={setEditFamiliesValue} />
+                      <button onClick={saveFamilies} className="p-1 rounded bg-primary/10 text-primary text-[10px] font-bold px-2">Save</button>
+                      <button onClick={() => setEditFamiliesId(null)} className="p-1"><X size={12} className="text-muted-foreground" /></button>
+                    </div>
+                  ) : (
+                    <button onClick={() => startEditFamilies(opp)} className="text-[10px] text-muted-foreground hover:text-primary">
+                      {(opp.career_family_ids && opp.career_family_ids.length > 0)
+                        ? (opp.career_family_ids as string[]).join(", ")
+                        : "🌐 Universal"}
+                    </button>
+                  )}
+                </td>
                 <td className="px-4 py-2.5 text-muted-foreground">{opp.min_grade}–{opp.max_grade}</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{opp.country || opp.location}</td>
                 <td className="px-4 py-2.5">
                   <button onClick={() => onSave({ id: opp.id, is_active: !opp.is_active })}>
                     {opp.is_active ? <ToggleRight size={20} className="text-primary" /> : <ToggleLeft size={20} className="text-muted-foreground" />}
@@ -180,7 +284,7 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
 }
 
 function OppForm({ data, onSave, onCancel }: any) {
-  const [form, setForm] = useState(data);
+  const [form, setForm] = useState({ ...data, career_family_ids: data.career_family_ids || [] });
   const set = (k: string, v: any) => setForm((p: any) => ({ ...p, [k]: v }));
 
   return (
@@ -198,7 +302,10 @@ function OppForm({ data, onSave, onCancel }: any) {
         <Input label="Application URL" value={form.application_url} onChange={(v) => set("application_url", v)} />
         <Input label="Deadline (YYYY-MM-DD)" value={form.deadline || ""} onChange={(v) => set("deadline", v || null)} />
         <Input label="Duration" value={form.duration} onChange={(v) => set("duration", v)} />
-        <Input label="Career Family" value={form.career_family} onChange={(v) => set("career_family", v)} />
+        <div>
+          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Career Families</label>
+          <CareerFamilySelect value={form.career_family_ids} onChange={(v) => set("career_family_ids", v)} />
+        </div>
       </div>
       <textarea value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Description"
         className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px]" />
@@ -216,6 +323,197 @@ function OppForm({ data, onSave, onCancel }: any) {
       <div className="flex gap-2">
         <button onClick={() => onSave(form)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
         <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// SCRAPE SOURCES MANAGER
+// ═══════════════════════════════════════
+function ScrapeSourcesManager() {
+  const [sources, setSources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [newSource, setNewSource] = useState({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship" });
+  const [scraping, setScraping] = useState(false);
+
+  const fetchSources = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("opportunity_sources").select("*").order("name");
+    setSources(data || []);
+    setLoading(false);
+  };
+
+  useState(() => { fetchSources(); });
+
+  const toggleActive = async (id: string, current: boolean) => {
+    await supabase.from("opportunity_sources").update({ is_active: !current } as any).eq("id", id);
+    toast.success(current ? "Source disabled" : "Source enabled");
+    fetchSources();
+  };
+
+  const addSource = async () => {
+    if (!newSource.name || !newSource.url) { toast.error("Name and URL required"); return; }
+    const { error } = await supabase.from("opportunity_sources").insert(newSource as any);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Source added!");
+    setAdding(false);
+    setNewSource({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship" });
+    fetchSources();
+  };
+
+  const deleteSource = async (id: string) => {
+    if (!confirm("Delete this source?")) return;
+    await supabase.from("opportunity_sources").delete().eq("id", id);
+    toast.success("Source deleted");
+    fetchSources();
+  };
+
+  const runScrapeNow = async () => {
+    setScraping(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("scrape-opportunities", { body: {} });
+      if (error) throw error;
+      toast.success(`Scrape complete: ${data?.total_new_listings || 0} new listings`);
+      fetchSources();
+    } catch (err: any) {
+      toast.error(err.message || "Scrape failed");
+    }
+    setScraping(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{sources.length} sources</p>
+        <div className="flex gap-2">
+          <button onClick={() => setAdding(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+            <Plus size={16} /> Add Source
+          </button>
+          <button onClick={runScrapeNow} disabled={scraping} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold">
+            {scraping ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Run Scrape Now
+          </button>
+        </div>
+      </div>
+
+      {adding && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Name" value={newSource.name} onChange={(v) => setNewSource({ ...newSource, name: v })} />
+            <Input label="URL" value={newSource.url} onChange={(v) => setNewSource({ ...newSource, url: v })} />
+            <Select label="Strategy" value={newSource.scrape_strategy} options={["scrape", "crawl"]} onChange={(v) => setNewSource({ ...newSource, scrape_strategy: v })} />
+            <Select label="Default Type" value={newSource.default_type} options={["internship","competition","program","volunteering","scholarship","workshop","mixed"]} onChange={(v) => setNewSource({ ...newSource, default_type: v })} />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={addSource} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Add</button>
+            <button onClick={() => setAdding(false)} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Name</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Type</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Strategy</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Last Scraped</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Count</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Active</th>
+              <th className="px-4 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sources.map((s: any) => (
+              <tr key={s.id} className="border-t border-border hover:bg-muted/30">
+                <td className="px-4 py-2.5">
+                  <p className="font-medium text-foreground">{s.name}</p>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline truncate block max-w-[200px]">{s.url}</a>
+                </td>
+                <td className="px-4 py-2.5 capitalize text-muted-foreground">{s.default_type}</td>
+                <td className="px-4 py-2.5 text-muted-foreground">{s.scrape_strategy}</td>
+                <td className="px-4 py-2.5 text-[10px] text-muted-foreground">
+                  {s.last_scraped_at ? new Date(s.last_scraped_at).toLocaleDateString() : "Never"}
+                </td>
+                <td className="px-4 py-2.5 text-muted-foreground">{s.last_scraped_count || 0}</td>
+                <td className="px-4 py-2.5">
+                  <button onClick={() => toggleActive(s.id, s.is_active)}>
+                    {s.is_active ? <ToggleRight size={20} className="text-primary" /> : <ToggleLeft size={20} className="text-muted-foreground" />}
+                  </button>
+                </td>
+                <td className="px-4 py-2.5">
+                  <button onClick={() => deleteSource(s.id)} className="p-1.5 rounded hover:bg-destructive/10">
+                    <Trash2 size={14} className="text-destructive" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {sources.length === 0 && (
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No sources configured</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// SCRAPE LOG VIEW
+// ═══════════════════════════════════════
+function ScrapeLogView() {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useState(() => {
+    (async () => {
+      setLoading(true);
+      const { data } = await supabase.from("scrape_log").select("*").order("run_at", { ascending: false }).limit(50);
+      setLogs(data || []);
+      setLoading(false);
+    })();
+  });
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{logs.length} runs logged</p>
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Run Date</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Sources</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">New Listings</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Failed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.map((log: any) => {
+              const failed = (log.failed_sources as string[]) || [];
+              return (
+                <tr key={log.id} className={`border-t border-border ${failed.length > 0 ? "bg-destructive/5" : ""}`}>
+                  <td className="px-4 py-2.5 text-foreground">
+                    {new Date(log.run_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{log.sources_processed}</td>
+                  <td className="px-4 py-2.5 font-bold text-primary">{log.total_new_listings}</td>
+                  <td className="px-4 py-2.5">
+                    {failed.length === 0 ? (
+                      <span className="text-[10px] text-muted-foreground">None</span>
+                    ) : (
+                      <span className="text-[10px] text-destructive">{failed.join(", ")}</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {logs.length === 0 && (
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No scrape runs yet</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -461,7 +759,6 @@ function QuestsMonitor() {
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2">
         <button onClick={() => setTab("quests")} className={`px-4 py-1.5 rounded-full text-xs font-semibold ${tab === "quests" ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}>
           Quests ({quests.length})
@@ -471,7 +768,6 @@ function QuestsMonitor() {
         </button>
       </div>
 
-      {/* Filters */}
       {tab === "quests" && (
         <div className="flex gap-3">
           <input value={filterFamily} onChange={(e) => setFilterFamily(e.target.value)} placeholder="Filter by family_id"
@@ -643,7 +939,6 @@ function SkillsManager() {
         </button>
       </div>
 
-      {/* Generate batch */}
       <div className="bg-card border border-border rounded-lg p-4 flex items-end gap-3">
         <div className="flex-1">
           <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Generate skill prompts for family</label>
