@@ -184,10 +184,21 @@ Generate 4 quests a ${grade.band} student exploring ${family.name} would find ge
           const aiData = await response.json();
           const content = aiData.choices?.[0]?.message?.content || "";
 
-          // ── Parse JSON ──
+          // ── Parse JSON (robust: extract first JSON array even if model adds trailing text) ──
           let questsArray;
           try {
-            const jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+            let jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+            // Find the first '[' and its matching ']'
+            const startIdx = jsonStr.indexOf("[");
+            if (startIdx === -1) throw new Error("No JSON array found");
+            let depth = 0;
+            let endIdx = -1;
+            for (let i = startIdx; i < jsonStr.length; i++) {
+              if (jsonStr[i] === "[") depth++;
+              else if (jsonStr[i] === "]") { depth--; if (depth === 0) { endIdx = i; break; } }
+            }
+            if (endIdx === -1) throw new Error("Unclosed JSON array");
+            jsonStr = jsonStr.slice(startIdx, endIdx + 1);
             questsArray = JSON.parse(jsonStr);
             if (!Array.isArray(questsArray)) throw new Error("Not an array");
           } catch (parseErr) {
