@@ -60,6 +60,7 @@ export interface AdminOpportunity {
   deadline: string | null;
   duration: string | null;
   career_family: string | null;
+  career_family_ids: string[];
   is_remote: boolean | null;
   is_active: boolean | null;
   is_link_dead: boolean | null;
