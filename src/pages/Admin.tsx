@@ -6,14 +6,16 @@ import { useApp } from "@/contexts/AppContext";
 import {
   Briefcase, FileText, Users, BarChart3, Plus, Pencil, Trash2,
   ToggleLeft, ToggleRight, AlertTriangle, ChevronLeft, RefreshCw,
-  Target, Flame, Zap, Flag, Loader2, Globe, X,
+  Target, Flame, Zap, Flag, Loader2, Globe, X, GraduationCap,
 } from "lucide-react";
+import CareersManager from "@/components/admin/CareersManager";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Section = "opportunities" | "feed" | "spotlights" | "missions" | "quests" | "skills" | "analytics";
+type Section = "opportunities" | "feed" | "spotlights" | "missions" | "quests" | "skills" | "careers" | "analytics";
 
 const sectionConfig = [
+  { id: "careers" as Section, label: "Careers", icon: GraduationCap },
   { id: "opportunities" as Section, label: "Opportunities", icon: Briefcase },
   { id: "feed" as Section, label: "Feed Posts", icon: FileText },
   { id: "spotlights" as Section, label: "Spotlights", icon: Users },
@@ -41,7 +43,7 @@ export default function Admin() {
     fetchAll,
   } = useAdminData();
 
-  const [section, setSection] = useState<Section>("opportunities");
+  const [section, setSection] = useState<Section>("careers");
   const [editingOpp, setEditingOpp] = useState<any | null>(null);
   const [editingPost, setEditingPost] = useState<any | null>(null);
   const [editingSpot, setEditingSpot] = useState<any | null>(null);
@@ -88,6 +90,7 @@ export default function Admin() {
       {/* Content */}
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl">
+          {section === "careers" && <CareersManager />}
           {section === "opportunities" && (
             <OpportunitiesManager data={opportunities} editing={editingOpp} setEditing={setEditingOpp} onSave={upsertOpportunity} onDelete={deleteOpportunity} />
           )}

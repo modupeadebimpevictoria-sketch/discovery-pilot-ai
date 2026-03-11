@@ -8,7 +8,7 @@ import { getSkillDetails } from "@/data/skillDetails";
 import { getImagineYouScenarios } from "@/data/imagineYouScenarios";
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
 import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModal";
@@ -16,9 +16,10 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
-  Target, Briefcase, Bot, CheckCircle, Lock, Shield
+  Target, Briefcase, Bot, CheckCircle, Lock, Shield, Award
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // Generate a deterministic photo URL for a career
 function getCareerPhoto(careerId: string): string {
@@ -127,9 +128,62 @@ export default function CareerExploration() {
   const [chatOpen, setChatOpen] = useState(false);
   const [showSetActiveModal, setShowSetActiveModal] = useState(false);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
+  const [dbCareer, setDbCareer] = useState<any>(null);
+
+  // Fetch enriched data from DB
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const { data } = await supabase.from("careers" as any).select("*").eq("is_active", true);
+      if (data) {
+        // Try to match by title (case-insensitive) since hardcoded careers use slug IDs
+        const match = (data as any[]).find((c: any) =>
+          c.id === id ||
+          c.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === id
+        );
+        if (match) setDbCareer(match);
+      }
+    })();
+  }, [id]);
 
   const career = getCareerById(id || "") || listingToCareer(id || "");
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
+
+  // Derive enriched description with fallback chain
+  const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
+  const dayInTheLife = dbCareer?.day_in_the_life || null;
+  const enrichedSkills: { name: string; importance: number }[] | null = dbCareer?.skills || null;
+  const workValues: string[] | null = dbCareer?.work_values || null;
+  const entryRequirements: string | null = dbCareer?.entry_requirements || null;
+  const careerPath: string | null = dbCareer?.career_path || null;
+  const growthOutlook: string | null = dbCareer?.growth_outlook || null;
+  const salaryContext: Record<string, any> = dbCareer?.salary_context || {};
+
+  // Salary lookup based on user's country
+  const userCountry = profile?.country?.toUpperCase() || "";
+  const countryCodeMap: Record<string, string> = {
+    "NIGERIA": "NG", "NG": "NG",
+    "KENYA": "KE", "KE": "KE",
+    "GHANA": "GH", "GH": "GH",
+    "SOUTH AFRICA": "ZA", "ZA": "ZA",
+  };
+  const userCountryCode = countryCodeMap[userCountry] || "";
+  const salaryEntry = salaryContext[userCountryCode] || salaryContext["GLOBAL"] || null;
+  const salaryLabel = salaryEntry
+    ? (userCountryCode && salaryContext[userCountryCode]
+        ? salaryEntry.label
+        : `${salaryEntry.label} (global average)`)
+    : null;
+  const salaryIsEmpty = !salaryLabel;
+
+  // Growth outlook badge
+  const outlookBadge = growthOutlook === "Bright"
+    ? { icon: "🌟", text: "High demand" }
+    : growthOutlook === "Average"
+    ? { icon: "📈", text: "Steady" }
+    : growthOutlook === "Below Average"
+    ? { icon: "⚡", text: "Competitive" }
+    : null;
 
   const saved = savedCareers.includes(career.id);
   const isActivePath = selectedCareerPath === career.id;
@@ -150,7 +204,7 @@ export default function CareerExploration() {
   const roleModels = getRoleModelProfiles(career.id, career.title, career.roleModels);
   const skills = getSkillDetails(career.id, career.skills);
   const imagineScenarios = getImagineYouScenarios(career.id, career.title, currentAge, career.timelineYears, career);
-  const heroPhoto = getCareerPhoto(career.id);
+  const heroPhoto = dbCareer?.unsplash_photo_url || getCareerPhoto(career.id);
 
   const timeline = [
     { age: currentAge, label: "Pick the right subjects now", emoji: "📚" },
@@ -266,6 +320,9 @@ export default function CareerExploration() {
             <span className="fact-pill">{career.category}</span>
             {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% fit</span>}
             <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
+            {outlookBadge && (
+              <span className="fact-pill border-primary/20 text-primary font-bold">{outlookBadge.icon} {outlookBadge.text}</span>
+            )}
           </div>
         </div>
       </div>
@@ -292,7 +349,7 @@ export default function CareerExploration() {
 
         {/* 2. What people actually do */}
         <Card title="What people in this job actually do" icon={<BookOpen size={16} className="text-primary" />}>
-          <p className="text-sm text-muted-foreground leading-relaxed">{career.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{heroDescription}</p>
           <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
             {career.dailyLife.split(", ").slice(0, 5).map((task, i) => (
               <div key={i} className="flex items-start gap-2">
@@ -302,6 +359,58 @@ export default function CareerExploration() {
             ))}
           </div>
         </Card>
+
+        {/* Day in the Life (from DB) */}
+        {dayInTheLife && (
+          <Card title="A day in the life" icon={<Clock size={16} className="text-glow-purple" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed">{dayInTheLife}</p>
+          </Card>
+        )}
+
+        {/* Skills from DB (pill tags with importance bars) */}
+        {enrichedSkills && enrichedSkills.length > 0 && (
+          <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
+            <div className="flex flex-wrap gap-2">
+              {enrichedSkills.slice(0, 8).map((s, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
+                  <span className="text-xs font-semibold text-foreground">{s.name}</span>
+                  <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Work Values from DB */}
+        {workValues && workValues.length > 0 && (
+          <Card title="Work Values" icon={<Award size={16} className="text-glow-pink" />}>
+            <div className="flex flex-wrap gap-1.5">
+              {workValues.map((v, i) => (
+                <span key={i} className="fact-pill text-foreground">{v}</span>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Entry Requirements from DB */}
+        {entryRequirements && (
+          <Card title="Entry Requirements" icon={<GraduationCap size={16} className="text-glow-purple" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{entryRequirements}</p>
+          </Card>
+        )}
+
+        {/* Career Progression from DB */}
+        {careerPath && (
+          <Card title="Career Progression" icon={<TrendingUp size={16} className="text-landing-mint" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{careerPath}</p>
+          </Card>
+        )}
+
+        {/* Salary from DB salary_context */}
+        {salaryIsEmpty ? null : null}
+        {/* We override the existing salary section below if DB salary_context exists */}
 
         {/* 3. A Day in the Life + Get Inspired — side-by-side */}
         {/* // TODO: Replace YouTube search with SpringBoard-produced custom videos per career. video_library table in Supabase is already structured for custom video_ids per career_id + video_type. Swap search query for DB lookup once custom videos are ready. */}
@@ -347,23 +456,36 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.futureGrowth}</p>
         </Card>
 
-        {/* 6. Salary */}
+        {/* 6. Salary — uses DB salary_context when available */}
         <Card title="What you can earn" icon={<DollarSign size={16} className="text-glow-pink" />}>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-[10px] text-muted-foreground">Starting</p>
-              <p className="text-sm font-bold text-foreground">{career.salaryRange.entry}</p>
+          {Object.keys(salaryContext).length > 0 ? (
+            <div className="text-center space-y-2">
+              <p className="text-lg font-bold text-foreground">
+                {salaryLabel}
+              </p>
+              {salaryIsEmpty && (
+                <p className="text-sm text-muted-foreground">Salary data coming soon 📊</p>
+              )}
             </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground">3–5 years</p>
-              <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground">Senior</p>
-              <p className="text-sm font-bold text-foreground">{career.salaryRange.senior}</p>
-            </div>
-          </div>
-          <p className="text-[10px] text-muted-foreground mt-2 text-center">This is what people earn after 3–5 years</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Starting</p>
+                  <p className="text-sm font-bold text-foreground">{career.salaryRange.entry}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">3–5 years</p>
+                  <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Senior</p>
+                  <p className="text-sm font-bold text-foreground">{career.salaryRange.senior}</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2 text-center">This is what people earn after 3–5 years</p>
+            </>
+          )}
         </Card>
 
         {/* 7. Meet the people — horizontal swipeable */}
