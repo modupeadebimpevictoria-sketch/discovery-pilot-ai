@@ -21,7 +21,7 @@ const EXTRACTION_SCHEMA = {
             enum: ["internship", "competition", "program", "volunteering", "scholarship", "workshop"],
           },
           description: { type: "string", description: "2-4 sentence summary" },
-          deadline: { type: "string", nullable: true, description: "ISO date string or null" },
+          deadline: { type: "string", nullable: true, description: "ISO date string (YYYY-MM-DD) or null if unknown" },
           application_url: { type: "string", description: "direct link to apply or learn more" },
           workshop_url: { type: "string", nullable: true, description: "for workshops: the learning page URL" },
           is_free: { type: "boolean" },
@@ -55,12 +55,48 @@ const EXTRACTION_SCHEMA = {
   },
 };
 
-const SYSTEM_PROMPT_CRAWL =
-  "Extract all youth opportunity listings from this page. Each listing should be a separate object. Only extract real specific opportunities — not navigation, categories, or site sections.";
-const SYSTEM_PROMPT_SCRAPE =
-  "Extract the opportunity details from this page. If there are multiple opportunities listed, extract all of them.";
+const SYSTEM_PROMPT =
+  "Extract all youth opportunity listings from this page. Each listing should be a separate object. Only extract real specific opportunities — not navigation, categories, or site sections. For deadlines, only use ISO date format YYYY-MM-DD or null.";
 
 const VALID_TYPES = new Set(["internship", "competition", "program", "volunteering", "scholarship", "workshop"]);
+
+// Validate deadline is a proper ISO date
+function parseDeadline(raw: any): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  // Must match YYYY-MM-DD pattern
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return null;
+  const d = new Date(match[0]);
+  if (isNaN(d.getTime())) return null;
+  return match[0];
+}
+
+// Scrape a single URL using the /v1/scrape endpoint (synchronous, always returns data)
+async function scrapeUrl(firecrawlKey: string, url: string): Promise<any[]> {
+  const resp = await fetch("https://api.firecrawl.dev/v1/scrape", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${firecrawlKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url,
+      formats: ["extract"],
+      extract: {
+        schema: EXTRACTION_SCHEMA,
+        systemPrompt: SYSTEM_PROMPT,
+      },
+    }),
+  });
+
+  const data = await resp.json();
+  if (!resp.ok) {
+    console.error(`Firecrawl scrape error for ${url}:`, data);
+    return [];
+  }
+
+  return data?.data?.extract?.opportunities || [];
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -106,72 +142,10 @@ Deno.serve(async (req) => {
     for (const source of sources) {
       try {
         console.log(`Processing source: ${source.name} (${source.scrape_strategy})`);
-        let firecrawlData: any;
 
-        if (source.scrape_strategy === "crawl") {
-          const resp = await fetch("https://api.firecrawl.dev/v1/crawl", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${firecrawlKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              url: source.url,
-              limit: 20,
-              scrapeOptions: {
-                formats: ["extract"],
-                extract: {
-                  schema: EXTRACTION_SCHEMA,
-                  systemPrompt: SYSTEM_PROMPT_CRAWL,
-                },
-              },
-            }),
-          });
-          firecrawlData = await resp.json();
-          if (!resp.ok) {
-            console.error(`Firecrawl crawl error for ${source.name}:`, firecrawlData);
-            failedSources.push(source.name);
-            continue;
-          }
-        } else {
-          const resp = await fetch("https://api.firecrawl.dev/v1/scrape", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${firecrawlKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              url: source.url,
-              formats: ["extract"],
-              extract: {
-                schema: EXTRACTION_SCHEMA,
-                systemPrompt: SYSTEM_PROMPT_SCRAPE,
-              },
-            }),
-          });
-          firecrawlData = await resp.json();
-          if (!resp.ok) {
-            console.error(`Firecrawl scrape error for ${source.name}:`, firecrawlData);
-            failedSources.push(source.name);
-            continue;
-          }
-        }
-
-        // Extract opportunities from response
-        // Crawl returns data as array, scrape returns data as object
-        let opportunities: any[] = [];
-
-        if (source.scrape_strategy === "crawl") {
-          // Crawl response: { data: [{ extract: { opportunities: [...] } }, ...] }
-          const pages = firecrawlData?.data || [];
-          for (const page of pages) {
-            const extracted = page?.extract?.opportunities || [];
-            opportunities.push(...extracted);
-          }
-        } else {
-          // Scrape response: { data: { extract: { opportunities: [...] } } }
-          opportunities = firecrawlData?.data?.extract?.opportunities || [];
-        }
+        // Always use the scrape endpoint — it's synchronous and reliable.
+        // The crawl endpoint is async and requires polling, which can timeout edge functions.
+        const opportunities = await scrapeUrl(firecrawlKey, source.url);
 
         let sourceNewCount = 0;
 
@@ -180,6 +154,7 @@ Deno.serve(async (req) => {
           if (existingUrls.has(opp.application_url)) continue;
 
           const oppType = VALID_TYPES.has(opp.type) ? opp.type : source.default_type;
+          const deadline = parseDeadline(opp.deadline);
 
           const row = {
             title: opp.title || "Untitled",
@@ -188,7 +163,7 @@ Deno.serve(async (req) => {
             description: opp.description || "",
             application_url: opp.application_url,
             workshop_url: opp.workshop_url || "",
-            deadline: opp.deadline || null,
+            deadline,
             is_remote: opp.is_remote || false,
             country: opp.country_code || "",
             location: opp.is_international ? "Global" : opp.country_code || "Global",
@@ -218,8 +193,8 @@ Deno.serve(async (req) => {
           totalNew++;
         }
 
-        // Update source stats
-        await supabase
+        // Always update source stats — even if 0 new
+        const { error: updateErr } = await supabase
           .from("opportunity_sources")
           .update({
             last_scraped_at: new Date().toISOString(),
@@ -227,12 +202,19 @@ Deno.serve(async (req) => {
           })
           .eq("id", source.id);
 
+        if (updateErr) {
+          console.error(`Failed to update source stats for ${source.name}:`, updateErr.message);
+        }
+
         sourcesProcessed++;
         console.log(`${source.name}: ${sourceNewCount} new opportunities`);
       } catch (sourceErr) {
         console.error(`Error processing ${source.name}:`, sourceErr);
         failedSources.push(source.name);
       }
+
+      // Small delay between sources to respect rate limits
+      await new Promise((r) => setTimeout(r, 500));
     }
 
     // Log the run
