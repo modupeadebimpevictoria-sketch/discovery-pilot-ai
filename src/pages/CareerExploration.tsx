@@ -318,9 +318,9 @@ export default function CareerExploration() {
             </div>
           </a>
           <a href={career.encouragementVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover rounded-2xl overflow-hidden">
-            <div className="relative aspect-video bg-muted/30 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <Play size={18} className="text-accent ml-0.5" />
+            <div className="relative aspect-video bg-glow-purple/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-glow-purple/20 flex items-center justify-center">
+                <Play size={18} className="text-glow-purple ml-0.5" />
               </div>
             </div>
             <div className="p-3 space-y-1">
