@@ -34,7 +34,6 @@ export default function OpportunityCard({
 
   const handleApplyClick = () => {
     onApply();
-    openExternal(opp.application_url);
     toast.success("Good luck! 🎯 We've logged this in your Passport.");
   };
 
