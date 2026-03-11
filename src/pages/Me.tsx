@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
@@ -9,6 +9,7 @@ import {
   User, Camera, Backpack, Heart, BookOpen, MapPin,
   Sun, Moon, Monitor, Bell, Shield, RefreshCw, KeyRound,
   LogOut, Trash2, ChevronRight, Zap, Edit3, Check, X,
+  ExternalLink, Bookmark,
 } from "lucide-react";
 
 const XP_LEVELS = [
@@ -41,6 +42,8 @@ export default function Me() {
   const [deleteText, setDeleteText] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [savedOpps, setSavedOpps] = useState<any[]>([]);
+  const [savedOppsLoading, setSavedOppsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const level = getLevel(xp);
@@ -54,10 +57,49 @@ export default function Me() {
       const { data } = supabase.storage
         .from("avatars")
         .getPublicUrl(`${user.id}/avatar`);
-      // Check if file actually exists by appending timestamp
       setAvatarUrl(`${data.publicUrl}?t=${Date.now()}`);
     }
   });
+
+  // Load saved opportunities
+  useEffect(() => {
+    if (!user) return;
+    const fetchSaved = async () => {
+      setSavedOppsLoading(true);
+      const { data: saves } = await supabase
+        .from("user_saved_opportunities")
+        .select("opportunity_id, saved_at")
+        .eq("user_id", user.id)
+        .order("saved_at", { ascending: false });
+
+      if (!saves || saves.length === 0) {
+        setSavedOpps([]);
+        setSavedOppsLoading(false);
+        return;
+      }
+
+      const ids = saves.map((s: any) => s.opportunity_id);
+      const { data: opps } = await supabase
+        .from("admin_opportunities")
+        .select("id, title, organisation, type, application_url, is_link_dead")
+        .in("id", ids);
+
+      setSavedOpps(opps || []);
+      setSavedOppsLoading(false);
+    };
+    fetchSaved();
+  }, [user]);
+
+  const handleUnsave = async (oppId: string) => {
+    if (!user) return;
+    await supabase
+      .from("user_saved_opportunities")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("opportunity_id", oppId);
+    setSavedOpps((prev) => prev.filter((o) => o.id !== oppId));
+    toast.success("Removed from saved ♡");
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -285,7 +327,53 @@ export default function Me() {
           ))}
         </div>
 
-        {/* ═══ Settings ═══ */}
+        {/* ═══ Saved Opportunities ═══ */}
+        <div className="space-y-1">
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1 mb-2">Saved Opportunities</h3>
+          {savedOppsLoading ? (
+            <div className="glass-card p-4 rounded-xl text-center">
+              <p className="text-xs text-muted-foreground">Loading...</p>
+            </div>
+          ) : savedOpps.length === 0 ? (
+            <div className="glass-card p-5 rounded-xl text-center space-y-2">
+              <Bookmark size={24} className="text-muted-foreground mx-auto" />
+              <p className="text-xs text-muted-foreground">Tap the ♡ on any opportunity to save it here</p>
+              <button onClick={() => navigate("/opportunities")} className="text-xs font-semibold text-primary">
+                Browse Opportunities →
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {savedOpps.map((opp) => (
+                <div key={opp.id} className="glass-card p-3.5 rounded-xl flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{opp.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{opp.organisation}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {!opp.is_link_dead && (
+                      <a
+                        href={opp.application_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"
+                      >
+                        <ExternalLink size={14} className="text-primary" />
+                      </a>
+                    )}
+                    <button
+                      onClick={() => handleUnsave(opp.id)}
+                      className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"
+                    >
+                      <Heart size={14} className="text-destructive fill-destructive" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="space-y-1">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1 mb-2">Settings</h3>
 
