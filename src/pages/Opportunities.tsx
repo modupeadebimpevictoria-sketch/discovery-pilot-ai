@@ -60,10 +60,11 @@ const typeConfig: Record<string, { emoji: string; label: string; color: string }
 
 export default function Opportunities() {
   const navigate = useNavigate();
-  const { selectedCareerPath, matchedCareers, appliedInternships, applyToInternship, profile } = useApp();
+  const { selectedCareerPath, matchedCareers, profile } = useApp();
   const [filter, setFilter] = useState<string>("all");
   const [dbOpps, setDbOpps] = useState<AdminOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
+  const { appliedIds, savedIds, recordClick, toggleSave } = useOpportunityActions();
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const userGrade = parseGradeNumber(profile?.grade);
