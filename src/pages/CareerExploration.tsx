@@ -348,7 +348,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 6. Salary */}
-        <Card title="What you can earn" icon={<DollarSign size={16} className="text-primary" />}>
+        <Card title="What you can earn" icon={<DollarSign size={16} className="text-glow-pink" />}>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <p className="text-[10px] text-muted-foreground">Starting</p>
