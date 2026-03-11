@@ -433,7 +433,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 9. Skills You'll Need */}
-        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-primary" />}>
+        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-glow-purple" />}>
           <div className="space-y-3">
             {skills.map((s) => (
               <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
