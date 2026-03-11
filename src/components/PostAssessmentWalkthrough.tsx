@@ -17,7 +17,7 @@ const screens = [
   {
     icon: <Map size={48} className="text-primary" />,
     headline: "Pick a path to get started 🗺️",
-    body: "Set one career as your Active Path to unlock quests, earn XP, and build your Career Passport. You can switch anytime — your progress is always saved.",
+    body: "Set one career as your Active Path to unlock daily missions, weekly quests, and skill development — plus earn XP and build your Career Passport. You can switch anytime — your progress is always saved.",
     bgClass: "bg-primary/10 border-primary/20",
     dotColor: "bg-primary",
   },
