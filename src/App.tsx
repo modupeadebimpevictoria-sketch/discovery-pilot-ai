@@ -19,6 +19,7 @@ import Quests from "./pages/Quests";
 import CareerPassport from "./pages/CareerPassport";
 import Opportunities from "./pages/Opportunities";
 import Mentor from "./pages/Mentor";
+import Me from "./pages/Me";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
