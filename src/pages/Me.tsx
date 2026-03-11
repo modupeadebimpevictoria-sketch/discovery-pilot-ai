@@ -433,6 +433,9 @@ export default function Me() {
             <ChevronRight size={14} className="text-muted-foreground" />
           </button>
 
+          {/* Send Feedback */}
+          <FeedbackSheet userId={user.id} />
+
           {/* Retake Assessment */}
           <button
             onClick={() => navigate("/assessment")}
