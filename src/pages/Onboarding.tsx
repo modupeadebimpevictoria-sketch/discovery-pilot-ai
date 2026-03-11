@@ -106,20 +106,24 @@ export default function Onboarding() {
           {/* Single select */}
           {current.options && !current.multi && (
             <div className="space-y-2">
-              {current.options.map((opt) => (
-                <motion.button
-                  key={opt}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => selectOption(opt)}
-                  className={`w-full p-4 rounded-2xl text-left font-medium transition-all duration-200 text-sm ${
-                    data[current.key] === opt
-                      ? "neon-border bg-primary/10 text-primary"
-                      : "glass-card text-foreground active:bg-muted/60"
-                  }`}
-                >
-                  {opt}
-                </motion.button>
-              ))}
+              {current.options.map((opt: any) => {
+                const label = typeof opt === "object" ? opt.label : opt;
+                const value = typeof opt === "object" ? opt.value : opt;
+                return (
+                  <motion.button
+                    key={value}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => selectOption(opt)}
+                    className={`w-full p-4 rounded-2xl text-left font-medium transition-all duration-200 text-sm ${
+                      data[current.key] === value
+                        ? "neon-border bg-primary/10 text-primary"
+                        : "glass-card text-foreground active:bg-muted/60"
+                    }`}
+                  >
+                    {label}
+                  </motion.button>
+                );
+              })}
             </div>
           )}
 
