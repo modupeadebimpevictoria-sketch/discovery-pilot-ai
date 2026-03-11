@@ -123,14 +123,12 @@ export default function OpportunityCard({
           )}
 
           {/* View details */}
-          <a
-            href={opp.application_url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => window.open(opp.application_url, "_blank", "noopener,noreferrer")}
             className="btn-glass text-xs py-2 px-3 flex items-center justify-center gap-1"
           >
             <ExternalLink size={12} />
-          </a>
+          </button>
         </div>
 
         {/* Save for later */}
