@@ -41,6 +41,27 @@ export default function CareerPassport() {
   } = ctx;
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [exploredOpps, setExploredOpps] = useState<any[]>([]);
+
+  // Fetch explored opportunities
+  useEffect(() => {
+    if (!ctx.user) return;
+    const fetch = async () => {
+      const { data: apps } = await supabase
+        .from("user_opportunity_applications")
+        .select("opportunity_id, applied_at")
+        .eq("user_id", ctx.user!.id)
+        .order("applied_at", { ascending: false });
+      if (!apps || apps.length === 0) return;
+      const ids = apps.map((a: any) => a.opportunity_id);
+      const { data: opps } = await supabase
+        .from("admin_opportunities")
+        .select("id, title, organisation, type, application_url")
+        .in("id", ids);
+      setExploredOpps(opps || []);
+    };
+    fetch();
+  }, [ctx.user]);
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;
