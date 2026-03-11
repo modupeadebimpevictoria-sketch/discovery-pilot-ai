@@ -56,8 +56,8 @@ export default function Quests() {
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl gradient-bg-warm flex items-center justify-center">
-            <Flame size={24} className="text-accent-foreground" />
+          <div className="w-12 h-12 rounded-2xl bg-glow-pink/20 flex items-center justify-center">
+            <Flame size={24} className="text-glow-pink" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Weekly Quests</h1>
