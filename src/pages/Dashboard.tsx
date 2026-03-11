@@ -208,10 +208,10 @@ export default function Dashboard() {
         {/* AI Mentor CTA */}
         <button
           onClick={() => setChatOpen(true)}
-          className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3"
+          className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3 border-landing-mint/20"
         >
-          <div className="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center">
-            <Bot size={24} className="text-primary-foreground" />
+          <div className="w-12 h-12 rounded-2xl bg-landing-mint/20 flex items-center justify-center">
+            <Bot size={24} className="text-landing-mint" />
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Ask SpringBoard AI 🏊</p>

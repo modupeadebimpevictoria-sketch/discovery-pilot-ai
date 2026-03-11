@@ -26,9 +26,9 @@ export default function DailyNudge({ career }: DailyNudgeProps) {
   return (
     <div className="space-y-2">
       <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-        <Sparkles size={14} className="text-primary" /> Today's Nudge
+        <Sparkles size={14} className="text-glow-pink" /> Today's Nudge
       </h2>
-      <div className="glass-card p-4 rounded-2xl space-y-3">
+      <div className="glass-card p-4 rounded-2xl space-y-3 border-glow-pink/20">
         <p className="text-sm text-foreground leading-relaxed">{nudge.action}</p>
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1 text-[10px] text-muted-foreground">

@@ -51,7 +51,7 @@ export default function MentorSpotlight() {
           />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-bold text-foreground">{mentor.name}</p>
-            <p className="text-[10px] text-primary font-semibold">{mentor.role}</p>
+            <p className="text-[10px] text-glow-purple font-semibold">{mentor.role}</p>
             <p className="text-xs text-muted-foreground italic leading-relaxed">"{mentor.quote}"</p>
           </div>
         </div>
