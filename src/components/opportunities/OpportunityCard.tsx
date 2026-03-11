@@ -31,11 +31,14 @@ export default function OpportunityCard({
   const gradeTag = `Grade ${opp.min_grade}–${opp.max_grade}`;
   const isDeadLink = opp.is_link_dead === true;
 
+  const openExternal = (url: string) => {
+    const w = window.top || window;
+    w.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const handleApplyClick = () => {
-    // Record the click
     onApply();
-    // Open external URL
-    window.open(opp.application_url, "_blank", "noopener,noreferrer");
+    openExternal(opp.application_url);
     toast.success("Good luck! 🎯 We've logged this in your Passport.");
   };
 
@@ -124,7 +127,7 @@ export default function OpportunityCard({
 
           {/* View details */}
           <button
-            onClick={() => window.open(opp.application_url, "_blank", "noopener,noreferrer")}
+            onClick={() => openExternal(opp.application_url)}
             className="btn-glass text-xs py-2 px-3 flex items-center justify-center gap-1"
           >
             <ExternalLink size={12} />
