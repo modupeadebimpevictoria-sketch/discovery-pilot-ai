@@ -1,12 +1,19 @@
 import { Users } from "lucide-react";
 
 const anonymizedPeople = [
-  { label: "Student in Lagos", pathway: "AI Engineer", emoji: "🤖", daysAgo: 2 },
-  { label: "Student in Nairobi", pathway: "Architect", emoji: "🏗️", daysAgo: 1 },
-  { label: "Student in Accra", pathway: "UX Designer", emoji: "🎨", daysAgo: 3 },
-  { label: "Student in Cape Town", pathway: "Entrepreneur", emoji: "🚀", daysAgo: 1 },
-  { label: "Student in Johannesburg", pathway: "Data Scientist", emoji: "📊", daysAgo: 4 },
+  { firstName: "Amara", gradeBand: "Grade 11–12", pathway: "AI Engineer", emoji: "🤖", daysAgo: 2 },
+  { firstName: "Kofi", gradeBand: "Grade 9–10", pathway: "Architect", emoji: "🏗️", daysAgo: 1 },
+  { firstName: "Zara", gradeBand: "Grade 11–12", pathway: "UX Designer", emoji: "🎨", daysAgo: 3 },
+  { firstName: "Thabo", gradeBand: "Grade 9–10", pathway: "Entrepreneur", emoji: "🚀", daysAgo: 1 },
+  { firstName: "Nia", gradeBand: "Grade 11–12", pathway: "Data Scientist", emoji: "📊", daysAgo: 4 },
 ];
+
+// Privacy rules:
+// - Only first name shown (never last name)
+// - Grade band, not exact grade
+// - No school, location, email or user_id
+// - Under-15s excluded by default
+// - Students can opt out via Settings
 
 export default function PeopleLikeYou() {
   return (
@@ -22,8 +29,8 @@ export default function PeopleLikeYou() {
             </div>
             <div className="flex-1">
               <p className="text-xs text-foreground">
-                <span className="font-semibold">{p.label}</span>{" "}
-                <span className="text-muted-foreground">is exploring</span>{" "}
+                <span className="font-semibold">{p.firstName}</span>{" "}
+                <span className="text-muted-foreground">· {p.gradeBand} · Exploring</span>{" "}
                 <span className="text-primary font-semibold">{p.pathway}</span>
               </p>
               <p className="text-[10px] text-muted-foreground">{p.daysAgo}d ago</p>
