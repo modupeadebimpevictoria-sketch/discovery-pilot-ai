@@ -521,7 +521,7 @@ export default function CareerExploration() {
             {imagineScenarios.map((scenario, i) => (
               <div key={i} className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">Age {scenario.age}</span>
+                  <span className="text-xs font-bold text-glow-purple bg-glow-purple/10 px-2.5 py-1 rounded-full">Age {scenario.age}</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{scenario.text}</p>
                 {i < imagineScenarios.length - 1 && <div className="border-t border-border/30 pt-2" />}
