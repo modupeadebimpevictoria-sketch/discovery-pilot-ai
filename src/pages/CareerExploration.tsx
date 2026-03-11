@@ -273,18 +273,18 @@ export default function CareerExploration() {
       <div className="px-5 space-y-4 pt-4">
         {/* 1. Quick Stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="glass-card p-3 text-center rounded-2xl">
+          <div className="glass-card p-3 text-center rounded-2xl border-primary/20">
             <DollarSign size={16} className="text-primary mx-auto mb-1" />
             <p className="text-xs text-muted-foreground">Average Pay</p>
             <p className="text-sm font-bold text-foreground">{career.salaryRange.mid}</p>
           </div>
-          <div className="glass-card p-3 text-center rounded-2xl">
-            <Clock size={16} className="text-secondary mx-auto mb-1" />
+          <div className="glass-card p-3 text-center rounded-2xl border-glow-purple/20">
+            <Clock size={16} className="text-glow-purple mx-auto mb-1" />
             <p className="text-xs text-muted-foreground">How Long</p>
             <p className="text-sm font-bold text-foreground">{career.timelineYears} years</p>
           </div>
-          <div className="glass-card p-3 text-center rounded-2xl">
-            <Star size={16} className="text-accent mx-auto mb-1" />
+          <div className="glass-card p-3 text-center rounded-2xl border-glow-pink/20">
+            <Star size={16} className="text-glow-pink mx-auto mb-1" />
             <p className="text-xs text-muted-foreground">Difficulty</p>
             <p className="text-sm font-bold text-foreground">{career.difficulty}</p>
           </div>
