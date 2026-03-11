@@ -340,7 +340,7 @@ export default function CareerExploration() {
         </Card>
 
         {/* 5. Is this job growing? */}
-        <Card title="Is this job growing in the future?" icon={<TrendingUp size={16} className="text-primary" />}>
+        <Card title="Is this job growing in the future?" icon={<TrendingUp size={16} className="text-landing-mint" />}>
           <div className="flex items-center gap-2 mb-2">
             <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
           </div>
