@@ -122,27 +122,6 @@ export default function GradeRoadmap() {
         </motion.div>
       </div>
     );
-  }
-  const milestones = roadmap.milestones;
-
-  // Group milestones by grade band
-  const bandGroups: Record<string, RoadmapMilestone[]> = {};
-  GRADE_BANDS.forEach((b) => (bandGroups[b] = []));
-  milestones.forEach((m) => {
-    const band = ageRangeToGradeBand(m.ageRange);
-    if (bandGroups[band]) bandGroups[band].push(m);
-  });
-
-  const completedCount = milestones.filter((m) => completedMilestones.includes(m.id)).length;
-  const progress = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
-
-  // Auto-collapse past bands for upper grade students
-  useEffect(() => {
-    const pastBands = GRADE_BANDS.filter((_, i) => i < currentBandIdx);
-    if (pastBands.length > 0) {
-      setCollapsedBands(new Set(pastBands));
-    }
-  }, [currentBandIdx]);
 
   const toggleCollapse = (band: string) => {
     setCollapsedBands((prev) => {
