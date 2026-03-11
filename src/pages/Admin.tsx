@@ -12,9 +12,10 @@ import CareersManager from "@/components/admin/CareersManager";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type Section = "opportunities" | "feed" | "spotlights" | "missions" | "quests" | "skills" | "analytics";
+type Section = "opportunities" | "feed" | "spotlights" | "missions" | "quests" | "skills" | "careers" | "analytics";
 
 const sectionConfig = [
+  { id: "careers" as Section, label: "Careers", icon: GraduationCap },
   { id: "opportunities" as Section, label: "Opportunities", icon: Briefcase },
   { id: "feed" as Section, label: "Feed Posts", icon: FileText },
   { id: "spotlights" as Section, label: "Spotlights", icon: Users },
