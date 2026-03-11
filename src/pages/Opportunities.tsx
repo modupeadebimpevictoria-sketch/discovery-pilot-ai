@@ -8,6 +8,38 @@ import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
 import { useOpportunityActions } from "@/hooks/useOpportunityActions";
+import { careerListings } from "@/data/careerFamilies";
+
+// Maps the Firecrawl-extracted career_family_ids values to our app's familyId values
+const FAMILY_ID_MAP: Record<string, string[]> = {
+  technology: ["technology", "product-tech", "space-future-tech"],
+  design: ["creative-design"],
+  science: ["science-research"],
+  business: ["business-entrepreneurship"],
+  engineering: ["engineering-architecture", "trades-technical"],
+  health: ["healthcare-medicine", "mental-health"],
+  law: ["law-justice"],
+  media: ["media-content", "entertainment-performance"],
+  education: ["education-academia"],
+  environment: ["environment-sustainability", "animals-nature"],
+  finance: ["finance-investment"],
+  arts: ["creative-design", "entertainment-performance"],
+  "social-work": ["social-impact", "international-development", "government-public-service"],
+  architecture: ["engineering-architecture", "real-estate-property"],
+  sports: ["sport-fitness"],
+  agriculture: ["environment-sustainability"],
+  hospitality: ["travel-hospitality", "food-culinary", "beauty-wellness"],
+};
+
+function getAppFamilyIds(dbFamilyIds: string[]): string[] {
+  const result: string[] = [];
+  for (const dbId of dbFamilyIds) {
+    const mapped = FAMILY_ID_MAP[dbId];
+    if (mapped) result.push(...mapped);
+    else result.push(dbId);
+  }
+  return result;
+}
 
 export type OpportunityType = "scholarship" | "competition" | "course" | "program" | "workshop" | "internship";
 
