@@ -540,8 +540,8 @@ export default function CareerExploration() {
             <p className="text-[10px] text-muted-foreground">Step-by-step path</p>
           </button>
           <button onClick={() => navigate("/opportunities")} className="glass-card-hover p-4 rounded-2xl text-left space-y-2">
-            <div className="w-9 h-9 rounded-xl gradient-bg-warm flex items-center justify-center">
-              <GraduationCap size={18} className="text-accent-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-glow-pink/20 flex items-center justify-center">
+              <GraduationCap size={18} className="text-glow-pink" />
             </div>
             <p className="text-sm font-bold text-foreground">Opportunities</p>
             <p className="text-[10px] text-muted-foreground">Scholarships & more</p>
