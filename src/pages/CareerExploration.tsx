@@ -466,6 +466,7 @@ export default function CareerExploration() {
                   <p className={`text-xs font-bold ${
                     i === timeline.length - 1 ? "text-primary" : i % 2 === 0 ? "text-glow-purple" : "text-glow-pink"
                   }`}>Age {t.age}</p>
+                  <p className="text-sm text-muted-foreground">{t.label}</p>
                 </div>
               </div>
             ))}
