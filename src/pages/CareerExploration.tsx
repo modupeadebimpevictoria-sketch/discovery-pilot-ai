@@ -474,7 +474,7 @@ export default function CareerExploration() {
 
         {/* 11. Opportunities / Internships (GATED) */}
         {internshipList.length > 0 && (
-          <Card title="🏢 Opportunities" icon={<Briefcase size={16} className="text-accent" />}>
+          <Card title="🏢 Opportunities" icon={<Briefcase size={16} className="text-glow-purple" />}>
             <p className="text-xs text-muted-foreground mb-3">Shadow opportunities and internships:</p>
             <div className="space-y-3">
               {internshipList.map((intern) => {
