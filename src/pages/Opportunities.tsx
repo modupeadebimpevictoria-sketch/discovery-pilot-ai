@@ -183,10 +183,11 @@ export default function Opportunities() {
               index={idx}
               typeConfig={typeConfig}
               locationLabel={locationLabel(opp)}
-              userGrade={userGrade}
               careerId={careerId}
-              applied={appliedInternships.includes(opp.id)}
+              applied={appliedIds.has(opp.id)}
+              saved={savedIds.has(opp.id)}
               onApply={() => handleApply(opp.id)}
+              onToggleSave={() => toggleSave(opp.id)}
             />
           ))}
         </div>
