@@ -327,7 +327,53 @@ export default function Me() {
           ))}
         </div>
 
-        {/* ═══ Settings ═══ */}
+        {/* ═══ Saved Opportunities ═══ */}
+        <div className="space-y-1">
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1 mb-2">Saved Opportunities</h3>
+          {savedOppsLoading ? (
+            <div className="glass-card p-4 rounded-xl text-center">
+              <p className="text-xs text-muted-foreground">Loading...</p>
+            </div>
+          ) : savedOpps.length === 0 ? (
+            <div className="glass-card p-5 rounded-xl text-center space-y-2">
+              <Bookmark size={24} className="text-muted-foreground mx-auto" />
+              <p className="text-xs text-muted-foreground">Tap the ♡ on any opportunity to save it here</p>
+              <button onClick={() => navigate("/opportunities")} className="text-xs font-semibold text-primary">
+                Browse Opportunities →
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {savedOpps.map((opp) => (
+                <div key={opp.id} className="glass-card p-3.5 rounded-xl flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{opp.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{opp.organisation}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {!opp.is_link_dead && (
+                      <a
+                        href={opp.application_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"
+                      >
+                        <ExternalLink size={14} className="text-primary" />
+                      </a>
+                    )}
+                    <button
+                      onClick={() => handleUnsave(opp.id)}
+                      className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"
+                    >
+                      <Heart size={14} className="text-destructive fill-destructive" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="space-y-1">
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-1 mb-2">Settings</h3>
 
