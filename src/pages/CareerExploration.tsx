@@ -456,23 +456,36 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.futureGrowth}</p>
         </Card>
 
-        {/* 6. Salary */}
+        {/* 6. Salary — uses DB salary_context when available */}
         <Card title="What you can earn" icon={<DollarSign size={16} className="text-glow-pink" />}>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-[10px] text-muted-foreground">Starting</p>
-              <p className="text-sm font-bold text-foreground">{career.salaryRange.entry}</p>
+          {Object.keys(salaryContext).length > 0 ? (
+            <div className="text-center space-y-2">
+              <p className="text-lg font-bold text-foreground">
+                {salaryLabel}
+              </p>
+              {salaryIsEmpty && (
+                <p className="text-sm text-muted-foreground">Salary data coming soon 📊</p>
+              )}
             </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground">3–5 years</p>
-              <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground">Senior</p>
-              <p className="text-sm font-bold text-foreground">{career.salaryRange.senior}</p>
-            </div>
-          </div>
-          <p className="text-[10px] text-muted-foreground mt-2 text-center">This is what people earn after 3–5 years</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Starting</p>
+                  <p className="text-sm font-bold text-foreground">{career.salaryRange.entry}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">3–5 years</p>
+                  <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Senior</p>
+                  <p className="text-sm font-bold text-foreground">{career.salaryRange.senior}</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2 text-center">This is what people earn after 3–5 years</p>
+            </>
+          )}
         </Card>
 
         {/* 7. Meet the people — horizontal swipeable */}
