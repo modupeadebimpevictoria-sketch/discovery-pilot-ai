@@ -31,10 +31,6 @@ export default function OpportunityCard({
   const gradeTag = `Grade ${opp.min_grade}–${opp.max_grade}`;
   const isDeadLink = opp.is_link_dead === true;
 
-  const openExternal = (url: string) => {
-    const w = window.top || window;
-    w.open(url, "_blank", "noopener,noreferrer");
-  };
 
   const handleApplyClick = () => {
     onApply();
