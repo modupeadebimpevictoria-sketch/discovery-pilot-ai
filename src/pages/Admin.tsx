@@ -43,7 +43,7 @@ export default function Admin() {
     fetchAll,
   } = useAdminData();
 
-  const [section, setSection] = useState<Section>("opportunities");
+  const [section, setSection] = useState<Section>("careers");
   const [editingOpp, setEditingOpp] = useState<any | null>(null);
   const [editingPost, setEditingPost] = useState<any | null>(null);
   const [editingSpot, setEditingSpot] = useState<any | null>(null);
