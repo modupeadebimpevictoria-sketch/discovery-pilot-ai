@@ -6,8 +6,9 @@ import { useApp } from "@/contexts/AppContext";
 import {
   Briefcase, FileText, Users, BarChart3, Plus, Pencil, Trash2,
   ToggleLeft, ToggleRight, AlertTriangle, ChevronLeft, RefreshCw,
-  Target, Flame, Zap, Flag, Loader2, Globe, X,
+  Target, Flame, Zap, Flag, Loader2, Globe, X, GraduationCap,
 } from "lucide-react";
+import CareersManager from "@/components/admin/CareersManager";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
