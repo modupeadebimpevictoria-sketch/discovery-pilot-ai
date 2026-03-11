@@ -107,6 +107,152 @@ export type Database = {
         }
         Relationships: []
       }
+      career_enrichment_log: {
+        Row: {
+          career_id: string | null
+          career_title: string | null
+          id: string
+          issue: string | null
+          logged_at: string | null
+          notes: string | null
+          resolved: boolean | null
+        }
+        Insert: {
+          career_id?: string | null
+          career_title?: string | null
+          id?: string
+          issue?: string | null
+          logged_at?: string | null
+          notes?: string | null
+          resolved?: boolean | null
+        }
+        Update: {
+          career_id?: string | null
+          career_title?: string | null
+          id?: string
+          issue?: string | null
+          logged_at?: string | null
+          notes?: string | null
+          resolved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "career_enrichment_log_career_id_fkey"
+            columns: ["career_id"]
+            isOneToOne: false
+            referencedRelation: "careers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      careers: {
+        Row: {
+          career_path: string | null
+          created_at: string | null
+          day_in_the_life: string | null
+          description: string | null
+          description_full: string | null
+          emoji: string | null
+          entry_requirements: string | null
+          family_id: string | null
+          growth_outlook: string | null
+          growth_tag: string | null
+          id: string
+          is_active: boolean | null
+          is_emerging: boolean | null
+          job_zone: number | null
+          onet_code: string | null
+          onet_last_updated: string | null
+          prospects_last_updated: string | null
+          prospects_slug: string | null
+          recommended_subjects: string[] | null
+          riasec_primary: string | null
+          riasec_profile: Json | null
+          riasec_secondary: string | null
+          salary_context: Json | null
+          salary_last_updated: string | null
+          salary_range: string | null
+          search_terms: Json | null
+          skills: Json | null
+          title: string
+          unsplash_keyword: string | null
+          unsplash_photo_url: string | null
+          updated_at: string | null
+          what_they_do_teen: string | null
+          work_values: Json | null
+        }
+        Insert: {
+          career_path?: string | null
+          created_at?: string | null
+          day_in_the_life?: string | null
+          description?: string | null
+          description_full?: string | null
+          emoji?: string | null
+          entry_requirements?: string | null
+          family_id?: string | null
+          growth_outlook?: string | null
+          growth_tag?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_emerging?: boolean | null
+          job_zone?: number | null
+          onet_code?: string | null
+          onet_last_updated?: string | null
+          prospects_last_updated?: string | null
+          prospects_slug?: string | null
+          recommended_subjects?: string[] | null
+          riasec_primary?: string | null
+          riasec_profile?: Json | null
+          riasec_secondary?: string | null
+          salary_context?: Json | null
+          salary_last_updated?: string | null
+          salary_range?: string | null
+          search_terms?: Json | null
+          skills?: Json | null
+          title: string
+          unsplash_keyword?: string | null
+          unsplash_photo_url?: string | null
+          updated_at?: string | null
+          what_they_do_teen?: string | null
+          work_values?: Json | null
+        }
+        Update: {
+          career_path?: string | null
+          created_at?: string | null
+          day_in_the_life?: string | null
+          description?: string | null
+          description_full?: string | null
+          emoji?: string | null
+          entry_requirements?: string | null
+          family_id?: string | null
+          growth_outlook?: string | null
+          growth_tag?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_emerging?: boolean | null
+          job_zone?: number | null
+          onet_code?: string | null
+          onet_last_updated?: string | null
+          prospects_last_updated?: string | null
+          prospects_slug?: string | null
+          recommended_subjects?: string[] | null
+          riasec_primary?: string | null
+          riasec_profile?: Json | null
+          riasec_secondary?: string | null
+          salary_context?: Json | null
+          salary_last_updated?: string | null
+          salary_range?: string | null
+          search_terms?: Json | null
+          skills?: Json | null
+          title?: string
+          unsplash_keyword?: string | null
+          unsplash_photo_url?: string | null
+          updated_at?: string | null
+          what_they_do_teen?: string | null
+          work_values?: Json | null
+        }
+        Relationships: []
+      }
       feed_posts: {
         Row: {
           author: string | null
