@@ -549,9 +549,9 @@ export default function CareerExploration() {
         </div>
 
         {/* 14. Ask AI Mentor */}
-        <button onClick={() => setChatOpen(true)} className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
-            <Bot size={20} className="text-primary-foreground" />
+        <button onClick={() => setChatOpen(true)} className="w-full glass-card-hover p-4 rounded-2xl flex items-center gap-3 border-landing-mint/20">
+          <div className="w-10 h-10 rounded-xl bg-landing-mint/20 flex items-center justify-center">
+            <Bot size={20} className="text-landing-mint" />
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Got questions about {career.title}?</p>
