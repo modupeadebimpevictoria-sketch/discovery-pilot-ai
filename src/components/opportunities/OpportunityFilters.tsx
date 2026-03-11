@@ -8,9 +8,9 @@ const filters = [
   { key: "internship", label: "💼 Internships" },
   { key: "scholarship", label: "🎓 Scholarships" },
   { key: "competition", label: "🏆 Competitions" },
-  { key: "course", label: "📚 Courses" },
   { key: "program", label: "🌍 Programs" },
-  { key: "workshop", label: "🤝 Workshops" },
+  { key: "volunteering", label: "🤝 Volunteering" },
+  { key: "workshop", label: "🛠️ Workshops" },
 ];
 
 export default function OpportunityFilters({ filter, onFilterChange }: OpportunityFiltersProps) {

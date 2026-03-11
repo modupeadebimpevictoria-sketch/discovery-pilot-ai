@@ -127,12 +127,12 @@ function FeedCard({ post, index, onExplore }: { post: FeedPost; index: number; o
         <h3 className="text-sm font-bold text-foreground leading-snug">{post.headline}</h3>
         <p className="text-xs text-muted-foreground leading-relaxed">{post.body}</p>
 
-        {post.type === "quest-nudge" ? (
+        {post.type === "mission-nudge" ? (
           <button
             onClick={() => window.location.href = "/quests"}
             className="w-full btn-primary-glow flex items-center justify-center gap-2 text-xs py-2.5"
           >
-            Continue Your Quest <ArrowRight size={14} />
+            Do it → <ArrowRight size={14} />
           </button>
         ) : (
           <button

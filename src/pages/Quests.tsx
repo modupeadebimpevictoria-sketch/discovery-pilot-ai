@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Map, Flame } from "lucide-react";
+import { Map, Zap, Target, BarChart3, Flame } from "lucide-react";
 import GradeRoadmap from "@/components/quests/GradeRoadmap";
+import MissionsView from "@/components/quests/MissionsView";
 import QuestsView from "@/components/quests/QuestsView";
+import SkillsView from "@/components/quests/SkillsView";
+import ProgressView from "@/components/quests/ProgressView";
 
 const tabs = [
-  { id: "roadmap", label: "My Roadmap", icon: Map },
+  { id: "roadmap", label: "Roadmap", icon: Map },
+  { id: "missions", label: "Missions", icon: Target },
   { id: "quests", label: "Quests", icon: Flame },
+  { id: "skills", label: "Skills", icon: Zap },
+  { id: "progress", label: "Progress", icon: BarChart3 },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -20,8 +26,8 @@ export default function Quests() {
       <div className="px-5 pt-6 pb-2">
         <h1 className="text-xl font-bold text-foreground mb-4">Your Journey</h1>
 
-        {/* Sub-tabs */}
-        <div className="flex gap-1 p-1 rounded-2xl bg-muted/50">
+        {/* Horizontal scrollable sub-tabs */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             const Icon = tab.icon;
@@ -29,21 +35,14 @@ export default function Quests() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  active ? "text-primary-foreground" : "text-muted-foreground"
+                className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
+                  active
+                    ? "gradient-bg text-primary-foreground"
+                    : "glass-card text-muted-foreground"
                 }`}
               >
-                {active && (
-                  <motion.div
-                    layoutId="quest-tab-bg"
-                    className="absolute inset-0 gradient-bg rounded-xl"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center gap-2">
-                  <Icon size={16} />
-                  {tab.label}
-                </span>
+                <Icon size={14} />
+                {tab.label}
               </button>
             );
           })}
@@ -58,7 +57,11 @@ export default function Quests() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {activeTab === "roadmap" ? <GradeRoadmap /> : <QuestsView />}
+          {activeTab === "roadmap" && <GradeRoadmap />}
+          {activeTab === "missions" && <MissionsView />}
+          {activeTab === "quests" && <QuestsView />}
+          {activeTab === "skills" && <SkillsView />}
+          {activeTab === "progress" && <ProgressView />}
         </motion.div>
       </div>
     </div>

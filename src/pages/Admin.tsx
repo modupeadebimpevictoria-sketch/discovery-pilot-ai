@@ -6,15 +6,20 @@ import { useApp } from "@/contexts/AppContext";
 import {
   Briefcase, FileText, Users, BarChart3, Plus, Pencil, Trash2,
   ToggleLeft, ToggleRight, AlertTriangle, ChevronLeft, RefreshCw,
+  Target, Flame, Zap, Flag, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-type Section = "opportunities" | "feed" | "spotlights" | "analytics";
+type Section = "opportunities" | "feed" | "spotlights" | "missions" | "quests" | "skills" | "analytics";
 
 const sectionConfig = [
   { id: "opportunities" as Section, label: "Opportunities", icon: Briefcase },
   { id: "feed" as Section, label: "Feed Posts", icon: FileText },
   { id: "spotlights" as Section, label: "Spotlights", icon: Users },
+  { id: "missions" as Section, label: "Missions", icon: Target },
+  { id: "quests" as Section, label: "Quests", icon: Flame },
+  { id: "skills" as Section, label: "Skills", icon: Zap },
   { id: "analytics" as Section, label: "Analytics", icon: BarChart3 },
 ];
 
@@ -43,15 +48,8 @@ export default function Admin() {
     );
   }
 
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
-
-  if (!isAdmin) {
-    navigate("/feed");
-    return null;
-  }
+  if (!user) { navigate("/auth"); return null; }
+  if (!isAdmin) { navigate("/feed"); return null; }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -67,13 +65,10 @@ export default function Admin() {
               key={s.id}
               onClick={() => setSection(s.id)}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                section === s.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted/50"
+                section === s.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/50"
               }`}
             >
-              <s.icon size={16} />
-              {s.label}
+              <s.icon size={16} /> {s.label}
             </button>
           ))}
         </nav>
@@ -88,32 +83,17 @@ export default function Admin() {
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl">
           {section === "opportunities" && (
-            <OpportunitiesManager
-              data={opportunities}
-              editing={editingOpp}
-              setEditing={setEditingOpp}
-              onSave={upsertOpportunity}
-              onDelete={deleteOpportunity}
-            />
+            <OpportunitiesManager data={opportunities} editing={editingOpp} setEditing={setEditingOpp} onSave={upsertOpportunity} onDelete={deleteOpportunity} />
           )}
           {section === "feed" && (
-            <FeedManager
-              data={feedPosts}
-              editing={editingPost}
-              setEditing={setEditingPost}
-              onSave={upsertFeedPost}
-              onDelete={deleteFeedPost}
-            />
+            <FeedManager data={feedPosts} editing={editingPost} setEditing={setEditingPost} onSave={upsertFeedPost} onDelete={deleteFeedPost} />
           )}
           {section === "spotlights" && (
-            <SpotlightsManager
-              data={spotlights}
-              editing={editingSpot}
-              setEditing={setEditingSpot}
-              onSave={upsertSpotlight}
-              onDelete={deleteSpotlight}
-            />
+            <SpotlightsManager data={spotlights} editing={editingSpot} setEditing={setEditingSpot} onSave={upsertSpotlight} onDelete={deleteSpotlight} />
           )}
+          {section === "missions" && <MissionsManager />}
+          {section === "quests" && <QuestsMonitor />}
+          {section === "skills" && <SkillsManager />}
           {section === "analytics" && <AnalyticsDashboard />}
         </div>
       </main>
@@ -130,7 +110,6 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
     country: "", city: "", min_grade: 9, max_grade: 12, application_url: "", deadline: "",
     duration: "", career_family: "", is_remote: false, is_active: true, is_link_dead: false,
   };
-
   const deadLinks = data.filter((o: any) => o.is_link_dead);
 
   return (
@@ -140,10 +119,7 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
           <h2 className="text-xl font-bold text-foreground">Opportunities Manager</h2>
           <p className="text-sm text-muted-foreground">{data.length} total · {deadLinks.length} dead links</p>
         </div>
-        <button
-          onClick={() => setEditing(emptyOpp)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
-        >
+        <button onClick={() => setEditing(emptyOpp)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
           <Plus size={16} /> Add Opportunity
         </button>
       </div>
@@ -189,12 +165,12 @@ function OpportunitiesManager({ data, editing, setEditing, onSave, onDelete }: a
                 </td>
                 <td className="px-4 py-2.5 flex gap-1">
                   <button onClick={() => setEditing(opp)} className="p-1.5 rounded hover:bg-muted"><Pencil size={14} className="text-muted-foreground" /></button>
-                  <button onClick={() => { if (confirm("Delete this opportunity?")) onDelete(opp.id); }} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
+                  <button onClick={() => { if (confirm("Delete?")) onDelete(opp.id); }} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
                 </td>
               </tr>
             ))}
             {data.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No opportunities yet — add your first one above</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No opportunities yet</td></tr>
             )}
           </tbody>
         </table>
@@ -213,7 +189,7 @@ function OppForm({ data, onSave, onCancel }: any) {
       <div className="grid grid-cols-2 gap-3">
         <Input label="Title" value={form.title} onChange={(v) => set("title", v)} />
         <Input label="Organisation" value={form.organisation} onChange={(v) => set("organisation", v)} />
-        <Select label="Type" value={form.type} options={["internship","shadowing","competition","program","virtual"]} onChange={(v) => set("type", v)} />
+        <Select label="Type" value={form.type} options={["internship","competition","program","volunteering","scholarship","workshop"]} onChange={(v) => set("type", v)} />
         <Input label="Location" value={form.location} onChange={(v) => set("location", v)} />
         <Input label="Country" value={form.country} onChange={(v) => set("country", v)} />
         <Input label="City" value={form.city} onChange={(v) => set("city", v)} />
@@ -224,29 +200,516 @@ function OppForm({ data, onSave, onCancel }: any) {
         <Input label="Duration" value={form.duration} onChange={(v) => set("duration", v)} />
         <Input label="Career Family" value={form.career_family} onChange={(v) => set("career_family", v)} />
       </div>
-      <textarea
-        value={form.description}
-        onChange={(e) => set("description", e.target.value)}
-        placeholder="Description"
-        className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px]"
-      />
+      <textarea value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Description"
+        className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px]" />
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 text-sm text-foreground">
-          <input type="checkbox" checked={form.is_remote} onChange={(e) => set("is_remote", e.target.checked)} className="accent-primary" />
-          Remote
+          <input type="checkbox" checked={form.is_remote} onChange={(e) => set("is_remote", e.target.checked)} className="accent-primary" /> Remote
         </label>
         <label className="flex items-center gap-2 text-sm text-foreground">
-          <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} className="accent-primary" />
-          Active
+          <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} className="accent-primary" /> Active
         </label>
         <label className="flex items-center gap-2 text-sm text-destructive">
-          <input type="checkbox" checked={form.is_link_dead} onChange={(e) => set("is_link_dead", e.target.checked)} className="accent-destructive" />
-          Dead Link
+          <input type="checkbox" checked={form.is_link_dead} onChange={(e) => set("is_link_dead", e.target.checked)} className="accent-destructive" /> Dead Link
         </label>
       </div>
       <div className="flex gap-2">
         <button onClick={() => onSave(form)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
         <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// MISSIONS MANAGER
+// ═══════════════════════════════════════
+function MissionsManager() {
+  const [missions, setMissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"pending" | "live">("pending");
+  const [editing, setEditing] = useState<any | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [genFamily, setGenFamily] = useState("");
+
+  const fetchMissions = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("missions").select("*").order("created_at", { ascending: false });
+    setMissions(data || []);
+    setLoading(false);
+  };
+
+  useState(() => { fetchMissions(); });
+
+  const pending = missions.filter((m) => !m.reviewed_by_admin);
+  const live = missions.filter((m) => m.is_active && m.reviewed_by_admin);
+  const displayed = tab === "pending" ? pending : live;
+
+  const emptyMission = {
+    title: "", description: "", task: "", mission_type: "do", career_id: "", family_id: "",
+    estimated_minutes: 5, xp_reward: 10, is_active: false, reviewed_by_admin: false,
+  };
+
+  const saveMission = async (m: any) => {
+    if (m.id) {
+      const { error } = await supabase.from("missions").update(m as any).eq("id", m.id);
+      if (error) { toast.error(error.message); return; }
+    } else {
+      const { error } = await supabase.from("missions").insert(m as any);
+      if (error) { toast.error(error.message); return; }
+    }
+    toast.success("Mission saved!");
+    setEditing(null);
+    fetchMissions();
+  };
+
+  const approveMission = async (id: string) => {
+    await supabase.from("missions").update({ reviewed_by_admin: true, is_active: true } as any).eq("id", id);
+    toast.success("Mission approved & live!");
+    fetchMissions();
+  };
+
+  const deleteMission = async (id: string) => {
+    if (!confirm("Delete this mission?")) return;
+    await supabase.from("missions").delete().eq("id", id);
+    toast.success("Deleted");
+    fetchMissions();
+  };
+
+  const generateMissions = async () => {
+    if (!genFamily) { toast.error("Select a career family"); return; }
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-missions", {
+        body: { career_family: genFamily },
+      });
+      if (error) throw error;
+      toast.success(`Generated ${data?.count || 0} missions!`);
+      fetchMissions();
+    } catch (err: any) {
+      toast.error(err.message || "Generation failed");
+    }
+    setGenerating(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Missions Manager</h2>
+          <p className="text-sm text-muted-foreground">{pending.length} pending · {live.length} live</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setEditing(emptyMission)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+            <Plus size={16} /> Write Mission
+          </button>
+        </div>
+      </div>
+
+      {/* Generate batch */}
+      <div className="bg-card border border-border rounded-lg p-4 flex items-end gap-3">
+        <div className="flex-1">
+          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Generate missions for career family</label>
+          <input value={genFamily} onChange={(e) => setGenFamily(e.target.value)} placeholder="e.g. creative-design"
+            className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5" />
+        </div>
+        <button onClick={generateMissions} disabled={generating} className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold flex items-center gap-2">
+          {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Generate
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2">
+        {(["pending", "live"] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)} className={`px-4 py-1.5 rounded-full text-xs font-semibold ${tab === t ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}>
+            {t === "pending" ? `Pending Review (${pending.length})` : `Live (${live.length})`}
+          </button>
+        ))}
+      </div>
+
+      {editing && (
+        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+          <h3 className="font-bold text-foreground">{editing.id ? "Edit" : "Write"} Mission</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Career Family" value={editing.family_id} onChange={(v) => setEditing({ ...editing, family_id: v })} />
+            <Input label="Title" value={editing.title} onChange={(v) => setEditing({ ...editing, title: v })} />
+            <Input label="Task (one sentence)" value={editing.task} onChange={(v) => setEditing({ ...editing, task: v })} />
+            <Select label="Type" value={editing.mission_type} options={["do","observe","reflect","share"]} onChange={(v) => setEditing({ ...editing, mission_type: v })} />
+            <Input label="Est. Minutes" value={editing.estimated_minutes} type="number" onChange={(v) => setEditing({ ...editing, estimated_minutes: parseInt(v) || 5 })} />
+            <Input label="XP Reward" value={editing.xp_reward} type="number" onChange={(v) => setEditing({ ...editing, xp_reward: parseInt(v) || 10 })} />
+          </div>
+          <textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} placeholder="Description"
+            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[60px]" />
+          <div className="flex gap-2">
+            <button onClick={() => saveMission(editing)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
+            <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Title</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Type</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">XP</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Family</th>
+              <th className="px-4 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayed.map((m: any) => (
+              <tr key={m.id} className="border-t border-border hover:bg-muted/30">
+                <td className="px-4 py-2.5 font-medium text-foreground">{m.title}</td>
+                <td className="px-4 py-2.5 capitalize text-muted-foreground">{m.mission_type}</td>
+                <td className="px-4 py-2.5 text-primary font-bold">{m.xp_reward}</td>
+                <td className="px-4 py-2.5 text-muted-foreground">{m.family_id || "—"}</td>
+                <td className="px-4 py-2.5 flex gap-1">
+                  {tab === "pending" && (
+                    <button onClick={() => approveMission(m.id)} className="px-2 py-1 rounded bg-primary/10 text-primary text-xs font-semibold">Approve</button>
+                  )}
+                  <button onClick={() => setEditing(m)} className="p-1.5 rounded hover:bg-muted"><Pencil size={14} className="text-muted-foreground" /></button>
+                  <button onClick={() => deleteMission(m.id)} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
+                </td>
+              </tr>
+            ))}
+            {displayed.length === 0 && (
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No missions here</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// QUESTS MONITOR
+// ═══════════════════════════════════════
+function QuestsMonitor() {
+  const [quests, setQuests] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"quests" | "logs">("quests");
+  const [filterFamily, setFilterFamily] = useState("");
+  const [filterGrade, setFilterGrade] = useState("");
+  const [generating, setGenerating] = useState(false);
+
+  const currentWeek = (() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    return Math.ceil((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+  })();
+
+  const fetchQuests = async () => {
+    setLoading(true);
+    const [qRes, lRes] = await Promise.all([
+      supabase.from("quests").select("*").order("created_at", { ascending: false }),
+      supabase.from("quest_generation_log").select("*").order("generated_at", { ascending: false }).limit(50),
+    ]);
+    setQuests(qRes.data || []);
+    setLogs(lRes.data || []);
+    setLoading(false);
+  };
+
+  useState(() => { fetchQuests(); });
+
+  const filtered = quests.filter((q) => {
+    if (filterFamily && q.family_id !== filterFamily) return false;
+    if (filterGrade && q.grade_band !== filterGrade) return false;
+    return true;
+  });
+
+  const thisWeekQuests = filtered.filter((q) => q.week_number === currentWeek);
+
+  const flagQuest = async (id: string) => {
+    await supabase.from("quests").update({ flagged: true } as any).eq("id", id);
+    toast.success("Quest flagged & hidden from students");
+    fetchQuests();
+  };
+
+  const deleteQuest = async (id: string) => {
+    if (!confirm("Permanently delete this quest?")) return;
+    await supabase.from("quests").delete().eq("id", id);
+    toast.success("Quest deleted");
+    fetchQuests();
+  };
+
+  const runGeneration = async () => {
+    setGenerating(true);
+    try {
+      const { error } = await supabase.functions.invoke("generate-weekly-quests", {});
+      if (error) throw error;
+      toast.success("Generation triggered!");
+      fetchQuests();
+    } catch (err: any) {
+      toast.error(err.message || "Generation failed");
+    }
+    setGenerating(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Quests Monitor</h2>
+          <p className="text-sm text-muted-foreground">Week {currentWeek} · {thisWeekQuests.length} quests this week</p>
+        </div>
+        <button onClick={runGeneration} disabled={generating} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold">
+          {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Run Generation
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2">
+        <button onClick={() => setTab("quests")} className={`px-4 py-1.5 rounded-full text-xs font-semibold ${tab === "quests" ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}>
+          Quests ({quests.length})
+        </button>
+        <button onClick={() => setTab("logs")} className={`px-4 py-1.5 rounded-full text-xs font-semibold ${tab === "logs" ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}>
+          Generation Log ({logs.length})
+        </button>
+      </div>
+
+      {/* Filters */}
+      {tab === "quests" && (
+        <div className="flex gap-3">
+          <input value={filterFamily} onChange={(e) => setFilterFamily(e.target.value)} placeholder="Filter by family_id"
+            className="bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none" />
+          <select value={filterGrade} onChange={(e) => setFilterGrade(e.target.value)}
+            className="bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none">
+            <option value="">All grades</option>
+            <option value="9-10">9-10</option>
+            <option value="11-12">11-12</option>
+            <option value="university-1-2">University 1-2</option>
+          </select>
+        </div>
+      )}
+
+      {tab === "quests" ? (
+        <div className="border border-border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Family</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Grade</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Title</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Type</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Flagged</th>
+                <th className="px-4 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {(thisWeekQuests.length > 0 ? thisWeekQuests : filtered).map((q: any) => (
+                <tr key={q.id} className={`border-t border-border hover:bg-muted/30 ${q.flagged ? "bg-destructive/5" : ""}`}>
+                  <td className="px-4 py-2.5 text-muted-foreground">{q.family_id || "—"}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{q.grade_band}</td>
+                  <td className="px-4 py-2.5 font-medium text-foreground">{q.title}</td>
+                  <td className="px-4 py-2.5 capitalize text-muted-foreground">{q.quest_type}</td>
+                  <td className="px-4 py-2.5">
+                    {q.flagged && <Flag size={14} className="text-destructive" />}
+                  </td>
+                  <td className="px-4 py-2.5 flex gap-1">
+                    {!q.flagged && (
+                      <button onClick={() => flagQuest(q.id)} className="p-1.5 rounded hover:bg-destructive/10" title="Flag">
+                        <Flag size={14} className="text-muted-foreground" />
+                      </button>
+                    )}
+                    <button onClick={() => deleteQuest(q.id)} className="p-1.5 rounded hover:bg-destructive/10">
+                      <Trash2 size={14} className="text-destructive" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No quests found</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="border border-border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Family</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Grade</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Week</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Status</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Error</th>
+                <th className="text-left px-4 py-2 text-muted-foreground font-medium">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log: any) => (
+                <tr key={log.id} className={`border-t border-border ${log.status === "failed" ? "bg-destructive/5" : ""}`}>
+                  <td className="px-4 py-2.5 text-muted-foreground">{log.career_family_id}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{log.grade_band}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{log.week_number}</td>
+                  <td className="px-4 py-2.5">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${log.status === "success" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
+                      {log.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-[10px] text-destructive">{log.error_message || "—"}</td>
+                  <td className="px-4 py-2.5 text-[10px] text-muted-foreground">{new Date(log.generated_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+              {logs.length === 0 && (
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No generation logs yet</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// SKILLS MANAGER
+// ═══════════════════════════════════════
+function SkillsManager() {
+  const [prompts, setPrompts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [genFamily, setGenFamily] = useState("");
+
+  const fetchPrompts = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("skill_prompts").select("*").order("family_id").order("skill_name").order("level").order("sort_order");
+    setPrompts(data || []);
+    setLoading(false);
+  };
+
+  useState(() => { fetchPrompts(); });
+
+  const emptyPrompt = {
+    family_id: "", career_id: "", skill_name: "", level: 1, prompt_text: "",
+    prompt_format: "write", estimated_minutes: 10, xp_reward: 15, sort_order: 0, is_active: false,
+  };
+
+  const savePrompt = async (p: any) => {
+    if (p.id) {
+      const { error } = await supabase.from("skill_prompts").update(p as any).eq("id", p.id);
+      if (error) { toast.error(error.message); return; }
+    } else {
+      const { error } = await supabase.from("skill_prompts").insert(p as any);
+      if (error) { toast.error(error.message); return; }
+    }
+    toast.success("Saved!");
+    setEditing(null);
+    fetchPrompts();
+  };
+
+  const toggleActive = async (id: string, current: boolean) => {
+    await supabase.from("skill_prompts").update({ is_active: !current } as any).eq("id", id);
+    fetchPrompts();
+  };
+
+  const deletePrompt = async (id: string) => {
+    if (!confirm("Delete?")) return;
+    await supabase.from("skill_prompts").delete().eq("id", id);
+    toast.success("Deleted");
+    fetchPrompts();
+  };
+
+  const generateSkillPrompts = async () => {
+    if (!genFamily) { toast.error("Select a career family"); return; }
+    setGenerating(true);
+    try {
+      const { error } = await supabase.functions.invoke("generate-skill-prompts", {
+        body: { career_family: genFamily },
+      });
+      if (error) throw error;
+      toast.success("Skill prompts generated!");
+      fetchPrompts();
+    } catch (err: any) {
+      toast.error(err.message || "Generation failed");
+    }
+    setGenerating(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Skills Manager</h2>
+          <p className="text-sm text-muted-foreground">{prompts.length} prompts</p>
+        </div>
+        <button onClick={() => setEditing(emptyPrompt)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+          <Plus size={16} /> Add Prompt
+        </button>
+      </div>
+
+      {/* Generate batch */}
+      <div className="bg-card border border-border rounded-lg p-4 flex items-end gap-3">
+        <div className="flex-1">
+          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Generate skill prompts for family</label>
+          <input value={genFamily} onChange={(e) => setGenFamily(e.target.value)} placeholder="e.g. creative-design"
+            className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5" />
+        </div>
+        <button onClick={generateSkillPrompts} disabled={generating} className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-semibold flex items-center gap-2">
+          {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Generate
+        </button>
+      </div>
+
+      {editing && (
+        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+          <h3 className="font-bold text-foreground">{editing.id ? "Edit" : "Add"} Skill Prompt</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Career Family" value={editing.family_id} onChange={(v) => setEditing({ ...editing, family_id: v })} />
+            <Input label="Skill Name" value={editing.skill_name} onChange={(v) => setEditing({ ...editing, skill_name: v })} />
+            <Select label="Level" value={String(editing.level)} options={["1","2","3"]} onChange={(v) => setEditing({ ...editing, level: parseInt(v) })} />
+            <Select label="Format" value={editing.prompt_format} options={["write","observe","analyse"]} onChange={(v) => setEditing({ ...editing, prompt_format: v })} />
+            <Input label="Est. Minutes" value={editing.estimated_minutes} type="number" onChange={(v) => setEditing({ ...editing, estimated_minutes: parseInt(v) || 10 })} />
+            <Input label="XP Reward" value={editing.xp_reward} type="number" onChange={(v) => setEditing({ ...editing, xp_reward: parseInt(v) || 15 })} />
+          </div>
+          <textarea value={editing.prompt_text} onChange={(e) => setEditing({ ...editing, prompt_text: e.target.value })} placeholder="Prompt text"
+            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px]" />
+          <div className="flex gap-2">
+            <button onClick={() => savePrompt(editing)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
+            <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div className="border border-border rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Family</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Skill</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Level</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Format</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Active</th>
+              <th className="px-4 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {prompts.map((p: any) => (
+              <tr key={p.id} className="border-t border-border hover:bg-muted/30">
+                <td className="px-4 py-2.5 text-muted-foreground">{p.family_id}</td>
+                <td className="px-4 py-2.5 font-medium text-foreground">{p.skill_name}</td>
+                <td className="px-4 py-2.5 text-muted-foreground">{p.level}</td>
+                <td className="px-4 py-2.5 capitalize text-muted-foreground">{p.prompt_format}</td>
+                <td className="px-4 py-2.5">
+                  <button onClick={() => toggleActive(p.id, p.is_active)}>
+                    {p.is_active ? <ToggleRight size={20} className="text-primary" /> : <ToggleLeft size={20} className="text-muted-foreground" />}
+                  </button>
+                </td>
+                <td className="px-4 py-2.5 flex gap-1">
+                  <button onClick={() => setEditing(p)} className="p-1.5 rounded hover:bg-muted"><Pencil size={14} className="text-muted-foreground" /></button>
+                  <button onClick={() => deletePrompt(p.id)} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
+                </td>
+              </tr>
+            ))}
+            {prompts.length === 0 && (
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No skill prompts yet</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -280,12 +743,8 @@ function FeedManager({ data, editing, setEditing, onSave, onDelete }: any) {
             <Input label="Career Family" value={editing.career_family} onChange={(v) => setEditing({ ...editing, career_family: v })} />
             <Input label="Image URL" value={editing.image_url} onChange={(v) => setEditing({ ...editing, image_url: v })} />
           </div>
-          <textarea
-            value={editing.body_markdown}
-            onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })}
-            placeholder="Body (Markdown)"
-            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[120px] font-mono"
-          />
+          <textarea value={editing.body_markdown} onChange={(e) => setEditing({ ...editing, body_markdown: e.target.value })} placeholder="Body (Markdown)"
+            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[120px] font-mono" />
           <div className="flex gap-2">
             <button onClick={async () => { const ok = await onSave(editing); if (ok) setEditing(null); }} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
             <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-semibold">Cancel</button>
@@ -317,12 +776,12 @@ function FeedManager({ data, editing, setEditing, onSave, onDelete }: any) {
                 </td>
                 <td className="px-4 py-2.5 flex gap-1">
                   <button onClick={() => setEditing(post)} className="p-1.5 rounded hover:bg-muted"><Pencil size={14} className="text-muted-foreground" /></button>
-                  <button onClick={() => { if (confirm("Delete this post?")) onDelete(post.id); }} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
+                  <button onClick={() => { if (confirm("Delete?")) onDelete(post.id); }} className="p-1.5 rounded hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></button>
                 </td>
               </tr>
             ))}
             {data.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No feed posts yet — create your first one</td></tr>
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No feed posts yet</td></tr>
             )}
           </tbody>
         </table>
@@ -358,12 +817,8 @@ function SpotlightsManager({ data, editing, setEditing, onSave, onDelete }: any)
             <Input label="Organisation" value={editing.organisation} onChange={(v) => setEditing({ ...editing, organisation: v })} />
             <Input label="Photo URL" value={editing.photo_url} onChange={(v) => setEditing({ ...editing, photo_url: v })} />
           </div>
-          <textarea
-            value={editing.backstory}
-            onChange={(e) => setEditing({ ...editing, backstory: e.target.value })}
-            placeholder="Backstory"
-            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[100px]"
-          />
+          <textarea value={editing.backstory} onChange={(e) => setEditing({ ...editing, backstory: e.target.value })} placeholder="Backstory"
+            className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[100px]" />
           <label className="flex items-center gap-2 text-sm text-foreground">
             <input type="checkbox" checked={editing.is_featured} onChange={(e) => setEditing({ ...editing, is_featured: e.target.checked })} className="accent-primary" />
             Featured (pinned on Mondays)
@@ -400,7 +855,7 @@ function SpotlightsManager({ data, editing, setEditing, onSave, onDelete }: any)
 }
 
 // ═══════════════════════════════════════
-// ANALYTICS (placeholder)
+// ANALYTICS
 // ═══════════════════════════════════════
 function AnalyticsDashboard() {
   return (
@@ -435,12 +890,8 @@ function Input({ label, value, onChange, type = "text" }: { label: string; value
   return (
     <div>
       <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</label>
-      <input
-        type={type}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5"
-      />
+      <input type={type} value={value ?? ""} onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5" />
     </div>
   );
 }
@@ -449,11 +900,8 @@ function Select({ label, value, options, onChange }: { label: string; value: str
   return (
     <div>
       <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5"
-      >
+      <select value={value} onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-muted/30 rounded-lg px-3 py-1.5 text-sm text-foreground border border-border focus:border-primary outline-none mt-0.5">
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
     </div>

@@ -1,6 +1,6 @@
 import { getCareerById, Career } from "@/data/careers";
 
-export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "quest-nudge";
+export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "mission-nudge";
 
 export interface FeedPost {
   id: string;
@@ -22,7 +22,7 @@ const typeConfig: Record<FeedContentType, { typeEmoji: string; typeLabel: string
   "field-update": { typeEmoji: "🌍", typeLabel: "Field Update" },
   "history": { typeEmoji: "🏛️", typeLabel: "History & Context" },
   "spotlight": { typeEmoji: "💬", typeLabel: "Inspiration" },
-  "quest-nudge": { typeEmoji: "🧭", typeLabel: "Quest Nudge" },
+  "mission-nudge": { typeEmoji: "🎯", typeLabel: "Mission Nudge" },
 };
 
 // Real professional portrait photos from Unsplash
@@ -128,16 +128,16 @@ function generateSpotlight(career: Career, idx: number): Omit<FeedPost, "id"> {
   };
 }
 
-function generateQuestNudge(career: Career, studentName: string): Omit<FeedPost, "id"> {
+function generateMissionNudge(career: Career, studentName: string): Omit<FeedPost, "id"> {
   return {
-    type: "quest-nudge",
+    type: "mission-nudge",
     careerId: career.id,
     careerTitle: career.title,
     careerEmoji: career.emoji,
-    headline: `${studentName}, your ${career.title} quest is waiting 🚀`,
-    body: `You're building your skills as a future ${career.title}! Complete your next quest to earn XP and level up your Career Passport. Every small step gets you closer to launch.`,
+    headline: `Complete today's mission 🎯`,
+    body: `Quick ${career.title} mission waiting for you — under 10 minutes. Complete it to earn XP and build your Career Passport.`,
     imageUrl: getFieldPhoto(career.id, 3),
-    ...typeConfig["quest-nudge"],
+    ...typeConfig["mission-nudge"],
   };
 }
 
@@ -159,7 +159,7 @@ export function generateFeedForCareers(
       () => generateFieldUpdate(career, studentName),
       () => generateHistory(career, studentName),
       () => generateSpotlight(career, careerIdx),
-      () => generateQuestNudge(career, studentName),
+      () => generateMissionNudge(career, studentName),
     ];
 
     generators.forEach((gen) => {
