@@ -6,11 +6,12 @@ import { missions } from "@/data/missions";
 import { internships } from "@/data/internships";
 import { weeklyQuests } from "@/data/weeklyQuests";
 import { skillDetails } from "@/data/skillDetails";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ChevronLeft, Award, Briefcase, Trophy, Target,
-  Zap, CheckCircle, Share2, Download, Link2, Stamp, Sparkles
+  Zap, CheckCircle, Share2, Download, Link2, Stamp, Sparkles, ExternalLink, Compass
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ShareModal from "@/components/ShareModal";
 
 const LEVEL_TITLES = ["Starter", "Explorer", "Discoverer", "Orbiter", "Navigator", "Trailblazer", "Pioneer", "Visionary", "Master", "Legend"];
@@ -40,6 +41,27 @@ export default function CareerPassport() {
   } = ctx;
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [exploredOpps, setExploredOpps] = useState<any[]>([]);
+
+  // Fetch explored opportunities
+  useEffect(() => {
+    if (!ctx.user) return;
+    const fetch = async () => {
+      const { data: apps } = await supabase
+        .from("user_opportunity_applications")
+        .select("opportunity_id, applied_at")
+        .eq("user_id", ctx.user!.id)
+        .order("applied_at", { ascending: false });
+      if (!apps || apps.length === 0) return;
+      const ids = apps.map((a: any) => a.opportunity_id);
+      const { data: opps } = await supabase
+        .from("admin_opportunities")
+        .select("id, title, organisation, type, application_url")
+        .in("id", ids);
+      setExploredOpps(opps || []);
+    };
+    fetch();
+  }, [ctx.user]);
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;
@@ -160,6 +182,12 @@ export default function CareerPassport() {
     if (appliedInternshipData.length > 0) {
       lines.push("── 💼 Applications ──");
       appliedInternshipData.forEach((i) => lines.push(`  ${i.emoji} ${i.title} @ ${i.company}`));
+      lines.push("");
+    }
+
+    if (exploredOpps.length > 0) {
+      lines.push("── 🚀 Opportunities Explored ──");
+      exploredOpps.forEach((o) => lines.push(`  🚀 ${o.title} @ ${o.organisation}`));
       lines.push("");
     }
 
@@ -409,7 +437,34 @@ export default function CareerPassport() {
         </div>
       )}
 
-      {/* Empty State */}
+      {/* ═══ OPPORTUNITIES EXPLORED ═══ */}
+      {exploredOpps.length > 0 && (
+        <div className="px-5 mb-6">
+          <h2 className="text-base font-bold text-foreground flex items-center gap-2 mb-3">
+            <Compass size={16} className="text-primary" /> Opportunities Explored
+          </h2>
+          <div className="space-y-2">
+            {exploredOpps.map((opp) => (
+              <div key={opp.id} className="bg-card border border-border p-3 rounded-xl flex items-center gap-3">
+                <span className="text-xl">🚀</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-foreground">{opp.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{opp.organisation}</p>
+                </div>
+                <a
+                  href={opp.application_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary shrink-0 flex items-center gap-1"
+                >
+                  <ExternalLink size={10} /> View
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {completedMissionData.length === 0 && completedQuestData.length === 0 && badges.length === 0 && earnedCount === 0 && (
         <div className="px-5">
           <div className="bg-card border border-border p-8 rounded-2xl text-center space-y-3">
