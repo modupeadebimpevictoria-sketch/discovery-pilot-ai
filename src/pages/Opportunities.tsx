@@ -29,6 +29,7 @@ export interface AdminOpportunity {
   career_family: string | null;
   is_remote: boolean | null;
   is_active: boolean | null;
+  is_link_dead: boolean | null;
 }
 
 function parseGradeNumber(grade: string | undefined | null): number | null {
