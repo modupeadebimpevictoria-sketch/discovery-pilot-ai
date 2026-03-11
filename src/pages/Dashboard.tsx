@@ -149,14 +149,14 @@ export default function Dashboard() {
           <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">📊 Your Progress</h3>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Milestones", value: completedMilestones.length, emoji: "🏁" },
-              { label: "Quests Done", value: completedQuests.length, emoji: "⚔️" },
-              { label: "Badges", value: badges.length, emoji: "🏅" },
-              { label: "Missions", value: completedMissions.length, emoji: "🎯" },
-              { label: "Applied", value: appliedInternships.length, emoji: "📩" },
-              { label: "Saved", value: savedCareers.length, emoji: "❤️" },
+              { label: "Milestones", value: completedMilestones.length, emoji: "🏁", color: "bg-primary/15 border-primary/20" },
+              { label: "Quests Done", value: completedQuests.length, emoji: "⚔️", color: "bg-glow-purple/15 border-glow-purple/20" },
+              { label: "Badges", value: badges.length, emoji: "🏅", color: "bg-glow-pink/15 border-glow-pink/20" },
+              { label: "Missions", value: completedMissions.length, emoji: "🎯", color: "bg-landing-mint/15 border-landing-mint/20" },
+              { label: "Applied", value: appliedInternships.length, emoji: "📩", color: "bg-glow-purple/15 border-glow-purple/20" },
+              { label: "Saved", value: savedCareers.length, emoji: "❤️", color: "bg-glow-pink/15 border-glow-pink/20" },
             ].map((s) => (
-              <div key={s.label} className="text-center p-2 rounded-xl bg-muted/30">
+              <div key={s.label} className={`text-center p-2 rounded-xl border ${s.color}`}>
                 <p className="text-lg">{s.emoji}</p>
                 <p className="text-lg font-bold text-foreground">{s.value}</p>
                 <p className="text-[10px] text-muted-foreground">{s.label}</p>
