@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
+import { useOpportunityActions } from "@/hooks/useOpportunityActions";
 
 export type OpportunityType = "scholarship" | "competition" | "course" | "program" | "workshop" | "internship";
 
