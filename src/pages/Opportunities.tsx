@@ -250,6 +250,29 @@ export default function Opportunities() {
         </div>
       ) : (
         <div className="px-5 space-y-3">
+          {!careerId && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-card neon-border p-4 rounded-2xl"
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🧭</span>
+                <div>
+                  <p className="text-sm font-bold text-foreground">Set your Active Path</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Choose a career path to unlock personalised opportunities matched to your interests. You'll only see general listings until then.
+                  </p>
+                  <button
+                    onClick={() => navigate("/career-exploration")}
+                    className="mt-2 text-xs font-semibold text-primary hover:underline"
+                  >
+                    Explore careers →
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
           {sortedOpps.map((opp, idx) => (
             <OpportunityCard
               key={opp.id}
