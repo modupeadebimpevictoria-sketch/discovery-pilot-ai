@@ -320,6 +320,9 @@ export default function CareerExploration() {
             <span className="fact-pill">{career.category}</span>
             {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% fit</span>}
             <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
+            {outlookBadge && (
+              <span className="fact-pill border-primary/20 text-primary font-bold">{outlookBadge.icon} {outlookBadge.text}</span>
+            )}
           </div>
         </div>
       </div>
