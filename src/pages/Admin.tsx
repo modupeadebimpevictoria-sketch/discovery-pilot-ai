@@ -90,6 +90,7 @@ export default function Admin() {
       {/* Content */}
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl">
+          {section === "careers" && <CareersManager />}
           {section === "opportunities" && (
             <OpportunitiesManager data={opportunities} editing={editingOpp} setEditing={setEditingOpp} onSave={upsertOpportunity} onDelete={deleteOpportunity} />
           )}
