@@ -8,7 +8,7 @@ import { getSkillDetails } from "@/data/skillDetails";
 import { getImagineYouScenarios } from "@/data/imagineYouScenarios";
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
 import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModal";
@@ -16,9 +16,10 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import {
   ArrowLeft, Heart, Play, DollarSign, TrendingUp, Clock, Star,
   Users, MapPin, GraduationCap, Share2, ChevronRight, Zap, BookOpen,
-  Target, Briefcase, Bot, CheckCircle, Lock, Shield
+  Target, Briefcase, Bot, CheckCircle, Lock, Shield, Award
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // Generate a deterministic photo URL for a career
 function getCareerPhoto(careerId: string): string {
