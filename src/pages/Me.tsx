@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
@@ -9,6 +9,7 @@ import {
   User, Camera, Backpack, Heart, BookOpen, MapPin,
   Sun, Moon, Monitor, Bell, Shield, RefreshCw, KeyRound,
   LogOut, Trash2, ChevronRight, Zap, Edit3, Check, X,
+  ExternalLink, Bookmark,
 } from "lucide-react";
 
 const XP_LEVELS = [
