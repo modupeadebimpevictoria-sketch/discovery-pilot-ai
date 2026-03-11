@@ -6,6 +6,7 @@ import { getCareerById } from "@/data/careers";
 import { archetypes } from "@/data/questions";
 import { fireConfetti, fireBurst } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";
+import PostAssessmentWalkthrough from "@/components/PostAssessmentWalkthrough";
 import { ArrowRight, Share2, Sparkles, Heart, ChevronDown } from "lucide-react";
 
 const surprisingFacts: Record<string, string> = {
