@@ -653,7 +653,7 @@ function RoleModelSwipeCard({ profile }: { profile: RoleModelProfile }) {
       <div className="p-2.5 space-y-0.5">
         <p className="text-xs font-bold text-foreground truncate">{profile.name}</p>
         <p className="text-[10px] text-muted-foreground truncate">{profile.title}</p>
-        <p className="text-[10px] text-primary font-semibold truncate">{profile.company}</p>
+        <p className="text-[10px] text-glow-purple font-semibold truncate">{profile.company}</p>
       </div>
     </div>
   );
