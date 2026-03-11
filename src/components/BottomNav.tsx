@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Compass, Home, Flame, Map, MousePointer2 } from "lucide-react";
+import { Compass, Home, Flame, Map, User } from "lucide-react";
 
 const navItems = [
-  { path: "/", icon: Home, label: "Home" },
-  { path: "/feed", icon: Flame, label: "Feed" },
+  { path: "/feed", icon: Home, label: "Home" },
   { path: "/quests", icon: Map, label: "Quests" },
   { path: "/universe", icon: Compass, label: "Explore" },
-  { path: "/mentor", icon: MousePointer2, label: "Mentor" },
+  { path: "/mentor", icon: Flame, label: "Mentor" },
+  { path: "/me", icon: User, label: "Me" },
 ];
 
 export default function BottomNav() {
