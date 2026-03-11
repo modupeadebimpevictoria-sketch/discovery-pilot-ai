@@ -349,7 +349,7 @@ export default function CareerExploration() {
 
         {/* 2. What people actually do */}
         <Card title="What people in this job actually do" icon={<BookOpen size={16} className="text-primary" />}>
-          <p className="text-sm text-muted-foreground leading-relaxed">{career.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{heroDescription}</p>
           <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
             {career.dailyLife.split(", ").slice(0, 5).map((task, i) => (
               <div key={i} className="flex items-start gap-2">
@@ -359,6 +359,58 @@ export default function CareerExploration() {
             ))}
           </div>
         </Card>
+
+        {/* Day in the Life (from DB) */}
+        {dayInTheLife && (
+          <Card title="A day in the life" icon={<Clock size={16} className="text-glow-purple" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed">{dayInTheLife}</p>
+          </Card>
+        )}
+
+        {/* Skills from DB (pill tags with importance bars) */}
+        {enrichedSkills && enrichedSkills.length > 0 && (
+          <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
+            <div className="flex flex-wrap gap-2">
+              {enrichedSkills.slice(0, 8).map((s, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
+                  <span className="text-xs font-semibold text-foreground">{s.name}</span>
+                  <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Work Values from DB */}
+        {workValues && workValues.length > 0 && (
+          <Card title="Work Values" icon={<Award size={16} className="text-glow-pink" />}>
+            <div className="flex flex-wrap gap-1.5">
+              {workValues.map((v, i) => (
+                <span key={i} className="fact-pill text-foreground">{v}</span>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Entry Requirements from DB */}
+        {entryRequirements && (
+          <Card title="Entry Requirements" icon={<GraduationCap size={16} className="text-glow-purple" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{entryRequirements}</p>
+          </Card>
+        )}
+
+        {/* Career Progression from DB */}
+        {careerPath && (
+          <Card title="Career Progression" icon={<TrendingUp size={16} className="text-landing-mint" />}>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{careerPath}</p>
+          </Card>
+        )}
+
+        {/* Salary from DB salary_context */}
+        {salaryIsEmpty ? null : null}
+        {/* We override the existing salary section below if DB salary_context exists */}
 
         {/* 3. A Day in the Life + Get Inspired — side-by-side */}
         {/* // TODO: Replace YouTube search with SpringBoard-produced custom videos per career. video_library table in Supabase is already structured for custom video_ids per career_id + video_type. Swap search query for DB lookup once custom videos are ready. */}
