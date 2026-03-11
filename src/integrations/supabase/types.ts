@@ -24,8 +24,10 @@ export type Database = {
           deadline: string | null
           description: string
           duration: string | null
+          flagged: boolean | null
           id: string
           is_active: boolean | null
+          is_archived: boolean | null
           is_link_dead: boolean | null
           is_remote: boolean | null
           location: string
@@ -34,9 +36,12 @@ export type Database = {
           min_age: number | null
           min_grade: number
           organisation: string
+          scholarship_amount: string | null
+          scholarship_coverage: string | null
           title: string
           type: string
           updated_at: string | null
+          workshop_url: string | null
         }
         Insert: {
           application_url?: string
@@ -47,8 +52,10 @@ export type Database = {
           deadline?: string | null
           description?: string
           duration?: string | null
+          flagged?: boolean | null
           id?: string
           is_active?: boolean | null
+          is_archived?: boolean | null
           is_link_dead?: boolean | null
           is_remote?: boolean | null
           location?: string
@@ -57,9 +64,12 @@ export type Database = {
           min_age?: number | null
           min_grade?: number
           organisation?: string
+          scholarship_amount?: string | null
+          scholarship_coverage?: string | null
           title: string
           type?: string
           updated_at?: string | null
+          workshop_url?: string | null
         }
         Update: {
           application_url?: string
@@ -70,8 +80,10 @@ export type Database = {
           deadline?: string | null
           description?: string
           duration?: string | null
+          flagged?: boolean | null
           id?: string
           is_active?: boolean | null
+          is_archived?: boolean | null
           is_link_dead?: boolean | null
           is_remote?: boolean | null
           location?: string
@@ -80,9 +92,12 @@ export type Database = {
           min_age?: number | null
           min_grade?: number
           organisation?: string
+          scholarship_amount?: string | null
+          scholarship_coverage?: string | null
           title?: string
           type?: string
           updated_at?: string | null
+          workshop_url?: string | null
         }
         Relationships: []
       }

@@ -7,7 +7,14 @@ import { ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 const steps = [
   { key: "name", question: "Hey! What's your name? 👋", placeholder: "Enter your name", emoji: "😊" },
   { key: "age", question: "How old are you?", placeholder: "Your age", emoji: "🎂", type: "number" },
-  { key: "grade", question: "What grade are you in?", emoji: "📚", options: ["Year 9 / Grade 8", "Year 10 / Grade 9", "Year 11 / Grade 10", "Year 12 / Grade 11", "Year 13 / Grade 12"] },
+  { key: "grade", question: "What year are you in?", emoji: "📚", options: [
+    { label: "Grade 9", value: "9" },
+    { label: "Grade 10", value: "10" },
+    { label: "Grade 11", value: "11" },
+    { label: "Grade 12", value: "12" },
+    { label: "University Year 1", value: "uni-1" },
+    { label: "University Year 2", value: "uni-2" },
+  ] as any },
   { key: "country", question: "Where are you from?", placeholder: "Your country", emoji: "🌍" },
   { key: "subjects", question: "What subjects are you taking?", emoji: "📖", multi: true, options: ["Mathematics", "Physics", "Chemistry", "Biology", "Computer Science", "English", "History", "Geography", "Art & Design", "Music", "Drama", "Economics", "Business Studies", "Psychology", "Physical Education", "Languages", "Media Studies", "Design Technology"] },
   { key: "dreamCareer", question: "Dream career? (Optional!)", placeholder: "e.g., Astronaut, Chef, or 'no idea!'", emoji: "💭" },
@@ -49,8 +56,9 @@ export default function Onboarding() {
     }
   };
 
-  const selectOption = (opt: string) => {
-    setData((d) => ({ ...d, [current.key]: opt }));
+  const selectOption = (opt: string | { label: string; value: string }) => {
+    const val = typeof opt === "object" ? opt.value : opt;
+    setData((d) => ({ ...d, [current.key]: val }));
     // Auto-advance for single-select
     setTimeout(() => {
       if (!isLast) setStep((s) => s + 1);
@@ -98,20 +106,24 @@ export default function Onboarding() {
           {/* Single select */}
           {current.options && !current.multi && (
             <div className="space-y-2">
-              {current.options.map((opt) => (
-                <motion.button
-                  key={opt}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => selectOption(opt)}
-                  className={`w-full p-4 rounded-2xl text-left font-medium transition-all duration-200 text-sm ${
-                    data[current.key] === opt
-                      ? "neon-border bg-primary/10 text-primary"
-                      : "glass-card text-foreground active:bg-muted/60"
-                  }`}
-                >
-                  {opt}
-                </motion.button>
-              ))}
+              {current.options.map((opt: any) => {
+                const label = typeof opt === "object" ? opt.label : opt;
+                const value = typeof opt === "object" ? opt.value : opt;
+                return (
+                  <motion.button
+                    key={value}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => selectOption(opt)}
+                    className={`w-full p-4 rounded-2xl text-left font-medium transition-all duration-200 text-sm ${
+                      data[current.key] === value
+                        ? "neon-border bg-primary/10 text-primary"
+                        : "glass-card text-foreground active:bg-muted/60"
+                    }`}
+                  >
+                    {label}
+                  </motion.button>
+                );
+              })}
             </div>
           )}
 

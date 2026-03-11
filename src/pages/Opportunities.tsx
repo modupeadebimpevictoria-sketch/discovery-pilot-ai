@@ -33,6 +33,8 @@ export interface AdminOpportunity {
 
 function parseGradeNumber(grade: string | undefined | null): number | null {
   if (!grade) return null;
+  if (grade === "uni-1") return 13;
+  if (grade === "uni-2") return 14;
   const match = grade.match(/(\d+)/);
   return match ? parseInt(match[1], 10) : null;
 }
