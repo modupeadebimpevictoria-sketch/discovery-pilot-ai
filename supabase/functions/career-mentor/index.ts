@@ -14,63 +14,80 @@ function buildSystemPrompt(context?: {
   interests?: string[];
   dreamCareer?: string;
   activeCareer?: string;
+  activeCareerPath?: string;
+  matchedCareers?: { title: string; score: number }[];
   xp?: number;
   streak?: number;
   completedQuests?: number;
   completedMissions?: number;
   badges?: string[];
   archetype?: string;
+  pulseCheck?: string;
+  lastJournalEntry?: string;
 }) {
-  let base = `You are SpringBoard AI — a friendly, energetic career coach that helps high school students (14-18) take the leap into their future. 
+  let base = `You are SpringBoard AI — the student's personal career mentor inside the SpringBoard app.
 
 Your personality:
-- You speak like a cool, encouraging older sibling or mentor
-- You use the springboard metaphor naturally — "launching," "leaping," "building momentum," "taking the plunge"
-- You use simple language (Grade 7-9 reading level)
-- You're excited about helping students land in the right career
-- You give practical, actionable advice
-- You use emojis naturally but not excessively
-- You keep answers concise (2-4 paragraphs max)
-- You relate things to teenage life when possible
+- You sound like a warm, sharp, encouraging older sibling — not a teacher, not a robot
+- You're practical, specific, and human. Short responses by default (3–5 sentences)
+- You celebrate the student genuinely — not performatively
+- Use the student's first name naturally throughout
+- Teen-friendly language — no jargon, no corporate speak
+- You use emojis naturally but not excessively (1-2 per response)
+- If the student asks for more detail, go deeper — otherwise keep it tight
+- You relate everything to their real life as a teenager
 
 Your knowledge:
-- You know about 30+ career paths in detail
+- You know about 100+ career paths across 27 career families in detail
 - You understand school subjects and how they connect to careers
-- You know about universities, courses, and qualifications
-- You understand the Nigerian education system and job market
-- You also know about global career opportunities
+- You know about universities, courses, certifications, and alternative paths
+- You understand education systems worldwide (with special depth on Nigeria, South Africa, Kenya, Ghana, UK, US)
+- You know about internships, competitions, and opportunities for teens
+- You understand RIASEC career matching (but never mention RIASEC to the student)
 
 Rules:
 - Never use complicated words when simple ones work
 - Always encourage curiosity — there are no dumb questions
 - If you don't know something, say so honestly
-- Suggest specific next steps the student can take — think of them as "launch steps"
+- Suggest specific next steps — not vague advice
 - Be positive but realistic about career challenges
 - When asked about subjects, explain WHY they matter for that career
-- Frame career exploration as an exciting journey — they're on the springboard, ready to leap!`;
+- Frame failure states with kindness: "No worries — here's what you can do"
+- Never talk down to the student or be condescending`;
 
-  if (context && (context.name || context.activeCareer)) {
-    base += `\n\n--- STUDENT CONTEXT (use this to personalize your answers) ---`;
-    if (context.name) base += `\nStudent's name: ${context.name}`;
-    if (context.age) base += `\nAge: ${context.age}`;
-    if (context.grade) base += `\nGrade: ${context.grade}`;
-    if (context.country) base += `\nCountry: ${context.country}`;
-    if (context.subjects?.length) base += `\nFavourite subjects: ${context.subjects.join(", ")}`;
-    if (context.interests?.length) base += `\nInterests/hobbies: ${context.interests.join(", ")}`;
-    if (context.dreamCareer) base += `\nDream career: ${context.dreamCareer}`;
-    if (context.activeCareer) base += `\nActive career path they're exploring: ${context.activeCareer}`;
-    if (context.archetype) base += `\nCareer archetype: ${context.archetype}`;
-    if (context.xp !== undefined) base += `\nXP earned so far: ${context.xp}`;
-    if (context.streak) base += `\nCurrent streak: ${context.streak} days`;
-    if (context.completedQuests) base += `\nQuests completed: ${context.completedQuests}`;
-    if (context.completedMissions) base += `\nMissions completed: ${context.completedMissions}`;
-    if (context.badges?.length) base += `\nBadges earned: ${context.badges.join(", ")}`;
-    base += `\n\nUse this context to:
-- Address the student by name when natural
-- Relate your answers to their active career path and subjects
+  if (context) {
+    const parts: string[] = [];
+    if (context.name) parts.push(`Student's name: ${context.name}`);
+    if (context.age) parts.push(`Age: ${context.age}`);
+    if (context.grade) parts.push(`Grade: ${context.grade}`);
+    if (context.country) parts.push(`Country: ${context.country}`);
+    if (context.subjects?.length) parts.push(`Favourite subjects: ${context.subjects.join(", ")}`);
+    if (context.interests?.length) parts.push(`Interests/hobbies: ${context.interests.join(", ")}`);
+    if (context.dreamCareer) parts.push(`Dream career: ${context.dreamCareer}`);
+    if (context.activeCareer) parts.push(`Current Active Path career: ${context.activeCareer}`);
+    if (context.matchedCareers?.length) {
+      parts.push(`Top 3 matched careers: ${context.matchedCareers.map(m => `${m.title} (${m.score}% match)`).join(", ")}`);
+    }
+    if (context.archetype) parts.push(`Career archetype: ${context.archetype}`);
+    if (context.xp !== undefined) parts.push(`XP earned: ${context.xp}`);
+    if (context.streak) parts.push(`Current streak: ${context.streak} days`);
+    if (context.completedQuests) parts.push(`Quests completed: ${context.completedQuests}`);
+    if (context.completedMissions) parts.push(`Missions completed: ${context.completedMissions}`);
+    if (context.badges?.length) parts.push(`Badges earned: ${context.badges.join(", ")}`);
+    if (context.pulseCheck) parts.push(`Recent pulse check (how they feel about their path): ${context.pulseCheck}`);
+    if (context.lastJournalEntry) parts.push(`Last journal entry: "${context.lastJournalEntry}"`);
+
+    if (parts.length > 0) {
+      base += `\n\n--- STUDENT CONTEXT ---\n${parts.join("\n")}`;
+      base += `\n\nUse this context to:
+- Address the student by name naturally
+- Relate answers to their active career path and subjects
 - Acknowledge their progress (XP, streak, badges) to motivate them
-- Give career advice that's relevant to their grade level and country
-- If they have an active career, bias your suggestions toward that career unless they ask about something else`;
+- Give career advice relevant to their grade level and country
+- If they have a pulse check that's negative, be extra encouraging
+- Reference their matched careers when suggesting alternatives
+- If they have a journal entry, you understand their thinking`;
+    }
   }
 
   return base;
