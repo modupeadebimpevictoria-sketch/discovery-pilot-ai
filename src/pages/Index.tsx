@@ -163,11 +163,11 @@ const testimonials = [
   },
 ];
 
-// SpringBoard logo — clean, no animation
-function SpringBoardLogo({ size = "text-2xl" }: { size?: string }) {
+// SpringBoard logo — uses the consistent SVG mark
+function SpringBoardWordmark({ size = "text-2xl" }: { size?: string }) {
   return (
-    <span className={`font-bold font-display text-primary tracking-tight ${size}`}>
-      Spring<span className="text-landing-mint">Board</span>
+    <span className={`font-bold tracking-tight ${size}`}>
+      <span className="text-primary">Spring</span><span className="text-foreground">Board</span>
     </span>
   );
 }
