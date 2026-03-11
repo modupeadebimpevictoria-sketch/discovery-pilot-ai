@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           application_url: string
           career_family: string | null
+          career_family_ids: Json
           city: string | null
           country: string
           created_at: string | null
@@ -38,6 +39,7 @@ export type Database = {
           organisation: string
           scholarship_amount: string | null
           scholarship_coverage: string | null
+          source: string
           title: string
           type: string
           updated_at: string | null
@@ -46,6 +48,7 @@ export type Database = {
         Insert: {
           application_url?: string
           career_family?: string | null
+          career_family_ids?: Json
           city?: string | null
           country?: string
           created_at?: string | null
@@ -66,6 +69,7 @@ export type Database = {
           organisation?: string
           scholarship_amount?: string | null
           scholarship_coverage?: string | null
+          source?: string
           title: string
           type?: string
           updated_at?: string | null
@@ -74,6 +78,7 @@ export type Database = {
         Update: {
           application_url?: string
           career_family?: string | null
+          career_family_ids?: Json
           city?: string | null
           country?: string
           created_at?: string | null
@@ -94,6 +99,7 @@ export type Database = {
           organisation?: string
           scholarship_amount?: string | null
           scholarship_coverage?: string | null
+          source?: string
           title?: string
           type?: string
           updated_at?: string | null
@@ -221,6 +227,42 @@ export type Database = {
           title?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      opportunity_sources: {
+        Row: {
+          created_at: string
+          default_type: string
+          id: string
+          is_active: boolean
+          last_scraped_at: string | null
+          last_scraped_count: number | null
+          name: string
+          scrape_strategy: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          default_type?: string
+          id?: string
+          is_active?: boolean
+          last_scraped_at?: string | null
+          last_scraped_count?: number | null
+          name: string
+          scrape_strategy?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          default_type?: string
+          id?: string
+          is_active?: boolean
+          last_scraped_at?: string | null
+          last_scraped_count?: number | null
+          name?: string
+          scrape_strategy?: string
+          url?: string
         }
         Relationships: []
       }
@@ -401,6 +443,30 @@ export type Database = {
           title?: string
           week_number?: number
           xp_reward?: number
+        }
+        Relationships: []
+      }
+      scrape_log: {
+        Row: {
+          failed_sources: Json
+          id: string
+          run_at: string
+          sources_processed: number
+          total_new_listings: number
+        }
+        Insert: {
+          failed_sources?: Json
+          id?: string
+          run_at?: string
+          sources_processed?: number
+          total_new_listings?: number
+        }
+        Update: {
+          failed_sources?: Json
+          id?: string
+          run_at?: string
+          sources_processed?: number
+          total_new_listings?: number
         }
         Relationships: []
       }
