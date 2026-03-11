@@ -103,6 +103,8 @@ export default function Opportunities() {
   const userGrade = parseGradeNumber(profile?.grade);
   const userCountry = profile?.country;
 
+  const userAge = profile?.age;
+
   // Fetch from admin_opportunities table
   useEffect(() => {
     const fetchOpps = async () => {
@@ -111,11 +113,18 @@ export default function Opportunities() {
         let query = supabase
           .from("admin_opportunities")
           .select("*")
-          .eq("is_active", true);
+          .eq("is_active", true)
+          .or("is_archived.eq.false,is_archived.is.null");
 
         // Grade filtering
         if (userGrade !== null) {
           query = query.lte("min_grade", userGrade).gte("max_grade", userGrade);
+        }
+
+        // Age filtering
+        if (userAge !== null && userAge !== undefined) {
+          query = query.or(`min_age.is.null,min_age.lte.${userAge}`);
+          query = query.or(`max_age.is.null,max_age.gte.${userAge}`);
         }
 
         const { data, error } = await query.order("created_at", { ascending: false });
@@ -128,7 +137,7 @@ export default function Opportunities() {
       }
     };
     fetchOpps();
-  }, [userGrade]);
+  }, [userGrade, userAge]);
 
   // Get the active path's family ID and all matched career family IDs
   const activePathFamilyId = useMemo(() => {
