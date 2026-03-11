@@ -429,9 +429,43 @@ function ScrapeSourcesManager() {
   const runScrapeNow = async () => {
     setScraping(true);
     try {
-      const { data, error } = await supabase.functions.invoke("scrape-opportunities", { body: {} });
-      if (error) throw error;
-      toast.success(`Scrape complete: ${data?.total_new_listings || 0} new listings`);
+      // First get list of active sources
+      const { data: listData, error: listErr } = await supabase.functions.invoke("scrape-opportunities", {
+        body: { mode: "list" },
+      });
+      if (listErr) throw listErr;
+      const sourceList = listData?.sources || [];
+      if (sourceList.length === 0) {
+        toast.info("No active sources to scrape");
+        setScraping(false);
+        return;
+      }
+
+      let totalNew = 0;
+      let processed = 0;
+      let failed = 0;
+
+      // Process each source individually to avoid timeout
+      for (const src of sourceList) {
+        try {
+          toast.info(`Scraping ${src.name}... (${processed + 1}/${sourceList.length})`);
+          const { data, error } = await supabase.functions.invoke("scrape-opportunities", {
+            body: { source_id: src.id },
+          });
+          if (error) {
+            console.error(`Failed to scrape ${src.name}:`, error);
+            failed++;
+          } else {
+            totalNew += data?.new_listings || 0;
+          }
+          processed++;
+        } catch {
+          failed++;
+          processed++;
+        }
+      }
+
+      toast.success(`Scrape complete: ${totalNew} new listings from ${processed} sources${failed ? ` (${failed} failed)` : ""}`);
       fetchSources();
     } catch (err: any) {
       toast.error(err.message || "Scrape failed");
