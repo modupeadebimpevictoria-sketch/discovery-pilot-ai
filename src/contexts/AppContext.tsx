@@ -150,18 +150,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, [saveProgress]);
 
+  const applyProgressData = useCallback((progress: any) => {
+    setXp(progress.xp || 0);
+    setStreak(progress.streak || 0);
+    setBadges((progress.badges as string[]) || []);
+    setCompletedMissions((progress.completed_missions as string[]) || []);
+    setCompletedQuests((progress.completed_quests as string[]) || []);
+    setCompletedMilestones((progress.completed_milestones as string[]) || []);
+    setSavedCareers((progress.saved_careers as string[]) || []);
+    setRejectedCareers((progress.rejected_careers as string[]) || []);
+    setAppliedInternships((progress.applied_internships as string[]) || []);
+    setSkillXp((progress.skill_xp as Record<string, number>) || {});
+    setSelectedCareerPathState(progress.selected_career_path || null);
+    setLastCheckInDateState(progress.last_check_in_date || null);
+    setPathwayStartDateState(progress.pathway_start_date || null);
+    setPulseCheckState(progress.pulse_check || null);
+    setArchetypeState(progress.archetype || "");
+    setMatchedCareersState((progress.matched_careers as { careerId: string; score: number }[]) || []);
+    setAssessmentAnswersState((progress.assessment_answers as Record<number, string | number>) || {});
+    setJournalEntries((progress.journal_entries as unknown as JournalEntry[]) || []);
+    setSavedResources((progress.saved_resources as unknown as SavedResource[]) || []);
+  }, []);
+
   // Load user data from DB
   const loadUserData = useCallback(async (userId: string) => {
     try {
       // Load profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileErr } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
 
       if (profileData && profileData.name) {
-        setProfileState({
+        const p = {
           name: profileData.name,
           age: profileData.age || 15,
           grade: profileData.grade || "",
@@ -169,44 +191,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
           subjects: profileData.subjects || [],
           dreamCareer: profileData.dream_career || "",
           interests: profileData.interests || [],
-        });
+        };
+        setProfileState(p);
+        setCache(`profile:${userId}`, p);
+      } else if (profileErr) {
+        // Offline fallback
+        const cached = getCache<StudentProfile>(`profile:${userId}`);
+        if (cached) setProfileState(cached);
       }
 
       // Load progress
-      const { data: progress } = await supabase
+      const { data: progress, error: progressErr } = await supabase
         .from("user_progress")
         .select("*")
         .eq("user_id", userId)
         .single();
 
       if (progress) {
-        setXp(progress.xp || 0);
-        setStreak(progress.streak || 0);
-        setBadges((progress.badges as string[]) || []);
-        setCompletedMissions((progress.completed_missions as string[]) || []);
-        setCompletedQuests((progress.completed_quests as string[]) || []);
-        setCompletedMilestones((progress.completed_milestones as string[]) || []);
-        setSavedCareers((progress.saved_careers as string[]) || []);
-        setRejectedCareers((progress.rejected_careers as string[]) || []);
-        setAppliedInternships((progress.applied_internships as string[]) || []);
-        setSkillXp((progress.skill_xp as Record<string, number>) || {});
-        setSelectedCareerPathState(progress.selected_career_path || null);
-        setLastCheckInDateState(progress.last_check_in_date || null);
-        setPathwayStartDateState(progress.pathway_start_date || null);
-        setPulseCheckState(progress.pulse_check || null);
-        setArchetypeState(progress.archetype || "");
-        setMatchedCareersState((progress.matched_careers as { careerId: string; score: number }[]) || []);
-        setAssessmentAnswersState((progress.assessment_answers as Record<number, string | number>) || {});
-        setJournalEntries((progress.journal_entries as unknown as JournalEntry[]) || []);
-        setSavedResources((progress.saved_resources as unknown as SavedResource[]) || []);
+        applyProgressData(progress);
+        setCache(`progress:${userId}`, progress);
+      } else if (progressErr) {
+        const cached = getCache<any>(`progress:${userId}`);
+        if (cached) applyProgressData(cached);
       }
 
       setDbLoaded(true);
     } catch (err) {
       console.error("Error loading user data:", err);
+      // Try cache on network failure
+      const cachedProfile = getCache<StudentProfile>(`profile:${userId}`);
+      if (cachedProfile) setProfileState(cachedProfile);
+      const cachedProgress = getCache<any>(`progress:${userId}`);
+      if (cachedProgress) applyProgressData(cachedProgress);
       setDbLoaded(true);
     }
-  }, []);
+  }, [applyProgressData]);
 
   // Auth listener
   useEffect(() => {
