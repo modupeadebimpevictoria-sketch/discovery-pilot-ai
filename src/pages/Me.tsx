@@ -42,6 +42,8 @@ export default function Me() {
   const [deleteText, setDeleteText] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [savedOpps, setSavedOpps] = useState<any[]>([]);
+  const [savedOppsLoading, setSavedOppsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const level = getLevel(xp);
