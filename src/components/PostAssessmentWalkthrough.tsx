@@ -8,22 +8,25 @@ interface PostAssessmentWalkthroughProps {
 
 const screens = [
   {
-    icon: <Flame size={48} className="text-primary" />,
+    icon: <Flame size={48} className="text-glow-pink" />,
     headline: "Your feed is ready 🔥",
     body: "Every day, SpringBoard brings you real stories, videos, and updates about your 3 matched careers. The more you explore, the more personalised it gets.",
-    mockEmoji: "📱",
+    bgClass: "bg-glow-pink/10 border-glow-pink/20",
+    dotColor: "bg-glow-pink",
   },
   {
     icon: <Map size={48} className="text-primary" />,
     headline: "Pick a path to get started 🗺️",
     body: "Set one career as your Active Path to unlock quests, earn XP, and build your Career Passport. You can switch anytime — your progress is always saved.",
-    mockEmoji: "🗺️",
+    bgClass: "bg-primary/10 border-primary/20",
+    dotColor: "bg-primary",
   },
   {
-    icon: <MessageCircle size={48} className="text-primary" />,
+    icon: <MessageCircle size={48} className="text-glow-purple" />,
     headline: "Meet your AI Mentor 👆",
     body: "Ask anything. Your SpringBoard Mentor knows your matches, your progress, and your goals — it gives you real, specific advice, not generic tips.",
-    mockEmoji: "🤖",
+    bgClass: "bg-glow-purple/10 border-glow-purple/20",
+    dotColor: "bg-glow-purple",
   },
 ];
 
