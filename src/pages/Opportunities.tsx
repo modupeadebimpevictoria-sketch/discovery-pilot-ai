@@ -114,6 +114,7 @@ export default function Opportunities() {
           .from("admin_opportunities")
           .select("*")
           .eq("is_active", true)
+          .eq("flagged", false)
           .or("is_archived.eq.false,is_archived.is.null");
 
         // Grade filtering
@@ -127,7 +128,7 @@ export default function Opportunities() {
           query = query.or(`max_age.is.null,max_age.gte.${userAge}`);
         }
 
-        const { data, error } = await query.order("created_at", { ascending: false });
+        const { data, error } = await query.order("deadline", { ascending: true, nullsFirst: false });
         if (error) throw error;
         setDbOpps((data as AdminOpportunity[]) || []);
       } catch (err) {
@@ -177,7 +178,12 @@ export default function Opportunities() {
       if (tierA !== tierB) return tierA - tierB;
       const aPri = getLocationPriority(a.country, userCountry);
       const bPri = getLocationPriority(b.country, userCountry);
-      return aPri - bPri;
+      if (aPri !== bPri) return aPri - bPri;
+      // Deadline ascending (soonest first), nulls last
+      if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
+      if (a.deadline && !b.deadline) return -1;
+      if (!a.deadline && b.deadline) return 1;
+      return 0;
     });
   }, [dbOpps, filter, userCountry, activePathFamilyId, matchedFamilyIds]);
 
@@ -261,11 +267,11 @@ export default function Opportunities() {
                 <div>
                   <p className="text-sm font-bold text-foreground">Set your Active Path</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    Choose a career path to unlock personalised opportunities matched to your interests. You'll only see general listings until then.
+                    Set an Active Path to unlock opportunities matched to your career goals.
                   </p>
                   <button
                     onClick={() => navigate("/career-exploration")}
-                    className="mt-2 text-xs font-semibold text-primary hover:underline"
+                    className="mt-2 px-4 py-1.5 rounded-full text-xs font-bold bg-lime-500 text-black hover:bg-lime-400 transition-colors"
                   >
                     Explore careers →
                   </button>
@@ -283,6 +289,7 @@ export default function Opportunities() {
               careerId={careerId}
               applied={appliedIds.has(opp.id)}
               saved={savedIds.has(opp.id)}
+              tier={getCareerTier(opp)}
               onApply={() => handleApply(opp.id)}
               onToggleSave={() => toggleSave(opp.id)}
             />
