@@ -99,7 +99,21 @@ export default function CareersManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-foreground">Careers Manager</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={handleBulkSyncOnet}
+            disabled={syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={syncingOnet ? "animate-spin" : ""} /> Sync from O*NET
+          </button>
+          <button
+            onClick={handleBulkSyncProspects}
+            disabled={syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={syncingProspects ? "animate-spin" : ""} /> Sync from Prospects
+          </button>
           <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
