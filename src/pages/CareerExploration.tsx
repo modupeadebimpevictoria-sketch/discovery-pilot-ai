@@ -32,7 +32,11 @@ function getCareerPhoto(careerId: string): string {
 }
 
 // Convert a CareerListing into a full Career object with sensible defaults
-function listingToCareer(id: string): Career | undefined {
+function listingToCareer(
+  id: string,
+  getCareerListingById: (id: string) => any,
+  getCareerFamilyById: (id: string) => any
+): Career | undefined {
   const listing = getCareerListingById(id);
   if (!listing) return undefined;
   const family = getCareerFamilyById(listing.familyId);
