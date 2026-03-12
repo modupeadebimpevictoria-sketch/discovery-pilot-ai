@@ -520,8 +520,13 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
               <FormInput label="Prospects slug" value={form.prospects_slug || ""} onChange={(v) => set("prospects_slug", v)} placeholder="e.g. architect" />
             </div>
             {form.prospects_slug && (
-              <button className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1" title="Sync from Prospects (edge function needed)">
-                Sync from Prospects <ChevronRight size={10} />
+              <button
+                onClick={handleSyncProspectsInline}
+                disabled={syncingProspectsInline}
+                className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
+              >
+                {syncingProspectsInline ? <Loader2 size={10} className="animate-spin" /> : <ChevronRight size={10} />}
+                {syncingProspectsInline ? "Syncing..." : "Sync from Prospects →"}
               </button>
             )}
           </div>
