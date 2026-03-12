@@ -418,7 +418,7 @@ function ScrapeSourcesManager() {
     if (error) { toast.error(error.message); return; }
     toast.success("Source added!");
     setAdding(false);
-    setNewSource({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship" });
+    setNewSource({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship", notes: "" });
     fetchSources();
   };
 
