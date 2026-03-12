@@ -12,6 +12,7 @@ interface OpportunityCardProps {
   careerId: string | undefined;
   applied: boolean;
   saved: boolean;
+  tier?: number;
   onApply: () => void;
   onToggleSave: () => void;
 }
