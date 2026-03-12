@@ -201,6 +201,15 @@ export default function CareersManager() {
           >
             <RefreshCw size={14} className={syncingProspects ? "animate-spin" : ""} /> Sync from Prospects
           </button>
+          {careers.length < 50 && (
+            <button
+              onClick={handleSeedFromHardcoded}
+              disabled={seeding || syncingOnet || syncingProspects}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-foreground text-xs font-semibold hover:bg-muted/80 disabled:opacity-50"
+            >
+              <Upload size={14} className={seeding ? "animate-pulse" : ""} /> Seed from data
+            </button>
+          )}
           <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
