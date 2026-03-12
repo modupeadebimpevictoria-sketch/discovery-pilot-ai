@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { getCareerById, type Career } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers, type Career } from "@/contexts/CareersContext";
 import { getMissionsByCareer } from "@/data/missions";
 import { getRoleModelProfiles, type RoleModelProfile } from "@/data/roleModelProfiles";
 import { getSkillDetails } from "@/data/skillDetails";
@@ -33,7 +32,11 @@ function getCareerPhoto(careerId: string): string {
 }
 
 // Convert a CareerListing into a full Career object with sensible defaults
-function listingToCareer(id: string): Career | undefined {
+function listingToCareer(
+  id: string,
+  getCareerListingById: (id: string) => any,
+  getCareerFamilyById: (id: string) => any
+): Career | undefined {
   const listing = getCareerListingById(id);
   if (!listing) return undefined;
   const family = getCareerFamilyById(listing.familyId);
@@ -124,6 +127,7 @@ export default function CareerExploration() {
     appliedInternships, applyToInternship,
     selectedCareerPath, setSelectedCareerPath,
   } = useApp();
+  const { getCareerById, getCareerListingById, getCareerFamilyById } = useCareers();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [showSetActiveModal, setShowSetActiveModal] = useState(false);
@@ -136,9 +140,9 @@ export default function CareerExploration() {
     (async () => {
       const { data } = await supabase.from("careers" as any).select("*").eq("is_active", true);
       if (data) {
-        // Try to match by title (case-insensitive) since hardcoded careers use slug IDs
         const match = (data as any[]).find((c: any) =>
           c.id === id ||
+          c.slug === id ||
           c.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === id
         );
         if (match) setDbCareer(match);
@@ -146,7 +150,7 @@ export default function CareerExploration() {
     })();
   }, [id]);
 
-  const career = getCareerById(id || "") || listingToCareer(id || "");
+  const career = getCareerById(id || "") || listingToCareer(id || "", getCareerListingById, getCareerFamilyById);
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   // Derive enriched description with fallback chain
@@ -189,7 +193,7 @@ export default function CareerExploration() {
   const isActivePath = selectedCareerPath === career.id;
   const hasAnyActivePath = !!selectedCareerPath;
   const currentActiveCareer = selectedCareerPath
-    ? (getCareerById(selectedCareerPath) || listingToCareer(selectedCareerPath))
+    ? (getCareerById(selectedCareerPath) || listingToCareer(selectedCareerPath, getCareerListingById, getCareerFamilyById))
     : null;
 
   const getDefaultMatch = (cid: string) => {

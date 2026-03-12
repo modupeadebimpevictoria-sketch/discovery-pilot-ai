@@ -174,6 +174,7 @@ export type Database = {
           salary_range: string | null
           search_terms: Json | null
           skills: Json | null
+          slug: string | null
           title: string
           unsplash_keyword: string | null
           unsplash_photo_url: string | null
@@ -209,6 +210,7 @@ export type Database = {
           salary_range?: string | null
           search_terms?: Json | null
           skills?: Json | null
+          slug?: string | null
           title: string
           unsplash_keyword?: string | null
           unsplash_photo_url?: string | null
@@ -244,6 +246,7 @@ export type Database = {
           salary_range?: string | null
           search_terms?: Json | null
           skills?: Json | null
+          slug?: string | null
           title?: string
           unsplash_keyword?: string | null
           unsplash_photo_url?: string | null

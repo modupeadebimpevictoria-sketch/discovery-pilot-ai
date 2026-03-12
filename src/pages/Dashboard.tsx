@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 import { archetypes } from "@/data/questions";
 import { getQuestsForCareer, getCurrentWeekNumber } from "@/data/weeklyQuests";
 import { Share2, Sparkles, Bot, ChevronRight, LogOut } from "lucide-react";
@@ -38,6 +38,7 @@ export default function Dashboard() {
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
+  const { getCareerById } = useCareers();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 

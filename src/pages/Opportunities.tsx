@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
 import { useOpportunityActions } from "@/hooks/useOpportunityActions";
-import { careerListings } from "@/data/careerFamilies";
+import { useCareers } from "@/contexts/CareersContext";
 
 // Maps the Firecrawl-extracted career_family_ids values to our app's familyId values
 const FAMILY_ID_MAP: Record<string, string[]> = {
@@ -141,11 +141,12 @@ export default function Opportunities() {
   }, [userGrade, userAge]);
 
   // Get the active path's family ID and all matched career family IDs
+  const { careerListings } = useCareers();
   const activePathFamilyId = useMemo(() => {
     if (!careerId) return null;
     const listing = careerListings.find((l) => l.id === careerId);
     return listing?.familyId || null;
-  }, [careerId]);
+  }, [careerId, careerListings]);
 
   const matchedFamilyIds = useMemo(() => {
     return new Set(
@@ -153,7 +154,7 @@ export default function Opportunities() {
         .map((m) => careerListings.find((l) => l.id === m.careerId)?.familyId)
         .filter(Boolean) as string[]
     );
-  }, [matchedCareers]);
+  }, [matchedCareers, careerListings]);
 
   // Tier: 0 = Active Path match, 1 = any matched career match, 2 = universal (empty), 3 = no match
   function getCareerTier(opp: AdminOpportunity): number {

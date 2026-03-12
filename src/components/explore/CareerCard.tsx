@@ -1,7 +1,6 @@
 import { Heart, Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import type { CareerListing } from "@/data/careerFamilies";
-import { getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers, type CareerListing } from "@/contexts/CareersContext";
 
 // Deterministic Unsplash photo for a career
 function getCareerPhoto(careerId: string): string {
@@ -35,6 +34,7 @@ interface CareerCardProps {
 }
 
 export default function CareerCard({ career, matchScore, saved, onToggleSave, onClick, index }: CareerCardProps) {
+  const { getCareerFamilyById } = useCareers();
   const family = getCareerFamilyById(career.familyId);
   const score = matchScore ?? getMatchScore(career.id);
   const photoUrl = getCareerPhoto(career.id);

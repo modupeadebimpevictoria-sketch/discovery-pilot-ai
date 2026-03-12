@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 import { archetypes } from "@/data/questions";
 import { fireConfetti, fireBurst } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";
@@ -45,6 +45,7 @@ const surprisingFacts: Record<string, string> = {
 export default function Results() {
   const navigate = useNavigate();
   const { matchedCareers, archetype, savedCareers, toggleSavedCareer, profile } = useApp();
+  const { getCareerById } = useCareers();
   const [phase, setPhase] = useState<"archetype" | "reveal" | "cards" | "walkthrough">("archetype");
   const [cardIndex, setCardIndex] = useState(0);
   const [walkthroughSeen] = useState(() => localStorage.getItem("sb_walkthrough_seen") === "true");

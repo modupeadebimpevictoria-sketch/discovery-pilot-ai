@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Send, Sparkles, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 import SpringBoardLogo from "@/components/SpringBoardLogo";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ function useStudentContext() {
     completedQuests, completedMissions, badges, archetype,
     pulseCheck, journalEntries,
   } = useApp();
+  const { getCareerById } = useCareers();
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;

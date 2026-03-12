@@ -98,6 +98,7 @@ export default function CareersManager() {
 
         const row: any = {
           title: listing.title,
+          slug: listing.id,
           family_id: listing.familyId,
           description: listing.description,
           emoji,

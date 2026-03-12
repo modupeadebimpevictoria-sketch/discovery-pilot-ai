@@ -1,11 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  careerFamilies,
-  careerListings,
-  searchCareerListings,
-  type CareerListing,
-} from "@/data/careerFamilies";
+import { useCareers, careerFamilies, type CareerListing } from "@/contexts/CareersContext";
 import { useApp } from "@/contexts/AppContext";
 import { Search, X, Bookmark, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
@@ -30,7 +25,7 @@ export default function CareerUniverse() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { savedCareers, toggleSavedCareer, rejectedCareers, matchedCareers } = useApp();
-
+  const { careerListings, searchCareerListings } = useCareers();
   const familyParam = searchParams.get("family");
   const [search, setSearch] = useState("");
   const [familyFilter, setFamilyFilter] = useState<string>(familyParam || "all");

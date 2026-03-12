@@ -1,4 +1,6 @@
 import { getCareerById, Career } from "@/data/careers";
+// NOTE: This file still uses the hardcoded careers data for feed generation.
+// It will be called with career IDs that may be slugs from the DB.
 
 export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "mission-nudge";
 

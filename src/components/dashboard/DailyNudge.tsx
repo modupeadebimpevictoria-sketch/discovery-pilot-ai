@@ -1,5 +1,5 @@
 import { Sparkles, Clock, Zap } from "lucide-react";
-import type { Career } from "@/data/careers";
+import type { Career } from "@/contexts/CareersContext";
 
 interface DailyNudgeProps {
   career: Career;

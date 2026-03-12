@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, Bot, Sparkles, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -22,6 +22,7 @@ function useStudentContext() {
     profile, selectedCareerPath, matchedCareers, xp, streak,
     completedQuests, completedMissions, badges, archetype,
   } = useApp();
+  const { getCareerById } = useCareers();
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;

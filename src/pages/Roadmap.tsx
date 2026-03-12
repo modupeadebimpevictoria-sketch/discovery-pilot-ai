@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers } from "@/contexts/CareersContext";
 import { getOrCreateRoadmap, RoadmapMilestone } from "@/data/roadmaps";
 import { ChevronLeft, CheckCircle, Circle, MapPin, GraduationCap, BookOpen, Trophy, Briefcase, Users, Code } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +30,7 @@ export default function Roadmap() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { completedMilestones, toggleMilestone, addXp, addBadge, xp } = useApp();
+  const { getCareerById, getCareerListingById, getCareerFamilyById } = useCareers();
 
   // Support both detailed careers and listing-only careers
   const detailedCareer = id ? getCareerById(id) : null;

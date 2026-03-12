@@ -1,5 +1,5 @@
 import { Lock, X, Sparkles } from "lucide-react";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 
 interface MatchedPathwaysQueueProps {
   matchedCareers: { careerId: string; score: number }[];
@@ -9,6 +9,7 @@ interface MatchedPathwaysQueueProps {
 }
 
 export default function MatchedPathwaysQueue({ matchedCareers, activePathwayId, rejectedCareers, onReject }: MatchedPathwaysQueueProps) {
+  const { getCareerById } = useCareers();
   const queuedCareers = matchedCareers.filter(
     (m) => m.careerId !== activePathwayId && !rejectedCareers.includes(m.careerId)
   );
