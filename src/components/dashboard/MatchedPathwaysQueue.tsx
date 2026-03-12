@@ -9,6 +9,7 @@ interface MatchedPathwaysQueueProps {
 }
 
 export default function MatchedPathwaysQueue({ matchedCareers, activePathwayId, rejectedCareers, onReject }: MatchedPathwaysQueueProps) {
+  const { getCareerById } = useCareers();
   const queuedCareers = matchedCareers.filter(
     (m) => m.careerId !== activePathwayId && !rejectedCareers.includes(m.careerId)
   );

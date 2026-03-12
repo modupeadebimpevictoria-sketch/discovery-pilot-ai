@@ -30,6 +30,7 @@ export default function Roadmap() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { completedMilestones, toggleMilestone, addXp, addBadge, xp } = useApp();
+  const { getCareerById, getCareerListingById, getCareerFamilyById } = useCareers();
 
   // Support both detailed careers and listing-only careers
   const detailedCareer = id ? getCareerById(id) : null;

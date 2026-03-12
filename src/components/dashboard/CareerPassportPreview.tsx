@@ -10,6 +10,7 @@ interface CareerPassportPreviewProps {
 
 export default function CareerPassportPreview({ matchedCareers, badges, completedMilestones }: CareerPassportPreviewProps) {
   const navigate = useNavigate();
+  const { getCareerById } = useCareers();
 
   return (
     <div className="space-y-2">
