@@ -505,8 +505,13 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
               <FormInput label="O*NET code" value={form.onet_code || ""} onChange={(v) => set("onet_code", v)} placeholder="e.g. 17-1011.00" />
             </div>
             {form.onet_code && (
-              <button className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1" title="Sync from O*NET (edge function needed)">
-                Sync from O*NET <ChevronRight size={10} />
+              <button
+                onClick={handleSyncOnetInline}
+                disabled={syncingOnetInline}
+                className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
+              >
+                {syncingOnetInline ? <Loader2 size={10} className="animate-spin" /> : <ChevronRight size={10} />}
+                {syncingOnetInline ? "Syncing..." : "Sync from O*NET →"}
               </button>
             )}
           </div>
