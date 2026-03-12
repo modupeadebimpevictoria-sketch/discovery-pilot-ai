@@ -1,11 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  careerFamilies,
-  careerListings,
-  searchCareerListings,
-  type CareerListing,
-} from "@/data/careerFamilies";
+import { useCareers, careerFamilies, type CareerListing } from "@/contexts/CareersContext";
 import { useApp } from "@/contexts/AppContext";
 import { Search, X, Bookmark, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
