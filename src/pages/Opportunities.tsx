@@ -267,11 +267,11 @@ export default function Opportunities() {
                 <div>
                   <p className="text-sm font-bold text-foreground">Set your Active Path</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    Choose a career path to unlock personalised opportunities matched to your interests. You'll only see general listings until then.
+                    Set an Active Path to unlock opportunities matched to your career goals.
                   </p>
                   <button
                     onClick={() => navigate("/career-exploration")}
-                    className="mt-2 text-xs font-semibold text-primary hover:underline"
+                    className="mt-2 px-4 py-1.5 rounded-full text-xs font-bold bg-lime-500 text-black hover:bg-lime-400 transition-colors"
                   >
                     Explore careers →
                   </button>
