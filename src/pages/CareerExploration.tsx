@@ -193,7 +193,7 @@ export default function CareerExploration() {
   const isActivePath = selectedCareerPath === career.id;
   const hasAnyActivePath = !!selectedCareerPath;
   const currentActiveCareer = selectedCareerPath
-    ? (getCareerById(selectedCareerPath) || listingToCareer(selectedCareerPath))
+    ? (getCareerById(selectedCareerPath) || listingToCareer(selectedCareerPath, getCareerListingById, getCareerFamilyById))
     : null;
 
   const getDefaultMatch = (cid: string) => {
