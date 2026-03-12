@@ -114,6 +114,7 @@ export default function Opportunities() {
           .from("admin_opportunities")
           .select("*")
           .eq("is_active", true)
+          .eq("flagged", false)
           .or("is_archived.eq.false,is_archived.is.null");
 
         // Grade filtering
@@ -127,7 +128,7 @@ export default function Opportunities() {
           query = query.or(`max_age.is.null,max_age.gte.${userAge}`);
         }
 
-        const { data, error } = await query.order("created_at", { ascending: false });
+        const { data, error } = await query.order("deadline", { ascending: true, nullsFirst: false });
         if (error) throw error;
         setDbOpps((data as AdminOpportunity[]) || []);
       } catch (err) {
