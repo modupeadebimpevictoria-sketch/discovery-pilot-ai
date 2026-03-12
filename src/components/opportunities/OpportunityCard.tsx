@@ -25,6 +25,7 @@ export default function OpportunityCard({
   careerId,
   applied,
   saved,
+  tier,
   onApply,
   onToggleSave,
 }: OpportunityCardProps) {
