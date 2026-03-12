@@ -394,7 +394,7 @@ function ScrapeSourcesManager() {
   const [sources, setSources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  const [newSource, setNewSource] = useState({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship" });
+  const [newSource, setNewSource] = useState({ name: "", url: "", scrape_strategy: "scrape", default_type: "internship", notes: "" });
   const [scraping, setScraping] = useState(false);
 
   const fetchSources = async () => {
