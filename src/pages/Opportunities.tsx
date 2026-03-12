@@ -178,7 +178,12 @@ export default function Opportunities() {
       if (tierA !== tierB) return tierA - tierB;
       const aPri = getLocationPriority(a.country, userCountry);
       const bPri = getLocationPriority(b.country, userCountry);
-      return aPri - bPri;
+      if (aPri !== bPri) return aPri - bPri;
+      // Deadline ascending (soonest first), nulls last
+      if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
+      if (a.deadline && !b.deadline) return -1;
+      if (!a.deadline && b.deadline) return 1;
+      return 0;
     });
   }, [dbOpps, filter, userCountry, activePathFamilyId, matchedFamilyIds]);
 
