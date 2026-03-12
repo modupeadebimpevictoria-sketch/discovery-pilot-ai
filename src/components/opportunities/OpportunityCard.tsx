@@ -60,6 +60,16 @@ export default function OpportunityCard({
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.color}`}>
               {cfg.label}
             </span>
+            {tier === 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/15 text-primary">
+                For your path 🎯
+              </span>
+            )}
+            {tier === 1 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-accent/10 text-accent-foreground">
+                Also relevant
+              </span>
+            )}
             <span className="text-[10px] text-muted-foreground">{locationLabel}</span>
             <span className="flex items-center gap-0.5 text-[10px] text-primary font-medium">
               <GraduationCap size={10} /> {gradeTag}
