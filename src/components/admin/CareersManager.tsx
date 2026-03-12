@@ -44,10 +44,47 @@ function formatSalaryLabel(min: number, max: number, symbol: string): string {
 }
 
 export default function CareersManager() {
-  const { careers, issues, loading, upsertCareer, softDeleteCareer, resolveIssue, updateIssueNotes } = useAdminCareers();
+  const { careers, issues, loading, fetchAll, upsertCareer, softDeleteCareer, resolveIssue, updateIssueNotes } = useAdminCareers();
   const [tab, setTab] = useState<"careers" | "issues">("careers");
   const [editing, setEditing] = useState<Partial<DbCareer> | null>(null);
   const [scrollToField, setScrollToField] = useState<string | null>(null);
+  const [syncingOnet, setSyncingOnet] = useState(false);
+  const [syncingProspects, setSyncingProspects] = useState(false);
+  const [syncProgress, setSyncProgress] = useState("");
+
+  const handleBulkSyncOnet = async () => {
+    setSyncingOnet(true);
+    setSyncProgress("Starting O*NET sync...");
+    try {
+      const { data, error } = await supabase.functions.invoke("enrich-careers-onet", { body: {} });
+      if (error) throw error;
+      setSyncProgress(`Done: ${data.succeeded}/${data.total} enriched, ${data.failed} failed`);
+      toast.success(`O*NET sync complete: ${data.succeeded} careers enriched`);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`O*NET sync failed: ${err.message}`);
+      setSyncProgress("");
+    } finally {
+      setSyncingOnet(false);
+    }
+  };
+
+  const handleBulkSyncProspects = async () => {
+    setSyncingProspects(true);
+    setSyncProgress("Starting Prospects sync...");
+    try {
+      const { data, error } = await supabase.functions.invoke("enrich-careers-prospects", { body: {} });
+      if (error) throw error;
+      setSyncProgress(`Done: ${data.succeeded}/${data.total} enriched, ${data.failed} failed`);
+      toast.success(`Prospects sync complete: ${data.succeeded} careers enriched`);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`Prospects sync failed: ${err.message}`);
+      setSyncProgress("");
+    } finally {
+      setSyncingProspects(false);
+    }
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" /></div>;
