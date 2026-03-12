@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers } from "@/contexts/CareersContext";
 import { getOrCreateRoadmap, RoadmapMilestone } from "@/data/roadmaps";
 import { ChevronLeft, CheckCircle, Circle, MapPin, GraduationCap, BookOpen, Trophy, Briefcase, Users, Code } from "lucide-react";
 import { toast } from "sonner";

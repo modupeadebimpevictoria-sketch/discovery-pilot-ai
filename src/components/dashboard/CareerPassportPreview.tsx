@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Award, ChevronRight } from "lucide-react";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 
 interface CareerPassportPreviewProps {
   matchedCareers: { careerId: string; score: number }[];

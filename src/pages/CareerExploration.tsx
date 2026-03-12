@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { getCareerById, type Career } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers, type Career } from "@/contexts/CareersContext";
 import { getMissionsByCareer } from "@/data/missions";
 import { getRoleModelProfiles, type RoleModelProfile } from "@/data/roleModelProfiles";
 import { getSkillDetails } from "@/data/skillDetails";

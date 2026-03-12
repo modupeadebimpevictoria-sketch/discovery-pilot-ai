@@ -154,7 +154,7 @@ export default function Opportunities() {
         .map((m) => careerListings.find((l) => l.id === m.careerId)?.familyId)
         .filter(Boolean) as string[]
     );
-  }, [matchedCareers]);
+  }, [matchedCareers, careerListings]);
 
   // Tier: 0 = Active Path match, 1 = any matched career match, 2 = universal (empty), 3 = no match
   function getCareerTier(opp: AdminOpportunity): number {

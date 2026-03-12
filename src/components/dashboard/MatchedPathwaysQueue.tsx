@@ -1,5 +1,5 @@
 import { Lock, X, Sparkles } from "lucide-react";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 
 interface MatchedPathwaysQueueProps {
   matchedCareers: { careerId: string; score: number }[];

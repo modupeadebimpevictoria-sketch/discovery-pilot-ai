@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, Bot, Sparkles, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 
 type Msg = { role: "user" | "assistant"; content: string };
 

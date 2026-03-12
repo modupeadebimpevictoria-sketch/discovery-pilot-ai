@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
-import { getCareerListingById, getCareerFamilyById } from "@/data/careerFamilies";
+import { useCareers } from "@/contexts/CareersContext";
 import { getOrCreateRoadmap, RoadmapMilestone } from "@/data/roadmaps";
 import {
   CheckCircle, Circle, MapPin, GraduationCap, BookOpen,
