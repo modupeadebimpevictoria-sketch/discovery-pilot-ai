@@ -315,11 +315,12 @@ function IssuesTable({ issues, onResolve, onUpdateNotes }: {
 // ═══════════════════════════
 // CAREER FORM
 // ═══════════════════════════
-function CareerForm({ data, scrollToField, onSave, onCancel }: {
+function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
   data: Partial<DbCareer>;
   scrollToField: string | null;
   onSave: (d: Partial<DbCareer>) => void;
   onCancel: () => void;
+  onSyncComplete?: (updatedData: Partial<DbCareer>) => void;
 }) {
   const [form, setForm] = useState<any>({
     ...data,
