@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 import { archetypes } from "@/data/questions";
 import { fireConfetti, fireBurst } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";

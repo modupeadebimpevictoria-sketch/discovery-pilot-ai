@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import OpportunityFilters from "@/components/opportunities/OpportunityFilters";
 import { useOpportunityActions } from "@/hooks/useOpportunityActions";
-import { careerListings } from "@/data/careerFamilies";
+import { useCareers } from "@/contexts/CareersContext";
 
 // Maps the Firecrawl-extracted career_family_ids values to our app's familyId values
 const FAMILY_ID_MAP: Record<string, string[]> = {

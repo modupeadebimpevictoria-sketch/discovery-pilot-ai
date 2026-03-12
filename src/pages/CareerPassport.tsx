@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { getCareerById } from "@/data/careers";
+import { useCareers } from "@/contexts/CareersContext";
 import { missions } from "@/data/missions";
 import { internships } from "@/data/internships";
 import { weeklyQuests } from "@/data/weeklyQuests";

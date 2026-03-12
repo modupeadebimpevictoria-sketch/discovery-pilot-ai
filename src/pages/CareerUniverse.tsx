@@ -25,7 +25,7 @@ export default function CareerUniverse() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { savedCareers, toggleSavedCareer, rejectedCareers, matchedCareers } = useApp();
-
+  const { careerListings, searchCareerListings } = useCareers();
   const familyParam = searchParams.get("family");
   const [search, setSearch] = useState("");
   const [familyFilter, setFamilyFilter] = useState<string>(familyParam || "all");
