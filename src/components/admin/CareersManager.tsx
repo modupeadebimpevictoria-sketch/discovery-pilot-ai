@@ -53,6 +53,7 @@ export default function CareersManager() {
   const [syncingOnet, setSyncingOnet] = useState(false);
   const [syncingProspects, setSyncingProspects] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [syncProgress, setSyncProgress] = useState("");
 
   const handleSeedFromHardcoded = async () => {
     if (!confirm(`This will insert ~${careerListings.length} careers from hardcoded data. Existing careers with matching titles will be skipped. Continue?`)) return;
