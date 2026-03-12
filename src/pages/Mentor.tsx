@@ -17,6 +17,7 @@ function useStudentContext() {
     completedQuests, completedMissions, badges, archetype,
     pulseCheck, journalEntries,
   } = useApp();
+  const { getCareerById } = useCareers();
 
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;

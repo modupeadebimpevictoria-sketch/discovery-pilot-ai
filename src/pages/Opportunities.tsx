@@ -141,11 +141,12 @@ export default function Opportunities() {
   }, [userGrade, userAge]);
 
   // Get the active path's family ID and all matched career family IDs
+  const { careerListings } = useCareers();
   const activePathFamilyId = useMemo(() => {
     if (!careerId) return null;
     const listing = careerListings.find((l) => l.id === careerId);
     return listing?.familyId || null;
-  }, [careerId]);
+  }, [careerId, careerListings]);
 
   const matchedFamilyIds = useMemo(() => {
     return new Set(

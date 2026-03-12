@@ -38,6 +38,7 @@ export default function Dashboard() {
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
+  const { getCareerById } = useCareers();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 

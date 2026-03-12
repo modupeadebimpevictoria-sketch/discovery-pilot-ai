@@ -63,6 +63,7 @@ export default function CareerPassport() {
     fetch();
   }, [ctx.user]);
 
+  const { getCareerById } = useCareers();
   const careerId = selectedCareerPath || matchedCareers[0]?.careerId;
   const career = careerId ? getCareerById(careerId) : null;
   const level = Math.min(10, Math.floor(xp / 100) + 1);

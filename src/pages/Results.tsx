@@ -45,6 +45,7 @@ const surprisingFacts: Record<string, string> = {
 export default function Results() {
   const navigate = useNavigate();
   const { matchedCareers, archetype, savedCareers, toggleSavedCareer, profile } = useApp();
+  const { getCareerById } = useCareers();
   const [phase, setPhase] = useState<"archetype" | "reveal" | "cards" | "walkthrough">("archetype");
   const [cardIndex, setCardIndex] = useState(0);
   const [walkthroughSeen] = useState(() => localStorage.getItem("sb_walkthrough_seen") === "true");
