@@ -497,6 +497,7 @@ function ScrapeSourcesManager() {
             <Input label="URL" value={newSource.url} onChange={(v) => setNewSource({ ...newSource, url: v })} />
             <Select label="Strategy" value={newSource.scrape_strategy} options={["scrape", "crawl"]} onChange={(v) => setNewSource({ ...newSource, scrape_strategy: v })} />
             <Select label="Default Type" value={newSource.default_type} options={["internship","competition","program","volunteering","scholarship","workshop","mixed"]} onChange={(v) => setNewSource({ ...newSource, default_type: v })} />
+            <Input label="Notes" value={newSource.notes} onChange={(v) => setNewSource({ ...newSource, notes: v })} />
           </div>
           <div className="flex gap-2">
             <button onClick={addSource} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Add</button>
