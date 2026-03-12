@@ -35,10 +35,13 @@ const EXTRACTION_SCHEMA = {
           max_grade: { type: "number", nullable: true },
           scholarship_amount: { type: "string", nullable: true },
           scholarship_coverage: { type: "string", enum: ["full", "partial", "varies"], nullable: true },
+          certificate_awarded: { type: "boolean" },
+          certificate_name: { type: "string", nullable: true },
+          platform: { type: "string", nullable: true },
           career_family_ids: {
             type: "array",
             items: { type: "string" },
-            description: "Career families: technology · design · science · business · engineering · health · law · media · education · environment · finance · arts · social-work · architecture · sports · agriculture · hospitality. Empty [] if open to all.",
+            description: "Which career families suit this? Use only these values: technology, design, science, business, engineering, health, law, media, education, environment, finance, arts, social-work, architecture, sports, agriculture, hospitality. Use empty array if open to all.",
           },
         },
         required: ["title", "organisation", "type", "description", "application_url"],
@@ -47,8 +50,11 @@ const EXTRACTION_SCHEMA = {
   },
 };
 
-const SYSTEM_PROMPT =
-  "Extract all youth opportunity listings from this page. Each listing should be a separate object. Only extract real specific opportunities — not navigation, categories, or site sections. For deadlines, only use ISO date format YYYY-MM-DD or null.";
+const SCRAPE_PROMPT =
+  "Extract opportunity details from this page. If multiple opportunities are listed, return all of them as separate objects in the opportunities array.";
+
+const CRAWL_PROMPT =
+  "Extract all youth opportunity listings from this page as separate objects. Only extract real specific opportunities, not navigation links or category headings.";
 
 const VALID_TYPES = new Set(["internship", "competition", "program", "volunteering", "scholarship", "workshop"]);
 
@@ -74,7 +80,7 @@ async function scrapeUrl(firecrawlKey: string, url: string): Promise<any[]> {
       timeout: 45000,
       extract: {
         schema: EXTRACTION_SCHEMA,
-        systemPrompt: SYSTEM_PROMPT,
+        systemPrompt: SCRAPE_PROMPT,
       },
     }),
   });
@@ -82,17 +88,53 @@ async function scrapeUrl(firecrawlKey: string, url: string): Promise<any[]> {
   const data = await resp.json();
   if (!resp.ok) {
     console.error(`Firecrawl scrape error for ${url}:`, JSON.stringify(data).slice(0, 300));
-    return [];
+    throw new Error(`Firecrawl scrape failed: ${resp.status}`);
   }
 
   return data?.data?.extract?.opportunities || [];
 }
 
+async function crawlUrl(firecrawlKey: string, url: string): Promise<any[]> {
+  const resp = await fetch("https://api.firecrawl.dev/v1/crawl", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${firecrawlKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url,
+      limit: 20,
+      scrapeOptions: {
+        formats: ["extract"],
+        extract: {
+          schema: EXTRACTION_SCHEMA,
+          systemPrompt: CRAWL_PROMPT,
+        },
+      },
+    }),
+  });
+
+  const data = await resp.json();
+  if (!resp.ok) {
+    console.error(`Firecrawl crawl error for ${url}:`, JSON.stringify(data).slice(0, 300));
+    throw new Error(`Firecrawl crawl failed: ${resp.status}`);
+  }
+
+  // Crawl returns pages with extract data; aggregate all opportunities
+  const allOpps: any[] = [];
+  const pages = data?.data || [];
+  for (const page of pages) {
+    const opps = page?.extract?.opportunities || [];
+    allOpps.push(...opps);
+  }
+  return allOpps;
+}
+
 /**
  * Modes:
- * 1. POST { source_id: "uuid" } — scrape a single source (used by client loop & cron)
- * 2. POST { mode: "list" }      — return list of active source IDs (used by client to drive the loop)
- * 3. POST {} or no body         — legacy: scrape ALL sources sequentially (kept for cron fallback)
+ * 1. POST { source_id: "uuid" } — scrape a single source
+ * 2. POST { mode: "list" }      — return list of active source IDs
+ * 3. POST {} or no body         — scrape ALL sources sequentially
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -141,13 +183,34 @@ Deno.serve(async (req) => {
         });
       }
 
-      console.log(`Processing source: ${source.name}`);
+      console.log(`Processing source: ${source.name} (strategy: ${source.scrape_strategy})`);
 
       // Get existing URLs for dedup
       const { data: existing } = await supabase.from("admin_opportunities").select("application_url");
       const existingUrls = new Set((existing || []).map((e: any) => e.application_url));
 
-      const opportunities = await scrapeUrl(firecrawlKey, source.url);
+      let opportunities: any[];
+      try {
+        if (source.scrape_strategy === "crawl") {
+          opportunities = await crawlUrl(firecrawlKey, source.url);
+        } else {
+          opportunities = await scrapeUrl(firecrawlKey, source.url);
+        }
+      } catch (err: any) {
+        console.error(`Firecrawl failed for ${source.name}:`, err.message);
+        // Increment consecutive_failures
+        await supabase
+          .from("opportunity_sources")
+          .update({
+            consecutive_failures: (source.consecutive_failures || 0) + 1,
+          })
+          .eq("id", source.id);
+        return new Response(
+          JSON.stringify({ success: false, source: source.name, error: err.message, new_listings: 0 }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       let newCount = 0;
 
       for (const opp of opportunities) {
@@ -188,10 +251,14 @@ Deno.serve(async (req) => {
         newCount++;
       }
 
-      // Update source stats
+      // Update source stats — reset consecutive_failures on success
       await supabase
         .from("opportunity_sources")
-        .update({ last_scraped_at: new Date().toISOString(), last_scraped_count: newCount })
+        .update({
+          last_scraped_at: new Date().toISOString(),
+          last_scraped_count: newCount,
+          consecutive_failures: 0,
+        })
         .eq("id", source.id);
 
       console.log(`${source.name}: ${newCount} new opportunities`);
@@ -202,7 +269,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Fallback mode: scrape ALL (used by cron — processes sources one by one within time limit)
+    // Fallback mode: scrape ALL (used by cron)
     const { data: sources, error: srcErr } = await supabase
       .from("opportunity_sources")
       .select("id")
@@ -215,7 +282,6 @@ Deno.serve(async (req) => {
     const startTime = Date.now();
 
     for (const s of (sources || [])) {
-      // Stop if we're approaching the 50s edge function timeout
       if (Date.now() - startTime > 45000) {
         console.log(`Stopping early: timeout approaching after ${processed} sources`);
         break;
@@ -231,10 +297,15 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ source_id: s.id }),
         });
         const result = await resp.json();
-        totalNew += result?.new_listings || 0;
+        if (!result.success) {
+          failed.push(result.source || s.id);
+        } else {
+          totalNew += result?.new_listings || 0;
+        }
         processed++;
       } catch (e: any) {
         failed.push(s.id);
+        processed++;
       }
     }
 

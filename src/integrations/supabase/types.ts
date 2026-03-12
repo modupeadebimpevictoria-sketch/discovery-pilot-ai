@@ -378,6 +378,7 @@ export type Database = {
       }
       opportunity_sources: {
         Row: {
+          consecutive_failures: number | null
           created_at: string
           default_type: string
           id: string
@@ -385,10 +386,12 @@ export type Database = {
           last_scraped_at: string | null
           last_scraped_count: number | null
           name: string
+          notes: string | null
           scrape_strategy: string
           url: string
         }
         Insert: {
+          consecutive_failures?: number | null
           created_at?: string
           default_type?: string
           id?: string
@@ -396,10 +399,12 @@ export type Database = {
           last_scraped_at?: string | null
           last_scraped_count?: number | null
           name: string
+          notes?: string | null
           scrape_strategy?: string
           url: string
         }
         Update: {
+          consecutive_failures?: number | null
           created_at?: string
           default_type?: string
           id?: string
@@ -407,6 +412,7 @@ export type Database = {
           last_scraped_at?: string | null
           last_scraped_count?: number | null
           name?: string
+          notes?: string | null
           scrape_strategy?: string
           url?: string
         }
