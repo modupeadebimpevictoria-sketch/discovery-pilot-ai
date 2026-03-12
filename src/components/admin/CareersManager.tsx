@@ -153,7 +153,6 @@ export default function CareersManager() {
             const id = await upsertCareer(d);
             if (id) {
               if (!d.id) {
-                // New career — switch to edit mode for it
                 setEditing({ ...d, id });
               } else {
                 setEditing(null);
@@ -161,6 +160,10 @@ export default function CareersManager() {
             }
           }}
           onCancel={() => { setEditing(null); setScrollToField(null); }}
+          onSyncComplete={(updatedData) => {
+            setEditing(updatedData);
+            fetchAll();
+          }}
         />
       )}
 
