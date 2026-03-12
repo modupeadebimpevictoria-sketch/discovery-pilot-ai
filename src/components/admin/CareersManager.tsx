@@ -52,7 +52,91 @@ export default function CareersManager() {
   const [scrollToField, setScrollToField] = useState<string | null>(null);
   const [syncingOnet, setSyncingOnet] = useState(false);
   const [syncingProspects, setSyncingProspects] = useState(false);
-  const [syncProgress, setSyncProgress] = useState("");
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedFromHardcoded = async () => {
+    if (!confirm(`This will insert ~${careerListings.length} careers from hardcoded data. Existing careers with matching titles will be skipped. Continue?`)) return;
+    setSeeding(true);
+    setSyncProgress("Seeding careers from hardcoded data...");
+
+    // Build a map of detailed career data by id
+    const detailMap = new Map(detailedCareers.map((c) => [c.id, c]));
+
+    // Map category to family_id
+    const categoryToFamilyMap: Record<string, string> = {
+      Technology: "technology",
+      Healthcare: "healthcare-medicine",
+      Business: "business-entrepreneurship",
+      "Creative Arts": "creative-design",
+      Engineering: "engineering-architecture",
+      Science: "science-research",
+      Sports: "sport-fitness",
+      Media: "media-content",
+      Environment: "environment-sustainability",
+      Government: "government-public-service",
+    };
+
+    // Get existing career titles to skip duplicates
+    const { data: existing } = await supabase.from("careers" as any).select("title");
+    const existingTitles = new Set((existing || []).map((c: any) => c.title.toLowerCase()));
+
+    // Get family emojis
+    const familyEmojis = new Map(careerFamilies.map((f) => [f.id, f.emoji]));
+
+    let inserted = 0;
+    let skipped = 0;
+    const batchSize = 50;
+
+    // Build rows
+    const rows = careerListings
+      .filter((l) => !existingTitles.has(l.title.toLowerCase()))
+      .map((listing) => {
+        const detail = detailMap.get(listing.id);
+        const emoji = detail?.emoji || familyEmojis.get(listing.familyId) || "💼";
+        const isEmerging = listing.growthTag?.includes("Emerging") || false;
+
+        const row: any = {
+          title: listing.title,
+          family_id: listing.familyId,
+          description: listing.description,
+          emoji,
+          salary_range: listing.salaryRange,
+          growth_tag: listing.growthTag || null,
+          search_terms: listing.searchTerms,
+          is_emerging: isEmerging,
+          is_active: true,
+        };
+
+        // Enrich from detailed data if available
+        if (detail) {
+          row.recommended_subjects = detail.recommendedSubjects;
+          row.description_full = detail.description;
+          row.day_in_the_life = detail.dailyLife;
+        }
+
+        return row;
+      });
+
+    skipped = careerListings.length - rows.length;
+
+    // Insert in batches
+    for (let i = 0; i < rows.length; i += batchSize) {
+      const batch = rows.slice(i, i + batchSize);
+      setSyncProgress(`Inserting careers ${i + 1}–${Math.min(i + batchSize, rows.length)} of ${rows.length}...`);
+      const { error } = await supabase.from("careers" as any).insert(batch);
+      if (error) {
+        console.error("Batch insert error:", error.message);
+        toast.error(`Batch failed at row ${i}: ${error.message}`);
+      } else {
+        inserted += batch.length;
+      }
+    }
+
+    setSyncProgress(`Done: ${inserted} inserted, ${skipped} skipped (already exist)`);
+    toast.success(`Seeded ${inserted} careers into the database`);
+    fetchAll();
+    setSeeding(false);
+  };
 
   const handleBulkSyncOnet = async () => {
     setSyncingOnet(true);
