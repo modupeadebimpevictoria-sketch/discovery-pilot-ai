@@ -333,6 +333,49 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
   const [riasecOverride, setRiasecOverride] = useState<{ primary: boolean; secondary: boolean }>({ primary: false, secondary: false });
   const [newSubject, setNewSubject] = useState("");
   const [newWorkValue, setNewWorkValue] = useState("");
+  const [syncingOnetInline, setSyncingOnetInline] = useState(false);
+  const [syncingProspectsInline, setSyncingProspectsInline] = useState(false);
+
+  const handleSyncOnetInline = async () => {
+    if (!form.id) { toast.error("Save the career first before syncing"); return; }
+    setSyncingOnetInline(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("enrich-careers-onet", { body: { career_id: form.id } });
+      if (error) throw error;
+      if (result.failed > 0) throw new Error("Enrichment failed — check enrichment issues tab");
+      toast.success("O*NET data synced ✓");
+      // Reload career data
+      const { data: updated } = await supabase.from("careers" as any).select("*").eq("id", form.id).single();
+      if (updated) {
+        setForm(updated);
+        onSyncComplete?.(updated as any);
+      }
+    } catch (err: any) {
+      toast.error(`O*NET sync failed: ${err.message}`);
+    } finally {
+      setSyncingOnetInline(false);
+    }
+  };
+
+  const handleSyncProspectsInline = async () => {
+    if (!form.id) { toast.error("Save the career first before syncing"); return; }
+    setSyncingProspectsInline(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("enrich-careers-prospects", { body: { career_id: form.id } });
+      if (error) throw error;
+      if (result.failed > 0) throw new Error("Enrichment failed — check enrichment issues tab");
+      toast.success("Prospects data synced ✓");
+      const { data: updated } = await supabase.from("careers" as any).select("*").eq("id", form.id).single();
+      if (updated) {
+        setForm(updated);
+        onSyncComplete?.(updated as any);
+      }
+    } catch (err: any) {
+      toast.error(`Prospects sync failed: ${err.message}`);
+    } finally {
+      setSyncingProspectsInline(false);
+    }
+  };
 
   const sectionRefs: Record<string, React.RefObject<HTMLDivElement>> = {
     identity: useRef<HTMLDivElement>(null),
