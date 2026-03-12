@@ -138,6 +138,13 @@ export default function CareersManager() {
         </button>
       </div>
 
+      {syncProgress && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+          {(syncingOnet || syncingProspects) && <Loader2 size={14} className="animate-spin" />}
+          {syncProgress}
+        </div>
+      )}
+
       {editing && (
         <CareerForm
           data={editing}
