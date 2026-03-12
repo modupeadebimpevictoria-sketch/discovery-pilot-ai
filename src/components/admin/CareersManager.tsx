@@ -44,10 +44,47 @@ function formatSalaryLabel(min: number, max: number, symbol: string): string {
 }
 
 export default function CareersManager() {
-  const { careers, issues, loading, upsertCareer, softDeleteCareer, resolveIssue, updateIssueNotes } = useAdminCareers();
+  const { careers, issues, loading, fetchAll, upsertCareer, softDeleteCareer, resolveIssue, updateIssueNotes } = useAdminCareers();
   const [tab, setTab] = useState<"careers" | "issues">("careers");
   const [editing, setEditing] = useState<Partial<DbCareer> | null>(null);
   const [scrollToField, setScrollToField] = useState<string | null>(null);
+  const [syncingOnet, setSyncingOnet] = useState(false);
+  const [syncingProspects, setSyncingProspects] = useState(false);
+  const [syncProgress, setSyncProgress] = useState("");
+
+  const handleBulkSyncOnet = async () => {
+    setSyncingOnet(true);
+    setSyncProgress("Starting O*NET sync...");
+    try {
+      const { data, error } = await supabase.functions.invoke("enrich-careers-onet", { body: {} });
+      if (error) throw error;
+      setSyncProgress(`Done: ${data.succeeded}/${data.total} enriched, ${data.failed} failed`);
+      toast.success(`O*NET sync complete: ${data.succeeded} careers enriched`);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`O*NET sync failed: ${err.message}`);
+      setSyncProgress("");
+    } finally {
+      setSyncingOnet(false);
+    }
+  };
+
+  const handleBulkSyncProspects = async () => {
+    setSyncingProspects(true);
+    setSyncProgress("Starting Prospects sync...");
+    try {
+      const { data, error } = await supabase.functions.invoke("enrich-careers-prospects", { body: {} });
+      if (error) throw error;
+      setSyncProgress(`Done: ${data.succeeded}/${data.total} enriched, ${data.failed} failed`);
+      toast.success(`Prospects sync complete: ${data.succeeded} careers enriched`);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`Prospects sync failed: ${err.message}`);
+      setSyncProgress("");
+    } finally {
+      setSyncingProspects(false);
+    }
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-muted-foreground" /></div>;
@@ -62,7 +99,21 @@ export default function CareersManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-foreground">Careers Manager</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={handleBulkSyncOnet}
+            disabled={syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={syncingOnet ? "animate-spin" : ""} /> Sync from O*NET
+          </button>
+          <button
+            onClick={handleBulkSyncProspects}
+            disabled={syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={syncingProspects ? "animate-spin" : ""} /> Sync from Prospects
+          </button>
           <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
@@ -87,6 +138,13 @@ export default function CareersManager() {
         </button>
       </div>
 
+      {syncProgress && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
+          {(syncingOnet || syncingProspects) && <Loader2 size={14} className="animate-spin" />}
+          {syncProgress}
+        </div>
+      )}
+
       {editing && (
         <CareerForm
           data={editing}
@@ -95,7 +153,6 @@ export default function CareersManager() {
             const id = await upsertCareer(d);
             if (id) {
               if (!d.id) {
-                // New career — switch to edit mode for it
                 setEditing({ ...d, id });
               } else {
                 setEditing(null);
@@ -103,6 +160,10 @@ export default function CareersManager() {
             }
           }}
           onCancel={() => { setEditing(null); setScrollToField(null); }}
+          onSyncComplete={(updatedData) => {
+            setEditing(updatedData);
+            fetchAll();
+          }}
         />
       )}
 
@@ -254,11 +315,12 @@ function IssuesTable({ issues, onResolve, onUpdateNotes }: {
 // ═══════════════════════════
 // CAREER FORM
 // ═══════════════════════════
-function CareerForm({ data, scrollToField, onSave, onCancel }: {
+function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
   data: Partial<DbCareer>;
   scrollToField: string | null;
   onSave: (d: Partial<DbCareer>) => void;
   onCancel: () => void;
+  onSyncComplete?: (updatedData: Partial<DbCareer>) => void;
 }) {
   const [form, setForm] = useState<any>({
     ...data,
@@ -271,6 +333,49 @@ function CareerForm({ data, scrollToField, onSave, onCancel }: {
   const [riasecOverride, setRiasecOverride] = useState<{ primary: boolean; secondary: boolean }>({ primary: false, secondary: false });
   const [newSubject, setNewSubject] = useState("");
   const [newWorkValue, setNewWorkValue] = useState("");
+  const [syncingOnetInline, setSyncingOnetInline] = useState(false);
+  const [syncingProspectsInline, setSyncingProspectsInline] = useState(false);
+
+  const handleSyncOnetInline = async () => {
+    if (!form.id) { toast.error("Save the career first before syncing"); return; }
+    setSyncingOnetInline(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("enrich-careers-onet", { body: { career_id: form.id } });
+      if (error) throw error;
+      if (result.failed > 0) throw new Error("Enrichment failed — check enrichment issues tab");
+      toast.success("O*NET data synced ✓");
+      // Reload career data
+      const { data: updated } = await supabase.from("careers" as any).select("*").eq("id", form.id).single();
+      if (updated) {
+        setForm(updated);
+        onSyncComplete?.(updated as any);
+      }
+    } catch (err: any) {
+      toast.error(`O*NET sync failed: ${err.message}`);
+    } finally {
+      setSyncingOnetInline(false);
+    }
+  };
+
+  const handleSyncProspectsInline = async () => {
+    if (!form.id) { toast.error("Save the career first before syncing"); return; }
+    setSyncingProspectsInline(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("enrich-careers-prospects", { body: { career_id: form.id } });
+      if (error) throw error;
+      if (result.failed > 0) throw new Error("Enrichment failed — check enrichment issues tab");
+      toast.success("Prospects data synced ✓");
+      const { data: updated } = await supabase.from("careers" as any).select("*").eq("id", form.id).single();
+      if (updated) {
+        setForm(updated);
+        onSyncComplete?.(updated as any);
+      }
+    } catch (err: any) {
+      toast.error(`Prospects sync failed: ${err.message}`);
+    } finally {
+      setSyncingProspectsInline(false);
+    }
+  };
 
   const sectionRefs: Record<string, React.RefObject<HTMLDivElement>> = {
     identity: useRef<HTMLDivElement>(null),
@@ -400,8 +505,13 @@ function CareerForm({ data, scrollToField, onSave, onCancel }: {
               <FormInput label="O*NET code" value={form.onet_code || ""} onChange={(v) => set("onet_code", v)} placeholder="e.g. 17-1011.00" />
             </div>
             {form.onet_code && (
-              <button className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1" title="Sync from O*NET (edge function needed)">
-                Sync from O*NET <ChevronRight size={10} />
+              <button
+                onClick={handleSyncOnetInline}
+                disabled={syncingOnetInline}
+                className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
+              >
+                {syncingOnetInline ? <Loader2 size={10} className="animate-spin" /> : <ChevronRight size={10} />}
+                {syncingOnetInline ? "Syncing..." : "Sync from O*NET →"}
               </button>
             )}
           </div>
@@ -410,8 +520,13 @@ function CareerForm({ data, scrollToField, onSave, onCancel }: {
               <FormInput label="Prospects slug" value={form.prospects_slug || ""} onChange={(v) => set("prospects_slug", v)} placeholder="e.g. architect" />
             </div>
             {form.prospects_slug && (
-              <button className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1" title="Sync from Prospects (edge function needed)">
-                Sync from Prospects <ChevronRight size={10} />
+              <button
+                onClick={handleSyncProspectsInline}
+                disabled={syncingProspectsInline}
+                className="px-2 py-1.5 rounded text-[10px] font-semibold bg-accent/20 text-accent-foreground hover:bg-accent/30 whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
+              >
+                {syncingProspectsInline ? <Loader2 size={10} className="animate-spin" /> : <ChevronRight size={10} />}
+                {syncingProspectsInline ? "Syncing..." : "Sync from Prospects →"}
               </button>
             )}
           </div>
