@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.generate-weekly-quests]
 verify_jwt = false
+
+[functions.enrich-careers-onet]
+verify_jwt = false
+
+[functions.enrich-careers-prospects]
+verify_jwt = false
+
+[functions.update-career-salaries]
+verify_jwt = false

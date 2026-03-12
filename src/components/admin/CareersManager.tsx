@@ -453,7 +453,7 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
     set("work_values", vals);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title?.trim()) { toast.error("Title is required"); return; }
     if (!form.family_id) { toast.error("Career family is required"); return; }
     const payload = {
@@ -462,6 +462,26 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
       riasec_secondary: displaySecondary,
     };
     onSave(payload);
+
+    // Also save salary via edge function if career has an id and salary data
+    if (form.id && form.salary_context && Object.keys(form.salary_context).length > 0) {
+      // Build salary payload with only regions that have min or max set
+      const salaryPayload: Record<string, any> = {};
+      for (const [code, data] of Object.entries(form.salary_context as Record<string, any>)) {
+        if (data.min || data.max) {
+          salaryPayload[code] = data;
+        }
+      }
+      if (Object.keys(salaryPayload).length > 0) {
+        try {
+          await supabase.functions.invoke("update-career-salaries", {
+            body: { career_id: form.id, salary: salaryPayload },
+          });
+        } catch (err: any) {
+          console.error("Salary save via edge function failed:", err.message);
+        }
+      }
+    }
   };
 
   return (
