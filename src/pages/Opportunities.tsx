@@ -289,6 +289,7 @@ export default function Opportunities() {
               careerId={careerId}
               applied={appliedIds.has(opp.id)}
               saved={savedIds.has(opp.id)}
+              tier={getCareerTier(opp)}
               onApply={() => handleApply(opp.id)}
               onToggleSave={() => toggleSave(opp.id)}
             />
