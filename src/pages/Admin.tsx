@@ -515,6 +515,7 @@ function ScrapeSourcesManager() {
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Strategy</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Last Scraped</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Count</th>
+              <th className="text-left px-4 py-2 text-muted-foreground font-medium">Failures</th>
               <th className="text-left px-4 py-2 text-muted-foreground font-medium">Active</th>
               <th className="px-4 py-2"></th>
             </tr>
@@ -525,6 +526,7 @@ function ScrapeSourcesManager() {
                 <td className="px-4 py-2.5">
                   <p className="font-medium text-foreground">{s.name}</p>
                   <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline truncate block max-w-[200px]">{s.url}</a>
+                  {s.notes && <p className="text-[10px] text-muted-foreground mt-0.5">{s.notes}</p>}
                 </td>
                 <td className="px-4 py-2.5 capitalize text-muted-foreground">{s.default_type}</td>
                 <td className="px-4 py-2.5 text-muted-foreground">{s.scrape_strategy}</td>
@@ -532,6 +534,11 @@ function ScrapeSourcesManager() {
                   {s.last_scraped_at ? new Date(s.last_scraped_at).toLocaleDateString() : "Never"}
                 </td>
                 <td className="px-4 py-2.5 text-muted-foreground">{s.last_scraped_count || 0}</td>
+                <td className="px-4 py-2.5">
+                  <span className={`text-xs font-bold ${(s.consecutive_failures || 0) >= 3 ? "text-destructive" : "text-muted-foreground"}`}>
+                    {s.consecutive_failures || 0}
+                  </span>
+                </td>
                 <td className="px-4 py-2.5">
                   <button onClick={() => toggleActive(s.id, s.is_active)}>
                     {s.is_active ? <ToggleRight size={20} className="text-primary" /> : <ToggleLeft size={20} className="text-muted-foreground" />}
@@ -545,7 +552,7 @@ function ScrapeSourcesManager() {
               </tr>
             ))}
             {sources.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No sources configured</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">No sources configured</td></tr>
             )}
           </tbody>
         </table>
