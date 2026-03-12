@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Lock } from "lucide-react";
-import type { Career } from "@/data/careers";
+import type { Career } from "@/contexts/CareersContext";
 
 interface ActivePathwayCardProps {
   career: Career;
