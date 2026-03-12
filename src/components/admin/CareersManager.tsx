@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { useAdminCareers, type DbCareer, type EnrichmentIssue } from "@/hooks/useAdminCareers";
 import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight, RefreshCw,
-  Loader2, Check, X, ChevronRight, GripVertical,
+  Loader2, Check, X, ChevronRight, GripVertical, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { careerListings, careerFamilies } from "@/data/careerFamilies";
+import { careers as detailedCareers } from "@/data/careers";
 
 const ALL_CAREER_FAMILIES = [
   "creative-design", "media-content", "entertainment-performance", "technology",
