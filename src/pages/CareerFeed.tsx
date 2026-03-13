@@ -9,6 +9,7 @@ import { ArrowRight, Play, ExternalLink } from "lucide-react";
 export default function CareerFeed() {
   const navigate = useNavigate();
   const { matchedCareers, rejectedCareers, profile, selectedCareerPath } = useApp();
+  const { getCareerById } = useCareers();
 
   const activeCareers = matchedCareers.filter(
     (m) => !rejectedCareers.includes(m.careerId)
