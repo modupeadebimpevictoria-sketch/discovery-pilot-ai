@@ -1,5 +1,5 @@
-import { getCareerById, Career } from "@/data/careers";
-// NOTE: This file still uses the hardcoded careers data for feed generation.
+import type { Career } from "@/contexts/CareersContext";
+// Feed generation — accepts a career lookup function so it can work with DB data.
 // It will be called with career IDs that may be slugs from the DB.
 
 export type FeedContentType = "deep-dive" | "interview" | "field-update" | "history" | "spotlight" | "mission-nudge";
@@ -145,13 +145,14 @@ function generateMissionNudge(career: Career, studentName: string): Omit<FeedPos
 
 export function generateFeedForCareers(
   matchedCareers: { careerId: string; score: number }[],
-  studentName: string
+  studentName: string,
+  careerLookup: (id: string) => Career | undefined
 ): FeedPost[] {
   const posts: FeedPost[] = [];
   let idCounter = 0;
 
   matchedCareers.forEach((match, careerIdx) => {
-    const career = getCareerById(match.careerId);
+    const career = careerLookup(match.careerId);
     if (!career) return;
 
     // Generate all 6 content types for each career

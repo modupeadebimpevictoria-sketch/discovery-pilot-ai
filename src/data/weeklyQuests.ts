@@ -59,7 +59,7 @@ const handcraftedQuests: WeeklyQuest[] = [
 ];
 
 // Career-specific quest generators — each template produces quests unique to the career's actual work
-import { careerListings, careerFamilies } from "@/data/careerFamilies";
+import type { CareerListing } from "@/contexts/CareersContext";
 
 interface QuestTemplate {
   titleFn: (career: string) => string;
@@ -251,16 +251,11 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
   ],
 };
 
-function getCareerFamilyId(careerId: string): string | undefined {
-  const listing = careerListings.find((l) => l.id === careerId);
-  return listing?.familyId;
-}
-
-function generateFamilyQuests(careerId: string): WeeklyQuest[] {
-  const familyId = getCareerFamilyId(careerId);
+function generateFamilyQuests(careerId: string, listings: CareerListing[]): WeeklyQuest[] {
+  const listing = listings.find((l) => l.id === careerId);
+  const familyId = listing?.familyId;
   if (!familyId || !familyQuestTemplates[familyId]) return [];
 
-  const listing = careerListings.find((l) => l.id === careerId);
   const careerTitle = listing?.title || careerId;
 
   return familyQuestTemplates[familyId].map((t, i) => ({
@@ -279,11 +274,11 @@ function generateFamilyQuests(careerId: string): WeeklyQuest[] {
 // Combine all quests (no more generic quests polluting career-specific feeds)
 export const weeklyQuests: WeeklyQuest[] = [...handcraftedQuests];
 
-export function getQuestsForCareer(careerId: string, weekNumber?: number): WeeklyQuest[] {
+export function getQuestsForCareer(careerId: string, weekNumber?: number, listings?: CareerListing[]): WeeklyQuest[] {
   // Get handcrafted quests for this career
   const careerQuests = handcraftedQuests.filter((q) => q.careerId === careerId);
   // Generate family-based quests (career-specific)
-  const familyQuests = generateFamilyQuests(careerId);
+  const familyQuests = generateFamilyQuests(careerId, listings || []);
   // Combine — handcrafted first, then family quests (NO generics)
   const all = [...careerQuests, ...familyQuests];
 
