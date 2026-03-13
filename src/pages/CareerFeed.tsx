@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
+import { useCareers } from "@/contexts/CareersContext";
 import { generateFeedForCareers, FeedPost } from "@/data/feedContent";
 import { ArrowRight, Play, ExternalLink } from "lucide-react";
 
