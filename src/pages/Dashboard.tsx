@@ -54,8 +54,9 @@ export default function Dashboard() {
 
   // Weekly quest progress for active pathway
   const weekNumber = getCurrentWeekNumber();
-  const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber) : [];
-  const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id) : [];
+  const { careerListings } = useCareers();
+  const weekQuests = activeCareeer ? getQuestsForCareer(activeCareeer.id, weekNumber, careerListings) : [];
+  const allQuestsForCareer = activeCareeer ? getQuestsForCareer(activeCareeer.id, undefined, careerListings) : [];
 
   // Not logged in
   if (!user) {

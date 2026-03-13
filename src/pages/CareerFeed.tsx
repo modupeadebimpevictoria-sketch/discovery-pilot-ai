@@ -18,8 +18,8 @@ export default function CareerFeed() {
   const studentName = profile?.name || "Explorer";
 
   const posts = useMemo(
-    () => generateFeedForCareers(activeCareers, studentName),
-    [activeCareers, studentName]
+    () => generateFeedForCareers(activeCareers, studentName, getCareerById),
+    [activeCareers, studentName, getCareerById]
   );
 
   if (activeCareers.length === 0) {
