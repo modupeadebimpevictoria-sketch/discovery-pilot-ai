@@ -59,7 +59,7 @@ const handcraftedQuests: WeeklyQuest[] = [
 ];
 
 // Career-specific quest generators — each template produces quests unique to the career's actual work
-import { careerListings, careerFamilies } from "@/data/careerFamilies";
+import type { CareerListing } from "@/contexts/CareersContext";
 
 interface QuestTemplate {
   titleFn: (career: string) => string;
