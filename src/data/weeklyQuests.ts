@@ -251,16 +251,11 @@ const familyQuestTemplates: Record<string, QuestTemplate[]> = {
   ],
 };
 
-function getCareerFamilyId(careerId: string): string | undefined {
-  const listing = careerListings.find((l) => l.id === careerId);
-  return listing?.familyId;
-}
-
-function generateFamilyQuests(careerId: string): WeeklyQuest[] {
-  const familyId = getCareerFamilyId(careerId);
+function generateFamilyQuests(careerId: string, listings: CareerListing[]): WeeklyQuest[] {
+  const listing = listings.find((l) => l.id === careerId);
+  const familyId = listing?.familyId;
   if (!familyId || !familyQuestTemplates[familyId]) return [];
 
-  const listing = careerListings.find((l) => l.id === careerId);
   const careerTitle = listing?.title || careerId;
 
   return familyQuestTemplates[familyId].map((t, i) => ({
