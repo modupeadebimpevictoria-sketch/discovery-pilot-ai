@@ -274,11 +274,11 @@ function generateFamilyQuests(careerId: string, listings: CareerListing[]): Week
 // Combine all quests (no more generic quests polluting career-specific feeds)
 export const weeklyQuests: WeeklyQuest[] = [...handcraftedQuests];
 
-export function getQuestsForCareer(careerId: string, weekNumber?: number): WeeklyQuest[] {
+export function getQuestsForCareer(careerId: string, weekNumber?: number, listings?: CareerListing[]): WeeklyQuest[] {
   // Get handcrafted quests for this career
   const careerQuests = handcraftedQuests.filter((q) => q.careerId === careerId);
   // Generate family-based quests (career-specific)
-  const familyQuests = generateFamilyQuests(careerId);
+  const familyQuests = generateFamilyQuests(careerId, listings || []);
   // Combine — handcrafted first, then family quests (NO generics)
   const all = [...careerQuests, ...familyQuests];
 

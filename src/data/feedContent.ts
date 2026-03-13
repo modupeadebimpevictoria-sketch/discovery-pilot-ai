@@ -145,13 +145,14 @@ function generateMissionNudge(career: Career, studentName: string): Omit<FeedPos
 
 export function generateFeedForCareers(
   matchedCareers: { careerId: string; score: number }[],
-  studentName: string
+  studentName: string,
+  careerLookup: (id: string) => Career | undefined
 ): FeedPost[] {
   const posts: FeedPost[] = [];
   let idCounter = 0;
 
   matchedCareers.forEach((match, careerIdx) => {
-    const career = getCareerById(match.careerId);
+    const career = careerLookup(match.careerId);
     if (!career) return;
 
     // Generate all 6 content types for each career
