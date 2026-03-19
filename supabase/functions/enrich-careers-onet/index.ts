@@ -6,7 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const ONET_BASE = "https://services.onetcenter.org/ws/mnm";
+// V2.0 API — no /ws/ prefix
+const ONET_BASE = "https://services.onetcenter.org/mnm";
 
 function formatSalaryLabel(min: number, max: number, symbol: string): string {
   const fmt = (n: number) => {
@@ -103,47 +104,54 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Step 2: Call O*NET endpoints in parallel
-        const [careerData, interestsData, skillsData, workValuesData, wagesData] = await Promise.all([
-          onetFetch(`${ONET_BASE}/careers/${code}`, onetApiKey),
-          onetFetch(`${ONET_BASE}/careers/${code}/interests`, onetApiKey),
-          onetFetch(`${ONET_BASE}/careers/${code}/skills`, onetApiKey),
-          onetFetch(`${ONET_BASE}/careers/${code}/work_values`, onetApiKey),
-          onetFetch(`${ONET_BASE}/careers/${code}/wages`, onetApiKey),
+        // Step 2: Call O*NET v2 endpoints in parallel
+        // v2 uses /career/{code} (singular) for the career report
+        const [careerData, skillsData, personalityData, outlookData] = await Promise.all([
+          onetFetch(`${ONET_BASE}/career/${code}`, onetApiKey),
+          onetFetch(`${ONET_BASE}/career/${code}/skills`, onetApiKey),
+          onetFetch(`${ONET_BASE}/career/${code}/personality`, onetApiKey),
+          onetFetch(`${ONET_BASE}/career/${code}/outlook`, onetApiKey),
         ]);
 
-        // Step 3: Parse responses
-        const outlookCat = careerData?.bright_outlook?.category || "";
-        let growthOutlook = "Below Average";
-        if (outlookCat === "Bright") growthOutlook = "Bright";
-        else if (outlookCat === "Average") growthOutlook = "Average";
+        // Step 3: Parse responses (v2 has flatter structure)
 
+        // Growth outlook from career overview
+        const brightOutlook = careerData?.bright_outlook;
+        let growthOutlook = "Below Average";
+        if (brightOutlook?.category === "Bright" || brightOutlook) growthOutlook = "Bright";
+
+        // Job zone
         const jobZone = careerData?.job_zone?.value || null;
 
+        // RIASEC from personality endpoint (v2)
         const riasecProfile: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
-        const interestElements = interestsData?.element || [];
-        for (const el of interestElements) {
-          const id = el.id as string;
-          if (id in riasecProfile) {
-            riasecProfile[id] = el.score ?? 0;
+        const interests = personalityData?.interests?.element || personalityData?.element || [];
+        for (const el of interests) {
+          const id = (el.id || el.code || "") as string;
+          const letter = id.charAt(0).toUpperCase();
+          if (letter in riasecProfile) {
+            riasecProfile[letter] = el.score ?? el.value ?? 0;
           }
         }
         const sorted = Object.entries(riasecProfile).sort(([, a], [, b]) => b - a);
         const riasecPrimary = sorted[0]?.[0] || null;
         const riasecSecondary = sorted[1]?.[0] || null;
 
+        // Skills - top 8
         const skillElements = (skillsData?.element || [])
-          .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))
+          .sort((a: any, b: any) => (b.score ?? b.value ?? 0) - (a.score ?? a.value ?? 0))
           .slice(0, 8)
-          .map((el: any) => ({ name: el.name || "", importance: el.score ?? 0 }));
+          .map((el: any) => ({ name: el.name || "", importance: el.score ?? el.value ?? 0 }));
 
-        const workValues = (workValuesData?.element || [])
+        // Work values from personality
+        const workValues = (personalityData?.work_values?.element || [])
           .slice(0, 3)
           .map((el: any) => el.name || "");
 
-        const nationalWages = wagesData?.national_wages || {};
-        const annual10th = nationalWages.annual_10th_percentile || 30000;
-        const annual90th = nationalWages.annual_90th_percentile || 80000;
+        // Wages from outlook endpoint (v2 combines outlook + wages)
+        const wages = outlookData?.salary || outlookData?.wages || {};
+        const annual10th = wages?.annual_10th_percentile || wages?.entry || 30000;
+        const annual90th = wages?.annual_90th_percentile || wages?.experienced || 80000;
         const globalSalary = {
           min: annual10th,
           max: annual90th,
@@ -169,7 +177,7 @@ Deno.serve(async (req) => {
             riasec_primary: riasecPrimary,
             riasec_secondary: riasecSecondary,
             skills: skillElements,
-            work_values: workValues,
+            work_values: workValues.length > 0 ? workValues : undefined,
             growth_outlook: growthOutlook,
             job_zone: jobZone,
             salary_context: { ...existingSalary, GLOBAL: globalSalary },
@@ -186,7 +194,7 @@ Deno.serve(async (req) => {
         await supabase.from("career_enrichment_log").insert({
           career_id: career.id,
           career_title: career.title,
-          issue: "no_onet_match",
+          issue: "enrichment_failed",
           notes: err.message?.slice(0, 200),
         });
       }
