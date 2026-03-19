@@ -8,10 +8,6 @@ const corsHeaders = {
 
 const ONET_BASE = "https://services.onetcenter.org/ws/mnm";
 
-function basicAuth(username: string, password: string): string {
-  return "Basic " + btoa(`${username}:${password}`);
-}
-
 function formatSalaryLabel(min: number, max: number, symbol: string): string {
   const fmt = (n: number) => {
     if (n >= 1_000_000) return `${Math.round(n / 1_000_000)}M`;
@@ -21,12 +17,10 @@ function formatSalaryLabel(min: number, max: number, symbol: string): string {
   return `${symbol}${fmt(min)}–${symbol}${fmt(max)}/yr`;
 }
 
-async function onetFetch(url: string, authHeader: string, username: string) {
-  const separator = url.includes("?") ? "&" : "?";
-  const fullUrl = `${url}${separator}client=${username}`;
-  const resp = await fetch(fullUrl, {
+async function onetFetch(url: string, apiKey: string) {
+  const resp = await fetch(url, {
     headers: {
-      Authorization: authHeader,
+      "X-API-Key": apiKey,
       Accept: "application/json",
     },
   });
@@ -37,9 +31,9 @@ async function onetFetch(url: string, authHeader: string, username: string) {
   return resp.json();
 }
 
-async function searchOnetCode(title: string, authHeader: string, username: string): Promise<string | null> {
+async function searchOnetCode(title: string, apiKey: string): Promise<string | null> {
   const url = `${ONET_BASE}/search?keyword=${encodeURIComponent(title)}`;
-  const data = await onetFetch(url, authHeader, username);
+  const data = await onetFetch(url, apiKey);
   const results = data?.career || [];
   if (results.length === 0) return null;
   const top = results[0];
@@ -52,16 +46,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const onetUsername = Deno.env.get("ONET_USERNAME");
-  const onetPassword = Deno.env.get("ONET_PASSWORD");
-  if (!onetUsername || !onetPassword) {
-    return new Response(JSON.stringify({ error: "ONET credentials not configured" }), {
+  const onetApiKey = Deno.env.get("ONET_API_KEY");
+  if (!onetApiKey) {
+    return new Response(JSON.stringify({ error: "ONET_API_KEY not configured" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
-  const authHeader = basicAuth(onetUsername, onetPassword);
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, serviceKey);
@@ -99,7 +91,7 @@ Deno.serve(async (req) => {
         // Step 1: Get onet_code
         let code = career.onet_code;
         if (!code) {
-          code = await searchOnetCode(career.title, authHeader, onetUsername);
+          code = await searchOnetCode(career.title, onetApiKey);
           if (!code) {
             await supabase.from("career_enrichment_log").insert({
               career_id: career.id,
@@ -113,25 +105,21 @@ Deno.serve(async (req) => {
 
         // Step 2: Call O*NET endpoints in parallel
         const [careerData, interestsData, skillsData, workValuesData, wagesData] = await Promise.all([
-          onetFetch(`${ONET_BASE}/careers/${code}`, authHeader, onetUsername),
-          onetFetch(`${ONET_BASE}/careers/${code}/interests`, authHeader, onetUsername),
-          onetFetch(`${ONET_BASE}/careers/${code}/skills`, authHeader, onetUsername),
-          onetFetch(`${ONET_BASE}/careers/${code}/work_values`, authHeader, onetUsername),
-          onetFetch(`${ONET_BASE}/careers/${code}/wages`, authHeader, onetUsername),
+          onetFetch(`${ONET_BASE}/careers/${code}`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/interests`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/skills`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/work_values`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/wages`, onetApiKey),
         ]);
 
         // Step 3: Parse responses
-
-        // Growth outlook
         const outlookCat = careerData?.bright_outlook?.category || "";
         let growthOutlook = "Below Average";
         if (outlookCat === "Bright") growthOutlook = "Bright";
         else if (outlookCat === "Average") growthOutlook = "Average";
 
-        // Job zone
         const jobZone = careerData?.job_zone?.value || null;
 
-        // RIASEC
         const riasecProfile: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
         const interestElements = interestsData?.element || [];
         for (const el of interestElements) {
@@ -144,18 +132,15 @@ Deno.serve(async (req) => {
         const riasecPrimary = sorted[0]?.[0] || null;
         const riasecSecondary = sorted[1]?.[0] || null;
 
-        // Skills - top 8
         const skillElements = (skillsData?.element || [])
           .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))
           .slice(0, 8)
           .map((el: any) => ({ name: el.name || "", importance: el.score ?? 0 }));
 
-        // Work values - top 3
         const workValues = (workValuesData?.element || [])
           .slice(0, 3)
           .map((el: any) => el.name || "");
 
-        // Wages
         const nationalWages = wagesData?.national_wages || {};
         const annual10th = nationalWages.annual_10th_percentile || 30000;
         const annual90th = nationalWages.annual_90th_percentile || 80000;
@@ -168,7 +153,6 @@ Deno.serve(async (req) => {
         };
 
         // Step 4: Update career
-        // Get existing salary_context to merge
         const { data: existing } = await supabase
           .from("careers")
           .select("salary_context")
@@ -207,7 +191,6 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Wait 200ms between careers
       if (i < careers.length - 1) {
         await new Promise((r) => setTimeout(r, 200));
       }
