@@ -6,8 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// V2.0 API — no /ws/ prefix
-const ONET_BASE = "https://services.onetcenter.org/mnm";
+// V2.0 API — uses /ws/ prefix and plural "careers"
+const ONET_BASE = "https://services.onetcenter.org/ws/mnm";
 
 function formatSalaryLabel(min: number, max: number, symbol: string): string {
   const fmt = (n: number) => {
