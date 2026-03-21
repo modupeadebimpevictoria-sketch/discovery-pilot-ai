@@ -107,10 +107,10 @@ Deno.serve(async (req) => {
         // Step 2: Call O*NET v2 endpoints in parallel
         // v2 uses /career/{code} (singular) for the career report
         const [careerData, skillsData, personalityData, outlookData] = await Promise.all([
-          onetFetch(`${ONET_BASE}/career/${code}`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/skills`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/personality`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/outlook`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/skills`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/personality`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/outlook`, onetApiKey),
         ]);
 
         // Step 3: Parse responses (v2 has flatter structure)
