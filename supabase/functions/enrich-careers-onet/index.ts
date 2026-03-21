@@ -6,8 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// V2.0 API — no /ws/ prefix
-const ONET_BASE = "https://services.onetcenter.org/mnm";
+// V2.0 API — uses /ws/ prefix and plural "careers"
+const ONET_BASE = "https://services.onetcenter.org/ws/mnm";
 
 function formatSalaryLabel(min: number, max: number, symbol: string): string {
   const fmt = (n: number) => {
@@ -107,10 +107,10 @@ Deno.serve(async (req) => {
         // Step 2: Call O*NET v2 endpoints in parallel
         // v2 uses /career/{code} (singular) for the career report
         const [careerData, skillsData, personalityData, outlookData] = await Promise.all([
-          onetFetch(`${ONET_BASE}/career/${code}`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/skills`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/personality`, onetApiKey),
-          onetFetch(`${ONET_BASE}/career/${code}/outlook`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/skills`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/personality`, onetApiKey),
+          onetFetch(`${ONET_BASE}/careers/${code}/outlook`, onetApiKey),
         ]);
 
         // Step 3: Parse responses (v2 has flatter structure)
