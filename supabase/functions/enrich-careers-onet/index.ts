@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-  console.log(`ONET_API_KEY length: ${onetApiKey.length}, first 4 chars: ${onetApiKey.slice(0, 4)}`);
+  
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
