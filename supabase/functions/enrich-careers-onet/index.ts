@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
             riasec_primary: riasecPrimary,
             riasec_secondary: riasecSecondary,
             skills: skillElements,
-            work_values: workValues.length > 0 ? workValues : undefined,
+            work_values: workStyles.length > 0 ? workStyles : undefined,
             growth_outlook: growthOutlook,
             job_zone: jobZone,
             salary_context: { ...existingSalary, GLOBAL: globalSalary },
