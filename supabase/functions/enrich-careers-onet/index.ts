@@ -113,45 +113,53 @@ Deno.serve(async (req) => {
           onetFetch(`${ONET_BASE}/careers/${code}/job_outlook`, onetApiKey),
         ]);
 
-        // Step 3: Parse responses (v2 has flatter structure)
+        // Step 3: Parse v2 responses
 
-        // Growth outlook from career overview
-        const brightOutlook = careerData?.bright_outlook;
+        // Growth outlook from job_outlook endpoint
+        const outlookCategory = outlookData?.outlook?.category;
         let growthOutlook = "Below Average";
-        if (brightOutlook?.category === "Bright" || brightOutlook) growthOutlook = "Bright";
+        if (outlookCategory === "Bright") growthOutlook = "Bright";
+        else if (outlookCategory === "Average") growthOutlook = "Average";
 
-        // Job zone
+        // Job zone from career overview
         const jobZone = careerData?.job_zone?.value || null;
 
-        // RIASEC from personality endpoint (v2)
+        // RIASEC from personality endpoint — v2 returns top_interest with name like "Realistic"
+        const riasecMap: Record<string, string> = {
+          Realistic: "R", Investigative: "I", Artistic: "A",
+          Social: "S", Enterprising: "E", Conventional: "C",
+        };
         const riasecProfile: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
-        const interests = personalityData?.interests?.element || personalityData?.element || [];
-        for (const el of interests) {
-          const id = (el.id || el.code || "") as string;
-          const letter = id.charAt(0).toUpperCase();
-          if (letter in riasecProfile) {
-            riasecProfile[letter] = el.score ?? el.value ?? 0;
-          }
+        const topInterest = personalityData?.top_interest;
+        if (topInterest) {
+          const letter = riasecMap[topInterest.name] || "";
+          if (letter) riasecProfile[letter] = 100;
         }
         const sorted = Object.entries(riasecProfile).sort(([, a], [, b]) => b - a);
-        const riasecPrimary = sorted[0]?.[0] || null;
-        const riasecSecondary = sorted[1]?.[0] || null;
+        const riasecPrimary = sorted[0]?.[1] > 0 ? sorted[0]?.[0] : topInterest?.name?.charAt(0) || null;
+        const riasecSecondary = sorted[1]?.[1] > 0 ? sorted[1]?.[0] : null;
 
-        // Skills - top 8
-        const skillElements = (skillsData?.element || [])
-          .sort((a: any, b: any) => (b.score ?? b.value ?? 0) - (a.score ?? a.value ?? 0))
+        // Skills - top 8 (v2 returns group[].element[])
+        const allSkills: any[] = [];
+        for (const group of (skillsData?.group || [])) {
+          for (const el of (group.element || [])) {
+            allSkills.push(el);
+          }
+        }
+        const skillElements = allSkills
+          .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))
           .slice(0, 8)
-          .map((el: any) => ({ name: el.name || "", importance: el.score ?? el.value ?? 0 }));
+          .map((el: any) => ({ name: el.name || "", importance: el.score ?? 0 }));
 
         // Work values from personality
-        const workValues = (personalityData?.work_values?.element || [])
+        const workStyles = (personalityData?.work_styles || [])
           .slice(0, 3)
           .map((el: any) => el.name || "");
 
-        // Wages from outlook endpoint (v2 combines outlook + wages)
-        const wages = outlookData?.salary || outlookData?.wages || {};
-        const annual10th = wages?.annual_10th_percentile || wages?.entry || 30000;
-        const annual90th = wages?.annual_90th_percentile || wages?.experienced || 80000;
+        // Wages from job_outlook endpoint
+        const wages = outlookData?.salary || {};
+        const annual10th = wages?.annual_10th_percentile || 30000;
+        const annual90th = wages?.annual_90th_percentile || wages?.annual_median ? (wages.annual_median * 1.5) : 80000;
         const globalSalary = {
           min: annual10th,
           max: annual90th,
