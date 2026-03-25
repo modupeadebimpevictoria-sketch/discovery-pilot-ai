@@ -101,8 +101,8 @@ Deno.serve(async (req) => {
         // Step 1: Get onet_code
         let code = career.onet_code;
         if (!code) {
-          const match = await searchOnetCode(career.title, onetApiKey);
-          if (!match) {
+          code = await searchOnetCode(career.title, onetApiKey);
+          if (!code) {
             await supabase.from("career_enrichment_log").insert({
               career_id: career.id,
               career_title: career.title,
@@ -111,7 +111,6 @@ Deno.serve(async (req) => {
             results.push({ id: career.id, title: career.title, status: "skipped" });
             continue;
           }
-          code = match.code;
         }
 
         // Step 2: Call O*NET v2 endpoints in parallel
