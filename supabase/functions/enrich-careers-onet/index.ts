@@ -147,41 +147,18 @@ Deno.serve(async (req) => {
         const riasecPrimary = sorted[0]?.[1] > 0 ? sorted[0]?.[0] : topInterest?.name?.charAt(0) || null;
         const riasecSecondary = sorted[1]?.[1] > 0 ? sorted[1]?.[0] : null;
 
-        // Skills - parse v2 response (try multiple possible structures)
+        // Skills — v2 returns an array of groups, each with element[] of individual skills
         const allSkills: any[] = [];
-        // Log top-level keys for debugging
-        console.log(`  Skills response keys: ${JSON.stringify(Object.keys(skillsData || {}))}`);
-        
-        // v2 might return: { group: [...] }, { element: [...] }, { skill: [...] }, or flat array
-        if (Array.isArray(skillsData?.group)) {
-          for (const group of skillsData.group) {
-            if (Array.isArray(group.element)) {
-              for (const el of group.element) allSkills.push(el);
-            }
+        const skillGroups = Array.isArray(skillsData) ? skillsData : (skillsData?.group || []);
+        for (const group of skillGroups) {
+          if (Array.isArray(group.element)) {
+            for (const el of group.element) allSkills.push(el);
           }
         }
-        if (allSkills.length === 0 && Array.isArray(skillsData?.element)) {
-          for (const el of skillsData.element) allSkills.push(el);
-        }
-        if (allSkills.length === 0 && Array.isArray(skillsData?.skill)) {
-          for (const el of skillsData.skill) allSkills.push(el);
-        }
-        if (allSkills.length === 0 && Array.isArray(skillsData)) {
-          for (const el of skillsData) allSkills.push(el);
-        }
-        
-        // Log first skill item structure for debugging
-        if (allSkills.length > 0) {
-          console.log(`  First skill item keys: ${JSON.stringify(Object.keys(allSkills[0]))}`);
-          console.log(`  First skill item: ${JSON.stringify(allSkills[0])}`);
-        } else {
-          console.log(`  No skills found. Full response: ${JSON.stringify(skillsData).slice(0, 500)}`);
-        }
-        
+
         const skillElements = allSkills
-          .sort((a: any, b: any) => (b.score?.value ?? b.score ?? b.importance ?? 0) - (a.score?.value ?? a.score ?? a.importance ?? 0))
           .slice(0, 8)
-          .map((el: any) => ({ name: el.name || el.title || "", importance: el.score?.value ?? el.score ?? el.importance ?? 0 }));
+          .map((el: any) => ({ name: el.name || "", importance: 0 }));
 
         // Work values from personality
         const workStyles = (personalityData?.work_styles || [])
