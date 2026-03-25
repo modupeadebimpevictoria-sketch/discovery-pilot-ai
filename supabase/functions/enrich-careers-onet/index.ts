@@ -32,14 +32,16 @@ async function onetFetch(url: string, apiKey: string) {
   return resp.json();
 }
 
-async function searchOnetCode(title: string, apiKey: string): Promise<string | null> {
+async function searchOnetCode(title: string, apiKey: string): Promise<{ code: string; score: number } | null> {
   const url = `${ONET_BASE}/search?keyword=${encodeURIComponent(title)}`;
   const data = await onetFetch(url, apiKey);
   const results = data?.career || [];
   if (results.length === 0) return null;
   const top = results[0];
-  if ((top.score ?? 0) < 80) return null;
-  return top.code || null;
+  const score = top.score ?? 0;
+  console.log(`  Search "${title}" → ${top.code} (score: ${score})`);
+  if (score < 50) return null;
+  return { code: top.code, score };
 }
 
 Deno.serve(async (req) => {
