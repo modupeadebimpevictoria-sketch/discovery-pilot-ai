@@ -38,7 +38,7 @@ async function searchOnetCode(title: string, apiKey: string): Promise<string | n
   const results = data?.career || [];
   if (results.length === 0) return null;
   const top = results[0];
-  if ((top.score ?? 0) < 80) return null;
+  console.log(`  Search "${title}" → ${top.code} (${top.title})`);
   return top.code || null;
 }
 
@@ -65,6 +65,8 @@ Deno.serve(async (req) => {
 
   try {
     let careers: any[] = [];
+    const batchSize = body?.batch_size || 0; // 0 = all
+    const offset = body?.offset || 0;
 
     if (body?.career_id) {
       const { data, error } = await supabase
@@ -75,14 +77,20 @@ Deno.serve(async (req) => {
       if (error || !data) throw new Error("Career not found");
       careers = [data];
     } else {
-      const { data, error } = await supabase
+      let query = supabase
         .from("careers")
         .select("id, title, onet_code")
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .order("title");
+      if (batchSize > 0) {
+        query = query.range(offset, offset + batchSize - 1);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       careers = data || [];
     }
 
+    console.log(`Processing ${careers.length} careers (offset=${offset})`);
     const results: { id: string; title: string; status: string }[] = [];
 
     for (let i = 0; i < careers.length; i++) {
