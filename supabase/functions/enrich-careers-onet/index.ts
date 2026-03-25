@@ -67,6 +67,8 @@ Deno.serve(async (req) => {
 
   try {
     let careers: any[] = [];
+    const batchSize = body?.batch_size || 0; // 0 = all
+    const offset = body?.offset || 0;
 
     if (body?.career_id) {
       const { data, error } = await supabase
@@ -77,14 +79,20 @@ Deno.serve(async (req) => {
       if (error || !data) throw new Error("Career not found");
       careers = [data];
     } else {
-      const { data, error } = await supabase
+      let query = supabase
         .from("careers")
         .select("id, title, onet_code")
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .order("title");
+      if (batchSize > 0) {
+        query = query.range(offset, offset + batchSize - 1);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       careers = data || [];
     }
 
+    console.log(`Processing ${careers.length} careers (offset=${offset})`);
     const results: { id: string; title: string; status: string }[] = [];
 
     for (let i = 0; i < careers.length; i++) {
@@ -95,8 +103,8 @@ Deno.serve(async (req) => {
         // Step 1: Get onet_code
         let code = career.onet_code;
         if (!code) {
-          code = await searchOnetCode(career.title, onetApiKey);
-          if (!code) {
+          const match = await searchOnetCode(career.title, onetApiKey);
+          if (!match) {
             await supabase.from("career_enrichment_log").insert({
               career_id: career.id,
               career_title: career.title,
@@ -105,6 +113,7 @@ Deno.serve(async (req) => {
             results.push({ id: career.id, title: career.title, status: "skipped" });
             continue;
           }
+          code = match.code;
         }
 
         // Step 2: Call O*NET v2 endpoints in parallel
