@@ -147,17 +147,18 @@ Deno.serve(async (req) => {
         const riasecPrimary = sorted[0]?.[1] > 0 ? sorted[0]?.[0] : topInterest?.name?.charAt(0) || null;
         const riasecSecondary = sorted[1]?.[1] > 0 ? sorted[1]?.[0] : null;
 
-        // Skills - top 8 (v2 returns group[].element[])
+        // Skills — v2 returns an array of groups, each with element[] of individual skills
         const allSkills: any[] = [];
-        for (const group of (skillsData?.group || [])) {
-          for (const el of (group.element || [])) {
-            allSkills.push(el);
+        const skillGroups = Array.isArray(skillsData) ? skillsData : (skillsData?.group || []);
+        for (const group of skillGroups) {
+          if (Array.isArray(group.element)) {
+            for (const el of group.element) allSkills.push(el);
           }
         }
+
         const skillElements = allSkills
-          .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))
           .slice(0, 8)
-          .map((el: any) => ({ name: el.name || "", importance: el.score ?? 0 }));
+          .map((el: any) => ({ name: el.name || "", importance: 0 }));
 
         // Work values from personality
         const workStyles = (personalityData?.work_styles || [])
