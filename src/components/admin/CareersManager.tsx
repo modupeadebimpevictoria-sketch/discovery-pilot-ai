@@ -310,7 +310,12 @@ function CareersTable({ careers, onEdit, onEditField, onDelete }: {
   onEdit: (c: DbCareer) => void;
   onEditField: (c: DbCareer, field: string) => void;
   onDelete: (c: DbCareer) => void;
+}) {
   const active = careers.filter((c) => c.is_active && !c.is_deleted);
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>
             <th className="text-left px-3 py-2 text-muted-foreground font-medium">Title</th>
