@@ -292,6 +292,76 @@ export default function CareersManager() {
 }
 
 // ═══════════════════════════
+// PENDING SYNC REVIEW
+// ═══════════════════════════
+function PendingSyncSection({ careers, onApprove, onReject }: {
+  careers: DbCareer[];
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+}) {
+  if (careers.length === 0) return null;
+
+  return (
+    <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-4 space-y-4">
+      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+        ⚠️ Pending O*NET Updates ({careers.length})
+      </h3>
+      <p className="text-xs text-muted-foreground">
+        These careers were manually edited. The O*NET sync has new data waiting for your approval.
+      </p>
+      {careers.map((c) => {
+        const pending = c.pending_sync_data || {};
+        const changedKeys = Object.keys(pending).filter((k) => k !== "updated_at" && k !== "onet_last_updated");
+        return (
+          <div key={c.id} className="border border-border rounded-lg p-3 space-y-2 bg-card">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-foreground text-sm">{c.emoji} {c.title}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onApprove(c.id)}
+                  className="px-3 py-1 rounded text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20"
+                >
+                  Apply Update
+                </button>
+                <button
+                  onClick={() => onReject(c.id)}
+                  className="px-3 py-1 rounded text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/20"
+                >
+                  Keep Mine
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <span className="font-semibold text-muted-foreground block mb-1">Your Current Version</span>
+                {changedKeys.slice(0, 6).map((key) => (
+                  <div key={key} className="flex gap-1 py-0.5">
+                    <span className="text-muted-foreground w-28 shrink-0 truncate">{key}:</span>
+                    <span className="text-foreground truncate">{JSON.stringify((c as any)[key])?.slice(0, 60)}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <span className="font-semibold text-muted-foreground block mb-1">Incoming O*NET Update</span>
+                {changedKeys.slice(0, 6).map((key) => (
+                  <div key={key} className="flex gap-1 py-0.5">
+                    <span className="text-muted-foreground w-28 shrink-0 truncate">{key}:</span>
+                    <span className="text-primary truncate">{JSON.stringify(pending[key])?.slice(0, 60)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {changedKeys.length > 6 && (
+              <p className="text-[10px] text-muted-foreground">+ {changedKeys.length - 6} more fields</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════
 // CAREERS TABLE
 // ═══════════════════════════
 function StatusIndicator({ ok, onClick }: { ok: boolean; onClick?: () => void }) {
