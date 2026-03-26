@@ -31,6 +31,10 @@ export interface DbCareer {
   growth_outlook: string | null;
   job_zone: number | null;
   is_active: boolean;
+  is_manually_edited: boolean;
+  is_deleted: boolean;
+  pending_sync_data: Record<string, any> | null;
+  sync_approval_status: string | null;
   onet_last_updated: string | null;
   prospects_last_updated: string | null;
   salary_last_updated: string | null;
