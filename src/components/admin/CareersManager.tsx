@@ -46,7 +46,7 @@ function formatSalaryLabel(min: number, max: number, symbol: string): string {
 }
 
 export default function CareersManager() {
-  const { careers, issues, loading, fetchAll, upsertCareer, softDeleteCareer, resolveIssue, updateIssueNotes } = useAdminCareers();
+  const { careers, issues, loading, fetchAll, upsertCareer, softDeleteCareer, approveSyncUpdate, rejectSyncUpdate, resolveIssue, updateIssueNotes } = useAdminCareers();
   const [tab, setTab] = useState<"careers" | "issues">("careers");
   const [editing, setEditing] = useState<Partial<DbCareer> | null>(null);
   const [scrollToField, setScrollToField] = useState<string | null>(null);
@@ -265,16 +265,23 @@ export default function CareersManager() {
       )}
 
       {tab === "careers" && !editing && (
-        <CareersTable
-          careers={careers}
-          onEdit={(c) => setEditing(c)}
-          onEditField={openEditScrolled}
-          onDelete={async (c) => {
-            if (confirm(`This will hide "${c.title}" from students. Their saved progress will be preserved. Continue?`)) {
-              await softDeleteCareer(c.id);
-            }
-          }}
-        />
+        <>
+          <PendingSyncSection
+            careers={careers.filter((c) => c.sync_approval_status === "pending" && c.pending_sync_data)}
+            onApprove={approveSyncUpdate}
+            onReject={rejectSyncUpdate}
+          />
+          <CareersTable
+            careers={careers}
+            onEdit={(c) => setEditing(c)}
+            onEditField={openEditScrolled}
+            onDelete={async (c) => {
+              if (confirm(`This will permanently remove "${c.title}" from students. The record will be kept but marked as deleted. Continue?`)) {
+                await softDeleteCareer(c.id);
+              }
+            }}
+          />
+        </>
       )}
 
       {tab === "issues" && (
@@ -303,12 +310,7 @@ function CareersTable({ careers, onEdit, onEditField, onDelete }: {
   onEdit: (c: DbCareer) => void;
   onEditField: (c: DbCareer, field: string) => void;
   onDelete: (c: DbCareer) => void;
-}) {
-  const active = careers.filter((c) => c.is_active);
-
-  return (
-    <div className="border border-border rounded-lg overflow-hidden">
-      <table className="w-full text-sm">
+  const active = careers.filter((c) => c.is_active && !c.is_deleted);
         <thead className="bg-muted/50">
           <tr>
             <th className="text-left px-3 py-2 text-muted-foreground font-medium">Title</th>
