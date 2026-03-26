@@ -147,7 +147,30 @@ Deno.serve(async (req) => {
         const riasecPrimary = sorted[0]?.[1] > 0 ? sorted[0]?.[0] : topInterest?.name?.charAt(0) || null;
         const riasecSecondary = sorted[1]?.[1] > 0 ? sorted[1]?.[0] : null;
 
-        // Skills — v2 returns an array of groups, each with element[] of individual skills
+        // Skills — v2 returns groups with element[] containing id + verbose description
+        // Map O*NET skill IDs to standard short names
+        const onetSkillNames: Record<string, string> = {
+          "2.A.1.a": "Reading Comprehension", "2.A.1.b": "Active Listening",
+          "2.A.1.c": "Writing", "2.A.1.d": "Speaking",
+          "2.A.1.e": "Mathematics", "2.A.1.f": "Science",
+          "2.A.2.a": "Critical Thinking", "2.A.2.b": "Active Learning",
+          "2.A.2.c": "Learning Strategies", "2.A.2.d": "Monitoring",
+          "2.B.1.a": "Social Perceptiveness", "2.B.1.b": "Coordination",
+          "2.B.1.c": "Persuasion", "2.B.1.d": "Negotiation",
+          "2.B.1.e": "Instructing", "2.B.1.f": "Service Orientation",
+          "2.B.2.i": "Complex Problem Solving",
+          "2.B.3.a": "Operations Analysis", "2.B.3.b": "Technology Design",
+          "2.B.3.c": "Equipment Selection", "2.B.3.d": "Installation",
+          "2.B.3.e": "Programming", "2.B.3.f": "Operation Monitoring",
+          "2.B.3.g": "Operation & Control", "2.B.3.h": "Equipment Maintenance",
+          "2.B.3.j": "Troubleshooting", "2.B.3.k": "Repairing",
+          "2.B.3.l": "Quality Control Analysis",
+          "2.B.4.e": "Judgment & Decision Making", "2.B.4.g": "Systems Analysis",
+          "2.B.4.h": "Systems Evaluation",
+          "2.B.5.a": "Time Management", "2.B.5.b": "Financial Management",
+          "2.B.5.c": "Material Management", "2.B.5.d": "Personnel Management",
+        };
+
         const allSkills: any[] = [];
         const skillGroups = Array.isArray(skillsData) ? skillsData : (skillsData?.group || []);
         for (const group of skillGroups) {
@@ -158,7 +181,10 @@ Deno.serve(async (req) => {
 
         const skillElements = allSkills
           .slice(0, 8)
-          .map((el: any) => ({ name: el.name || "", importance: 0 }));
+          .map((el: any) => ({
+            name: onetSkillNames[el.id] || el.name?.split(",")[0]?.trim() || "",
+            importance: 0,
+          }));
 
         // Work values from personality
         const workStyles = (personalityData?.work_styles || [])

@@ -378,9 +378,11 @@ export default function CareerExploration() {
               {enrichedSkills.slice(0, 8).map((s, i) => (
                 <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
                   <span className="text-xs font-semibold text-foreground">{s.name}</span>
-                  <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
-                  </div>
+                  {s.importance > 0 && (
+                    <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
