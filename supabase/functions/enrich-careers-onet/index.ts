@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     if (body?.career_id) {
       const { data, error } = await supabase
         .from("careers")
-        .select("id, title, onet_code")
+        .select("id, title, onet_code, is_manually_edited, is_deleted")
         .eq("id", body.career_id)
         .single();
       if (error || !data) throw new Error("Career not found");
@@ -79,8 +79,9 @@ Deno.serve(async (req) => {
     } else {
       let query = supabase
         .from("careers")
-        .select("id, title, onet_code")
+        .select("id, title, onet_code, is_manually_edited, is_deleted")
         .eq("is_active", true)
+        .eq("is_deleted", false)
         .order("title");
       if (batchSize > 0) {
         query = query.range(offset, offset + batchSize - 1);
@@ -203,7 +204,7 @@ Deno.serve(async (req) => {
           source: "O*NET",
         };
 
-        // Step 4: Update career
+        // Step 4: Build the update payload
         const { data: existing } = await supabase
           .from("careers")
           .select("salary_context")
@@ -212,25 +213,40 @@ Deno.serve(async (req) => {
 
         const existingSalary = (existing?.salary_context as Record<string, any>) || {};
 
-        const { error: updateErr } = await supabase
-          .from("careers")
-          .update({
-            onet_code: code,
-            riasec_profile: riasecProfile,
-            riasec_primary: riasecPrimary,
-            riasec_secondary: riasecSecondary,
-            skills: skillElements,
-            work_values: workStyles.length > 0 ? workStyles : undefined,
-            growth_outlook: growthOutlook,
-            job_zone: jobZone,
-            salary_context: { ...existingSalary, GLOBAL: globalSalary },
-            onet_last_updated: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", career.id);
+        const updatePayload = {
+          onet_code: code,
+          riasec_profile: riasecProfile,
+          riasec_primary: riasecPrimary,
+          riasec_secondary: riasecSecondary,
+          skills: skillElements,
+          work_values: workStyles.length > 0 ? workStyles : undefined,
+          growth_outlook: growthOutlook,
+          job_zone: jobZone,
+          salary_context: { ...existingSalary, GLOBAL: globalSalary },
+          onet_last_updated: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
 
-        if (updateErr) throw updateErr;
-        results.push({ id: career.id, title: career.title, status: "success" });
+        // Step 5: Sync protection — if manually edited or deleted, store as pending
+        if (career.is_manually_edited || career.is_deleted) {
+          console.log(`  ⏸ Career "${career.title}" is manually edited/deleted — storing as pending`);
+          const { error: pendingErr } = await supabase
+            .from("careers")
+            .update({
+              pending_sync_data: updatePayload,
+              sync_approval_status: "pending",
+            })
+            .eq("id", career.id);
+          if (pendingErr) throw pendingErr;
+          results.push({ id: career.id, title: career.title, status: "pending_review" });
+        } else {
+          const { error: updateErr } = await supabase
+            .from("careers")
+            .update(updatePayload)
+            .eq("id", career.id);
+          if (updateErr) throw updateErr;
+          results.push({ id: career.id, title: career.title, status: "success" });
+        }
       } catch (err: any) {
         console.error(`Failed to enrich ${career.title}:`, err.message);
         results.push({ id: career.id, title: career.title, status: "failed" });

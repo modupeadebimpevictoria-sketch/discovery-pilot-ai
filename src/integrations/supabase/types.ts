@@ -159,10 +159,13 @@ export type Database = {
           growth_tag: string | null
           id: string
           is_active: boolean | null
+          is_deleted: boolean
           is_emerging: boolean | null
+          is_manually_edited: boolean
           job_zone: number | null
           onet_code: string | null
           onet_last_updated: string | null
+          pending_sync_data: Json | null
           prospects_last_updated: string | null
           prospects_slug: string | null
           recommended_subjects: string[] | null
@@ -175,6 +178,7 @@ export type Database = {
           search_terms: Json | null
           skills: Json | null
           slug: string | null
+          sync_approval_status: string | null
           title: string
           unsplash_keyword: string | null
           unsplash_photo_url: string | null
@@ -195,10 +199,13 @@ export type Database = {
           growth_tag?: string | null
           id?: string
           is_active?: boolean | null
+          is_deleted?: boolean
           is_emerging?: boolean | null
+          is_manually_edited?: boolean
           job_zone?: number | null
           onet_code?: string | null
           onet_last_updated?: string | null
+          pending_sync_data?: Json | null
           prospects_last_updated?: string | null
           prospects_slug?: string | null
           recommended_subjects?: string[] | null
@@ -211,6 +218,7 @@ export type Database = {
           search_terms?: Json | null
           skills?: Json | null
           slug?: string | null
+          sync_approval_status?: string | null
           title: string
           unsplash_keyword?: string | null
           unsplash_photo_url?: string | null
@@ -231,10 +239,13 @@ export type Database = {
           growth_tag?: string | null
           id?: string
           is_active?: boolean | null
+          is_deleted?: boolean
           is_emerging?: boolean | null
+          is_manually_edited?: boolean
           job_zone?: number | null
           onet_code?: string | null
           onet_last_updated?: string | null
+          pending_sync_data?: Json | null
           prospects_last_updated?: string | null
           prospects_slug?: string | null
           recommended_subjects?: string[] | null
@@ -247,6 +258,7 @@ export type Database = {
           search_terms?: Json | null
           skills?: Json | null
           slug?: string | null
+          sync_approval_status?: string | null
           title?: string
           unsplash_keyword?: string | null
           unsplash_photo_url?: string | null
