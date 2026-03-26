@@ -67,7 +67,7 @@ export function useAdminCareers() {
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const upsertCareer = async (career: Partial<DbCareer>) => {
-    const payload = { ...career, updated_at: new Date().toISOString() };
+    const payload = { ...career, updated_at: new Date().toISOString(), is_manually_edited: true };
     if (career.id) {
       const { error } = await supabase.from("careers" as any).update(payload as any).eq("id", career.id);
       if (error) { toast.error(error.message); return null; }
@@ -84,9 +84,39 @@ export function useAdminCareers() {
   };
 
   const softDeleteCareer = async (id: string) => {
-    const { error } = await supabase.from("careers" as any).update({ is_active: false, updated_at: new Date().toISOString() } as any).eq("id", id);
+    const { error } = await supabase.from("careers" as any).update({
+      is_active: false,
+      is_deleted: true,
+      is_manually_edited: true,
+      updated_at: new Date().toISOString(),
+    } as any).eq("id", id);
     if (error) { toast.error(error.message); return; }
-    toast.success("Career hidden from students");
+    toast.success("Career deleted (soft)");
+    fetchAll();
+  };
+
+  const approveSyncUpdate = async (id: string) => {
+    const { data: career } = await supabase.from("careers" as any).select("pending_sync_data").eq("id", id).single();
+    if (!career?.pending_sync_data) { toast.error("No pending data"); return; }
+    const { error } = await supabase.from("careers" as any).update({
+      ...(career.pending_sync_data as any),
+      pending_sync_data: null,
+      sync_approval_status: "approved",
+      is_manually_edited: false,
+      updated_at: new Date().toISOString(),
+    } as any).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Update applied ✓");
+    fetchAll();
+  };
+
+  const rejectSyncUpdate = async (id: string) => {
+    const { error } = await supabase.from("careers" as any).update({
+      pending_sync_data: null,
+      sync_approval_status: "rejected",
+    } as any).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Update rejected — keeping your version");
     fetchAll();
   };
 
@@ -104,6 +134,7 @@ export function useAdminCareers() {
   return {
     careers, issues, loading, fetchAll,
     upsertCareer, softDeleteCareer,
+    approveSyncUpdate, rejectSyncUpdate,
     resolveIssue, updateIssueNotes,
   };
 }
