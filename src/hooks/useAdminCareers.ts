@@ -96,8 +96,8 @@ export function useAdminCareers() {
   };
 
   const approveSyncUpdate = async (id: string) => {
-    const { data: career } = await supabase.from("careers" as any).select("pending_sync_data").eq("id", id).single();
-    if (!career?.pending_sync_data) { toast.error("No pending data"); return; }
+    const { data: career } = await supabase.from("careers" as any).select("pending_sync_data").eq("id", id).single() as any;
+    if (!(career as any)?.pending_sync_data) { toast.error("No pending data"); return; }
     const { error } = await supabase.from("careers" as any).update({
       ...(career.pending_sync_data as any),
       pending_sync_data: null,
