@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     if (body?.career_id) {
       const { data, error } = await supabase
         .from("careers")
-        .select("id, title, onet_code")
+        .select("id, title, onet_code, is_manually_edited, is_deleted")
         .eq("id", body.career_id)
         .single();
       if (error || !data) throw new Error("Career not found");
@@ -79,8 +79,9 @@ Deno.serve(async (req) => {
     } else {
       let query = supabase
         .from("careers")
-        .select("id, title, onet_code")
+        .select("id, title, onet_code, is_manually_edited, is_deleted")
         .eq("is_active", true)
+        .eq("is_deleted", false)
         .order("title");
       if (batchSize > 0) {
         query = query.range(offset, offset + batchSize - 1);
