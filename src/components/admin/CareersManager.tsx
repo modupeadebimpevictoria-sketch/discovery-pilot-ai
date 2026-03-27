@@ -384,7 +384,7 @@ function CareersTable({ careers, onEdit, onEditField, onDelete }: {
   const active = careers.filter((c) => c.is_active && !c.is_deleted);
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>
@@ -445,7 +445,7 @@ function IssuesTable({ issues, onResolve, onUpdateNotes }: {
   onUpdateNotes: (id: string, notes: string) => void;
 }) {
   return (
-    <div className="border border-border rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>
