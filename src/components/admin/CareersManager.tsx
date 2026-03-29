@@ -247,6 +247,13 @@ export default function CareersManager() {
             </button>
           )}
           <button
+            onClick={handleFixAllPhotos}
+            disabled={fixingPhotos || syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
+          </button>
+          <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
               is_emerging: false, is_active: true, salary_context: {},
