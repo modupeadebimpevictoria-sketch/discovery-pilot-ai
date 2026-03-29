@@ -207,7 +207,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 {activeCareer
                   ? `I know you're exploring ${activeCareer} — ask me anything about it or any other career! 💬`
-                  : "I'm here to springboard you into the right career. Ask me anything about your future! 💬"}
+                  : "I'm here to help you find the right career. Ask me anything about your future! 💬"}
               </p>
             </div>
             <div className="space-y-2">
