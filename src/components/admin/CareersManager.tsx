@@ -277,10 +277,10 @@ export default function CareersManager() {
         </button>
       </div>
 
-      {syncProgress && (
+      {(syncProgress || photoProgress) && (
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-          {(syncingOnet || syncingProspects) && <Loader2 size={14} className="animate-spin" />}
-          {syncProgress}
+          {(syncingOnet || syncingProspects || fixingPhotos) && <Loader2 size={14} className="animate-spin" />}
+          {syncProgress || photoProgress}
         </div>
       )}
 
