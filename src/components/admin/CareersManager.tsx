@@ -838,6 +838,20 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
             className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[60px] mt-0.5"
           />
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          <FormInput
+            label="Be Inspired video URL (YouTube / Vimeo)"
+            value={form.encouragement_video_url || ""}
+            onChange={(v) => set("encouragement_video_url", v)}
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+          <FormInput
+            label="Encouragement figure name"
+            value={form.encouragement_figure || ""}
+            onChange={(v) => set("encouragement_figure", v)}
+            placeholder="e.g. Andrew Ng"
+          />
+        </div>
       </div>
 
       {/* Structured Data Section */}
