@@ -18,7 +18,7 @@ const XP_LEVELS = [
   { name: "Explorer", min: 200, max: 599, emoji: "🧭" },
   { name: "Trailblazer", min: 600, max: 1199, emoji: "🔥" },
   { name: "Achiever", min: 1200, max: 2499, emoji: "⭐" },
-  { name: "Springboarder", min: 2500, max: Infinity, emoji: "🚀" },
+  { name: "Findr Pro", min: 2500, max: Infinity, emoji: "🚀" },
 ];
 
 function getLevel(xp: number) {
@@ -533,7 +533,7 @@ export default function Me() {
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground pb-4">SpringBoard v1.0 · Made with 💚</p>
+        <p className="text-center text-[10px] text-muted-foreground pb-4">Findr v1.0 · Made with 💚</p>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
-interface SpringBoardLogoProps {
+interface FindrLogoProps {
   size?: number;
   darkBackground?: boolean;
   className?: string;
 }
 
-export default function SpringBoardLogo({ size = 40, darkBackground, className = "" }: SpringBoardLogoProps) {
+export default function FindrLogo({ size = 40, darkBackground, className = "" }: FindrLogoProps) {
   // On dark backgrounds: stripes become off-white and outer ring becomes white
   // Auto-detect: if darkBackground is undefined, we use CSS to handle both
   const ringColor = darkBackground ? "#F5F5F0" : "#1A1A1A";

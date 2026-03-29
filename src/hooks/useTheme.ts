@@ -14,13 +14,13 @@ function applyTheme(theme: Theme) {
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const stored = localStorage.getItem("springboard-theme") as Theme | null;
+    const stored = localStorage.getItem("findr-theme") as Theme | null;
     return stored || "system";
   });
 
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
-    localStorage.setItem("springboard-theme", t);
+    localStorage.setItem("findr-theme", t);
     applyTheme(t);
   }, []);
 

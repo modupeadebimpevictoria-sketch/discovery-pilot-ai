@@ -419,7 +419,7 @@ export default function CareerExploration() {
         {/* We override the existing salary section below if DB salary_context exists */}
 
         {/* 3. A Day in the Life + Get Inspired — side-by-side */}
-        {/* // TODO: Replace YouTube search with SpringBoard-produced custom videos per career. video_library table in Supabase is already structured for custom video_ids per career_id + video_type. Swap search query for DB lookup once custom videos are ready. */}
+        {/* // TODO: Replace YouTube search with Findr-produced custom videos per career. video_library table in Supabase is already structured for custom video_ids per career_id + video_type. Swap search query for DB lookup once custom videos are ready. */}
         <div className="grid grid-cols-2 gap-3">
           <a href={career.dayInLifeVideo} target="_blank" rel="noopener noreferrer" className="glass-card-hover rounded-2xl overflow-hidden">
             <div className="relative aspect-video bg-muted/30 flex items-center justify-center">
@@ -684,7 +684,7 @@ export default function CareerExploration() {
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Got questions about {career.title}?</p>
-            <p className="text-[10px] text-muted-foreground">Ask SpringBoard AI — your career mentor</p>
+            <p className="text-[10px] text-muted-foreground">Ask Findr AI — your career mentor</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
