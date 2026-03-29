@@ -236,7 +236,7 @@ function OpportunitiesListings({ data, editing, setEditing, onSave, onDelete }: 
         </div>
       )}
 
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -297,7 +297,7 @@ function ArchivedListings({ data, onSave, onDelete }: any) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">{data.length} archived opportunities</p>
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -506,7 +506,7 @@ function ScrapeSourcesManager() {
         </div>
       )}
 
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -580,7 +580,7 @@ function ScrapeLogView() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">{logs.length} runs logged</p>
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -746,7 +746,7 @@ function MissionsManager() {
         </div>
       )}
 
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -884,7 +884,7 @@ function QuestsMonitor() {
       )}
 
       {tab === "quests" ? (
-        <div className="border border-border rounded-lg overflow-x-auto">
+        <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
@@ -925,7 +925,7 @@ function QuestsMonitor() {
           </table>
         </div>
       ) : (
-        <div className="border border-border rounded-lg overflow-x-auto">
+        <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
@@ -1071,7 +1071,7 @@ function SkillsManager() {
         </div>
       )}
 
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -1148,7 +1148,7 @@ function FeedManager({ data, editing, setEditing, onSave, onDelete }: any) {
         </div>
       )}
 
-      <div className="border border-border rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
