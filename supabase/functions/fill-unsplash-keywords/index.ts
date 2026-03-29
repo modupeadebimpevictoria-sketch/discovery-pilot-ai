@@ -74,7 +74,7 @@ No markdown, no explanation, just the JSON array.`;
 
   let keywords: { id: string; keyword: string }[] = [];
   try {
-    const aiResp = await fetch("https://ai.lovable.dev/api/generate", {
+    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
