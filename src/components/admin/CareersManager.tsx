@@ -1054,6 +1054,63 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
         </div>
       </div>
 
+      {/* Meet the People (Role Models) */}
+      <div className="space-y-3">
+        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Meet the People</h4>
+        <p className="text-[10px] text-muted-foreground">Add role models / industry people shown on the career detail page.</p>
+        <div className="space-y-3">
+          {(form.role_models || []).map((rm: any, i: number) => (
+            <div key={i} className="border border-border rounded-lg p-3 space-y-2 bg-muted/10">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">Person {i + 1}</span>
+                <button onClick={() => removeRoleModel(i)} className="p-1 hover:bg-destructive/10 rounded"><X size={12} className="text-destructive" /></button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={rm.name || ""}
+                  onChange={(e) => updateRoleModel(i, "name", e.target.value)}
+                  placeholder="Name"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.title || ""}
+                  onChange={(e) => updateRoleModel(i, "title", e.target.value)}
+                  placeholder="Job title"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.company || ""}
+                  onChange={(e) => updateRoleModel(i, "company", e.target.value)}
+                  placeholder="Company / Organisation"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.photoUrl || ""}
+                  onChange={(e) => updateRoleModel(i, "photoUrl", e.target.value)}
+                  placeholder="Photo URL"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+              </div>
+              <textarea
+                value={rm.journeyFact || ""}
+                onChange={(e) => updateRoleModel(i, "journeyFact", e.target.value)}
+                placeholder="Their journey / backstory"
+                className="w-full bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none min-h-[40px]"
+              />
+              <textarea
+                value={rm.quote || ""}
+                onChange={(e) => updateRoleModel(i, "quote", e.target.value)}
+                placeholder="Inspirational quote"
+                className="w-full bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none min-h-[40px]"
+              />
+            </div>
+          ))}
+          <button onClick={addRoleModel} className="text-xs text-primary hover:underline flex items-center gap-1">
+            <Plus size={12} /> Add person
+          </button>
+        </div>
+      </div>
+
       {/* Bottom save */}
       <div className="flex gap-2 sticky bottom-0 bg-card pt-3 border-t border-border">
         <button onClick={handleSave} className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">Save</button>
