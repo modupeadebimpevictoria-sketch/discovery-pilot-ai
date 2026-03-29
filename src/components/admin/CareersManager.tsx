@@ -807,6 +807,12 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
             className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px] mt-0.5"
           />
         </div>
+        <FormInput
+          label="Day in the Life video URL (YouTube / Vimeo)"
+          value={form.day_in_life_video_url || ""}
+          onChange={(v) => set("day_in_life_video_url", v)}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
         <div>
           <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Full description</label>
           <textarea
