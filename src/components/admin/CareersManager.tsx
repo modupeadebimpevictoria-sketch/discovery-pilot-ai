@@ -670,6 +670,22 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
     set("work_values", vals);
   };
 
+  // Role Models helpers
+  const addRoleModel = () => {
+    const models = [...(form.role_models || []), { name: "", title: "", company: "", journeyFact: "", quote: "", photoUrl: "" }];
+    set("role_models", models);
+  };
+  const updateRoleModel = (i: number, field: string, value: string) => {
+    const models = [...(form.role_models || [])];
+    models[i] = { ...models[i], [field]: value };
+    set("role_models", models);
+  };
+  const removeRoleModel = (i: number) => {
+    const models = [...(form.role_models || [])];
+    models.splice(i, 1);
+    set("role_models", models);
+  };
+
   const handleSave = async () => {
     if (!form.title?.trim()) { toast.error("Title is required"); return; }
     if (!form.family_id) { toast.error("Career family is required"); return; }
