@@ -149,10 +149,13 @@ export type Database = {
         Row: {
           career_path: string | null
           created_at: string | null
+          day_in_life_video_url: string | null
           day_in_the_life: string | null
           description: string | null
           description_full: string | null
           emoji: string | null
+          encouragement_figure: string | null
+          encouragement_video_url: string | null
           entry_requirements: string | null
           family_id: string | null
           growth_outlook: string | null
@@ -172,6 +175,7 @@ export type Database = {
           riasec_primary: string | null
           riasec_profile: Json | null
           riasec_secondary: string | null
+          role_models: Json | null
           salary_context: Json | null
           salary_last_updated: string | null
           salary_range: string | null
@@ -189,10 +193,13 @@ export type Database = {
         Insert: {
           career_path?: string | null
           created_at?: string | null
+          day_in_life_video_url?: string | null
           day_in_the_life?: string | null
           description?: string | null
           description_full?: string | null
           emoji?: string | null
+          encouragement_figure?: string | null
+          encouragement_video_url?: string | null
           entry_requirements?: string | null
           family_id?: string | null
           growth_outlook?: string | null
@@ -212,6 +219,7 @@ export type Database = {
           riasec_primary?: string | null
           riasec_profile?: Json | null
           riasec_secondary?: string | null
+          role_models?: Json | null
           salary_context?: Json | null
           salary_last_updated?: string | null
           salary_range?: string | null
@@ -229,10 +237,13 @@ export type Database = {
         Update: {
           career_path?: string | null
           created_at?: string | null
+          day_in_life_video_url?: string | null
           day_in_the_life?: string | null
           description?: string | null
           description_full?: string | null
           emoji?: string | null
+          encouragement_figure?: string | null
+          encouragement_video_url?: string | null
           entry_requirements?: string | null
           family_id?: string | null
           growth_outlook?: string | null
@@ -252,6 +263,7 @@ export type Database = {
           riasec_primary?: string | null
           riasec_profile?: Json | null
           riasec_secondary?: string | null
+          role_models?: Json | null
           salary_context?: Json | null
           salary_last_updated?: string | null
           salary_range?: string | null

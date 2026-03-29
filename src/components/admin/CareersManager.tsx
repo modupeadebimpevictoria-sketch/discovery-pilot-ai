@@ -54,6 +54,41 @@ export default function CareersManager() {
   const [syncingProspects, setSyncingProspects] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [syncProgress, setSyncProgress] = useState("");
+  const [fixingPhotos, setFixingPhotos] = useState(false);
+  const [photoProgress, setPhotoProgress] = useState("");
+
+  const handleFixAllPhotos = async () => {
+    if (!confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. This may take a few minutes. Continue?")) return;
+    setFixingPhotos(true);
+    const batchSize = 20;
+    // Count total active careers
+    const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
+    const total = count || 0;
+    let processed = 0;
+    let totalSucceeded = 0;
+    let totalFailed = 0;
+
+    for (let offset = 0; offset < total; offset += batchSize) {
+      setPhotoProgress(`Fixing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
+      try {
+        const { data, error } = await supabase.functions.invoke("fill-unsplash-keywords", {
+          body: { batch_size: batchSize, offset },
+        });
+        if (error) throw error;
+        totalSucceeded += data.succeeded || 0;
+        totalFailed += data.failed || 0;
+        processed += data.total || 0;
+      } catch (err: any) {
+        toast.error(`Batch at offset ${offset} failed: ${err.message}`);
+        totalFailed += batchSize;
+      }
+    }
+
+    setPhotoProgress(`Done: ${totalSucceeded} updated, ${totalFailed} failed out of ${total}`);
+    toast.success(`Photos fixed: ${totalSucceeded}/${total}`);
+    fetchAll();
+    setFixingPhotos(false);
+  };
 
   const handleSeedFromHardcoded = async () => {
     if (!confirm(`This will insert ~${careerListings.length} careers from hardcoded data. Existing careers with matching titles will be skipped. Continue?`)) return;
@@ -212,6 +247,13 @@ export default function CareersManager() {
             </button>
           )}
           <button
+            onClick={handleFixAllPhotos}
+            disabled={fixingPhotos || syncingOnet || syncingProspects}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
+          </button>
+          <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
               is_emerging: false, is_active: true, salary_context: {},
@@ -235,10 +277,10 @@ export default function CareersManager() {
         </button>
       </div>
 
-      {syncProgress && (
+      {(syncProgress || photoProgress) && (
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-          {(syncingOnet || syncingProspects) && <Loader2 size={14} className="animate-spin" />}
-          {syncProgress}
+          {(syncingOnet || syncingProspects || fixingPhotos) && <Loader2 size={14} className="animate-spin" />}
+          {syncProgress || photoProgress}
         </div>
       )}
 
@@ -503,6 +545,7 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
     work_values: data.work_values || [],
     salary_context: data.salary_context || {},
     recommended_subjects: data.recommended_subjects || [],
+    role_models: data.role_models || [],
   });
   const [riasecOverride, setRiasecOverride] = useState<{ primary: boolean; secondary: boolean }>({ primary: false, secondary: false });
   const [newSubject, setNewSubject] = useState("");
@@ -627,6 +670,22 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
     set("work_values", vals);
   };
 
+  // Role Models helpers
+  const addRoleModel = () => {
+    const models = [...(form.role_models || []), { name: "", title: "", company: "", journeyFact: "", quote: "", photoUrl: "" }];
+    set("role_models", models);
+  };
+  const updateRoleModel = (i: number, field: string, value: string) => {
+    const models = [...(form.role_models || [])];
+    models[i] = { ...models[i], [field]: value };
+    set("role_models", models);
+  };
+  const removeRoleModel = (i: number) => {
+    const models = [...(form.role_models || [])];
+    models.splice(i, 1);
+    set("role_models", models);
+  };
+
   const handleSave = async () => {
     if (!form.title?.trim()) { toast.error("Title is required"); return; }
     if (!form.family_id) { toast.error("Career family is required"); return; }
@@ -748,6 +807,12 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
             className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[80px] mt-0.5"
           />
         </div>
+        <FormInput
+          label="Day in the Life video URL (YouTube / Vimeo)"
+          value={form.day_in_life_video_url || ""}
+          onChange={(v) => set("day_in_life_video_url", v)}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
         <div>
           <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Full description</label>
           <textarea
@@ -771,6 +836,20 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
             value={form.career_path || ""}
             onChange={(e) => set("career_path", e.target.value)}
             className="w-full bg-muted/30 rounded-lg px-3 py-2 text-sm text-foreground border border-border focus:border-primary outline-none min-h-[60px] mt-0.5"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <FormInput
+            label="Be Inspired video URL (YouTube / Vimeo)"
+            value={form.encouragement_video_url || ""}
+            onChange={(v) => set("encouragement_video_url", v)}
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+          <FormInput
+            label="Encouragement figure name"
+            value={form.encouragement_figure || ""}
+            onChange={(v) => set("encouragement_figure", v)}
+            placeholder="e.g. Andrew Ng"
           />
         </div>
       </div>
@@ -972,6 +1051,63 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
             placeholder="Type subject and press Enter"
             className="flex-1 bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
           />
+        </div>
+      </div>
+
+      {/* Meet the People (Role Models) */}
+      <div className="space-y-3">
+        <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Meet the People</h4>
+        <p className="text-[10px] text-muted-foreground">Add role models / industry people shown on the career detail page.</p>
+        <div className="space-y-3">
+          {(form.role_models || []).map((rm: any, i: number) => (
+            <div key={i} className="border border-border rounded-lg p-3 space-y-2 bg-muted/10">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">Person {i + 1}</span>
+                <button onClick={() => removeRoleModel(i)} className="p-1 hover:bg-destructive/10 rounded"><X size={12} className="text-destructive" /></button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={rm.name || ""}
+                  onChange={(e) => updateRoleModel(i, "name", e.target.value)}
+                  placeholder="Name"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.title || ""}
+                  onChange={(e) => updateRoleModel(i, "title", e.target.value)}
+                  placeholder="Job title"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.company || ""}
+                  onChange={(e) => updateRoleModel(i, "company", e.target.value)}
+                  placeholder="Company / Organisation"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+                <input
+                  value={rm.photoUrl || ""}
+                  onChange={(e) => updateRoleModel(i, "photoUrl", e.target.value)}
+                  placeholder="Photo URL"
+                  className="bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none"
+                />
+              </div>
+              <textarea
+                value={rm.journeyFact || ""}
+                onChange={(e) => updateRoleModel(i, "journeyFact", e.target.value)}
+                placeholder="Their journey / backstory"
+                className="w-full bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none min-h-[40px]"
+              />
+              <textarea
+                value={rm.quote || ""}
+                onChange={(e) => updateRoleModel(i, "quote", e.target.value)}
+                placeholder="Inspirational quote"
+                className="w-full bg-muted/30 rounded px-2 py-1 text-xs text-foreground border border-border focus:border-primary outline-none min-h-[40px]"
+              />
+            </div>
+          ))}
+          <button onClick={addRoleModel} className="text-xs text-primary hover:underline flex items-center gap-1">
+            <Plus size={12} /> Add person
+          </button>
         </div>
       </div>
 
