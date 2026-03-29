@@ -545,6 +545,7 @@ function CareerForm({ data, scrollToField, onSave, onCancel, onSyncComplete }: {
     work_values: data.work_values || [],
     salary_context: data.salary_context || {},
     recommended_subjects: data.recommended_subjects || [],
+    role_models: data.role_models || [],
   });
   const [riasecOverride, setRiasecOverride] = useState<{ primary: boolean; secondary: boolean }>({ primary: false, secondary: false });
   const [newSubject, setNewSubject] = useState("");
