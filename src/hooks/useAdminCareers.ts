@@ -38,6 +38,10 @@ export interface DbCareer {
   onet_last_updated: string | null;
   prospects_last_updated: string | null;
   salary_last_updated: string | null;
+  day_in_life_video_url: string | null;
+  encouragement_video_url: string | null;
+  encouragement_figure: string | null;
+  role_models: { name: string; title: string; company: string; journeyFact: string; quote: string; photoUrl: string }[] | null;
   created_at: string;
   updated_at: string;
 }
