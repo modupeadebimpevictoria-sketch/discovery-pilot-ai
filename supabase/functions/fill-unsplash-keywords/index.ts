@@ -60,11 +60,13 @@ Deno.serve(async (req) => {
   
   const aiPrompt = `For each career below, generate a specific 3-5 word scene-based photo search phrase describing someone actively doing this job. The phrase should be vivid and specific enough to find a great stock photo. Do NOT just repeat the career title.
 
-Examples:
-- Software Engineer → "developer coding dual monitors office"
-- Pediatric Nurse → "nurse examining child clinic"
-- Marine Biologist → "scientist diving coral reef"
-- Chef → "chef plating dish kitchen"
+IMPORTANT: If the photo would naturally feature a person or people (which is most careers), prefix the phrase with "african" so that search results represent young African professionals. Examples:
+- Software Engineer → "african developer coding dual monitors office"
+- Pediatric Nurse → "african nurse examining child clinic"
+- Chef → "african chef plating dish kitchen"
+- Architect → "african architect working blueprints"
+
+Only SKIP "african" for careers where the ideal photo would NOT feature any person at all (e.g. purely landscape, equipment, or object-focused shots like "coral reef underwater" or "circuit board closeup").
 
 Careers (format: id|||title|||family):
 ${careerList}
