@@ -10,7 +10,7 @@ const screens = [
   {
     icon: <Flame size={48} className="text-glow-pink" />,
     headline: "Your feed is ready 🔥",
-    body: "Every day, SpringBoard brings you real stories, videos, and updates about your 3 matched careers. The more you explore, the more personalised it gets.",
+    body: "Every day, Findr brings you real stories, videos, and updates about your 3 matched careers. The more you explore, the more personalised it gets.",
     bgClass: "bg-glow-pink/10 border-glow-pink/20",
     dotColor: "bg-glow-pink",
   },
@@ -24,7 +24,7 @@ const screens = [
   {
     icon: <MessageCircle size={48} className="text-glow-purple" />,
     headline: "Meet your AI Mentor 👆",
-    body: "Ask anything. Your SpringBoard Mentor knows your matches, your progress, and your goals — it gives you real, specific advice, not generic tips.",
+    body: "Ask anything. Your Findr Mentor knows your matches, your progress, and your goals — it gives you real, specific advice, not generic tips.",
     bgClass: "bg-glow-purple/10 border-glow-purple/20",
     dotColor: "bg-glow-purple",
   },

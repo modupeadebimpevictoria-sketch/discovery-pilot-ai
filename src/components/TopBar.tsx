@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import SpringBoardLogo from "@/components/SpringBoardLogo";
+import FindrLogo from "@/components/FindrLogo";
 import { useTheme } from "@/hooks/useTheme";
 
 const showOn = ["/dashboard", "/feed", "/quests", "/universe", "/opportunities", "/passport", "/auth", "/me", "/mentor"];
@@ -17,9 +17,9 @@ export default function TopBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-40 px-5 py-3 bg-background/80 backdrop-blur-xl border-b border-border/30 flex items-center justify-between">
       <div className="flex items-center gap-2.5">
-        <SpringBoardLogo size={32} darkBackground={isDark} />
+        <FindrLogo size={32} darkBackground={isDark} />
         <span className="text-lg font-bold tracking-tight">
-          <span className="text-primary">Spring</span><span className="text-foreground">Board</span>
+          <span className="text-primary">Fin</span><span className="text-foreground">dr</span>
         </span>
       </div>
       <div className="flex items-center gap-3">

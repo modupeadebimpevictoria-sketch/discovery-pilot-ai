@@ -684,7 +684,7 @@ export default function CareerExploration() {
           </div>
           <div className="text-left flex-1">
             <p className="text-sm font-bold text-foreground">Got questions about {career.title}?</p>
-            <p className="text-[10px] text-muted-foreground">Ask SpringBoard AI — your career mentor</p>
+            <p className="text-[10px] text-muted-foreground">Ask Findr AI — your career mentor</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>

@@ -8,7 +8,7 @@ import VideoBackground from "@/components/VideoBackground";
 import CareerProfileCard from "@/components/CareerProfileCard";
 import CategoryVideoTile from "@/components/CategoryVideoTile";
 import TestimonialCard from "@/components/TestimonialCard";
-import SpringBoardLogo from "@/components/SpringBoardLogo";
+import FindrLogo from "@/components/FindrLogo";
 import confetti from "canvas-confetti";
 
 // Subtle fade-in only — no looping or bouncing
@@ -140,7 +140,7 @@ const testimonials = [
   {
     name: "Zara O.",
     role: "UX Designer, 23",
-    quote: "I had no idea UX design existed until SpringBoard showed me. Now I'm designing apps at a startup. This literally changed my life.",
+    quote: "I had no idea UX design existed until Findr showed me. Now I'm designing apps at a startup. This literally changed my life.",
     photoUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
@@ -152,22 +152,22 @@ const testimonials = [
   {
     name: "Aisha K.",
     role: "Biomedical Researcher, 22",
-    quote: "SpringBoard gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
+    quote: "Findr gave me the roadmap I needed. My school counselor couldn't tell me any of this.",
     photoUrl: "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=200&h=200&fit=crop&crop=face&q=90",
   },
   {
     name: "Tunde B.",
     role: "Filmmaker, 25",
-    quote: "I was stuck between law and art. SpringBoard showed me I could make films. Best decision I ever made.",
+    quote: "I was stuck between law and art. Findr showed me I could make films. Best decision I ever made.",
     photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face&q=90",
   },
 ];
 
-// SpringBoard logo — uses the consistent SVG mark
-function SpringBoardWordmark({ size = "text-2xl" }: { size?: string }) {
+// Findr logo — uses the consistent SVG mark
+function FindrWordmark({ size = "text-2xl" }: { size?: string }) {
   return (
     <span className={`font-bold tracking-tight ${size}`}>
-      <span className="text-primary">Spring</span><span className="text-foreground">Board</span>
+      <span className="text-primary">Fin</span><span className="text-foreground">dr</span>
     </span>
   );
 }
@@ -192,8 +192,8 @@ export default function Index() {
       >
         {/* Logo — top left */}
         <div className="absolute top-6 left-6 z-20 flex items-center gap-2.5">
-          <SpringBoardLogo size={28} darkBackground />
-          <SpringBoardWordmark />
+          <FindrLogo size={28} darkBackground />
+          <FindrWordmark />
         </div>
 
         {/* Hero content */}
@@ -393,7 +393,7 @@ export default function Index() {
             </div>
             <div className="text-left flex-1">
               <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors font-display">
-                Chat with SpringBoard AI
+                Chat with Findr AI
               </p>
               <p className="text-xs text-muted-foreground">
                 Got career questions? Your AI coach is ready.

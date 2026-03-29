@@ -4,7 +4,7 @@ import { Send, Sparkles, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
-import SpringBoardLogo from "@/components/SpringBoardLogo";
+import FindrLogo from "@/components/FindrLogo";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -200,10 +200,10 @@ export default function MentorPage() {
       {/* Header */}
       <div className="glass-heavy border-b border-glass-border/30 px-4 py-3 flex items-center gap-3 sticky top-[52px] z-30">
         <div className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center overflow-hidden">
-          <SpringBoardLogo size={28} />
+          <FindrLogo size={28} />
         </div>
         <div className="flex-1">
-          <h2 className="text-sm font-bold text-foreground">SpringBoard AI Mentor</h2>
+          <h2 className="text-sm font-bold text-foreground">Findr AI Mentor</h2>
           <p className="text-[10px] text-muted-foreground">
             {activeCareer ? `Helping you explore ${activeCareer} 🎯` : "Your career guide — ask anything 🚀"}
           </p>
@@ -222,7 +222,7 @@ export default function MentorPage() {
             {/* Welcome */}
             <div className="text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-glow-purple/10 border border-glow-purple/20 mx-auto flex items-center justify-center">
-                <SpringBoardLogo size={36} />
+                <FindrLogo size={36} />
               </div>
               <h3 className="text-lg font-bold text-foreground">
                 {getTimeGreeting(studentContext.name)}
@@ -280,7 +280,7 @@ export default function MentorPage() {
           <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
               <div className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
-                <SpringBoardLogo size={18} />
+                <FindrLogo size={18} />
               </div>
             )}
             <div
@@ -310,7 +310,7 @@ export default function MentorPage() {
         {isLoading && messages[messages.length - 1]?.role === "user" && (
           <div className="flex gap-2">
             <div className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
-              <SpringBoardLogo size={18} />
+              <FindrLogo size={18} />
             </div>
             <div className="glass-card px-4 py-3 rounded-2xl rounded-bl-md">
               <div className="flex gap-1.5">

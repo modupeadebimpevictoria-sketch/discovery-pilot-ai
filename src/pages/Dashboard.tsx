@@ -216,7 +216,7 @@ export default function Dashboard() {
             <Bot size={24} className="text-landing-mint" />
           </div>
           <div className="text-left flex-1">
-            <p className="text-sm font-bold text-foreground">Ask SpringBoard AI 🏊</p>
+            <p className="text-sm font-bold text-foreground">Ask Findr AI 🏊</p>
             <p className="text-[10px] text-muted-foreground">Got career questions? Your AI coach is ready.</p>
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />

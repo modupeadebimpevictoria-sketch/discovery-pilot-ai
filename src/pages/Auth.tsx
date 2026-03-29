@@ -64,7 +64,7 @@ export default function Auth() {
               {mode === "forgot" ? "🔑" : "🚀"}
             </motion.span>
             <h1 className="text-2xl font-bold gradient-text">
-              {mode === "login" ? "Welcome Back!" : mode === "signup" ? "Join SpringBoard" : "Reset Password"}
+              {mode === "login" ? "Welcome Back!" : mode === "signup" ? "Join Findr" : "Reset Password"}
             </h1>
             <p className="text-sm text-muted-foreground">
               {mode === "login"
