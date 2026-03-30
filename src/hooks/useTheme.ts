@@ -15,7 +15,7 @@ function applyTheme(theme: Theme) {
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
     const stored = localStorage.getItem("findr-theme") as Theme | null;
-    return stored || "system";
+    return stored || "dark";
   });
 
   const setTheme = useCallback((t: Theme) => {
