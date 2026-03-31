@@ -371,23 +371,28 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* Skills from DB (pill tags with importance bars) */}
-        {enrichedSkills && enrichedSkills.length > 0 && (
-          <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
-            <div className="flex flex-wrap gap-2">
-              {enrichedSkills.slice(0, 8).map((s, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
-                  <span className="text-xs font-semibold text-foreground">{s.name}</span>
-                  {s.importance > 0 && (
-                    <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        {/* Skills — merge DB skills with detailed explanations */}
+        <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
+          <div className="space-y-3">
+            {(enrichedSkills && enrichedSkills.length > 0
+              ? enrichedSkills.slice(0, 6).map((s) => {
+                  const detail = skills.find((d) => d.name.toLowerCase() === s.name.toLowerCase());
+                  return { name: s.name, explanation: detail?.explanation || `Understanding ${s.name.toLowerCase()} helps you solve real problems and stand out in this career.`, resourceUrl: detail?.resourceUrl, resourceLabel: detail?.resourceLabel };
+                })
+              : skills
+            ).map((s) => (
+              <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
+                <p className="text-sm font-bold text-foreground">{s.name}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{s.explanation}</p>
+                {s.resourceUrl && (
+                  <a href={s.resourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1">
+                    🔗 {s.resourceLabel || "Start learning free"} <ChevronRight size={12} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
 
         {/* Work Values from DB */}
         {workValues && workValues.length > 0 && (
