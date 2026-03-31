@@ -250,11 +250,19 @@ export default function CareersManager() {
           )}
           <button
             onClick={handleFixAllPhotos}
-            disabled={fixingPhotos || syncingOnet || syncingProspects}
+            disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
           >
             <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
           </button>
+          <button
+            onClick={handleEnrichSkills}
+            disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={enrichingSkills ? "animate-spin" : ""} /> Enrich Skill Explanations
+          </button>
+          {skillProgress && <span className="text-xs text-muted-foreground">{skillProgress}</span>}
           <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
