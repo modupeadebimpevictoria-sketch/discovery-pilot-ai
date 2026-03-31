@@ -322,7 +322,7 @@ export default function CareerExploration() {
           <h1 className="text-2xl font-bold text-foreground drop-shadow-md">{career.emoji} {career.title}</h1>
           <div className="flex items-center gap-2 flex-wrap mt-2">
             <span className="fact-pill">{career.category}</span>
-            {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% fit</span>}
+            {/* percentage fit removed */}
             <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
             {outlookBadge && (
               <span className="fact-pill border-primary/20 text-primary font-bold">{outlookBadge.icon} {outlookBadge.text}</span>
