@@ -593,23 +593,24 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* 12. Imagine you at age snapshots */}
-        <div className="glass-card p-5 rounded-2xl space-y-4 neon-border">
-          <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
-            🔮 Imagine you at different ages
-          </h3>
-          <div className="space-y-4">
-            {imagineScenarios.map((scenario, i) => (
-              <div key={i} className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-glow-purple bg-glow-purple/10 px-2.5 py-1 rounded-full">Age {scenario.age}</span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{scenario.text}</p>
-                {i < imagineScenarios.length - 1 && <div className="border-t border-border/30 pt-2" />}
+        {/* 12. Imagine you — single future scenario */}
+        {imagineScenarios.length > 0 && (() => {
+          const entryAge = 18 + career.timelineYears;
+          const bestScenario = imagineScenarios.reduce((closest, s) =>
+            Math.abs(s.age - entryAge) < Math.abs(closest.age - entryAge) ? s : closest
+          , imagineScenarios[0]);
+          return (
+            <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
+              <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
+                🔮 Imagine you at age {bestScenario.age}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-glow-purple bg-glow-purple/10 px-2.5 py-1 rounded-full">Age {bestScenario.age}</span>
               </div>
-            ))}
-          </div>
-        </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{bestScenario.text}</p>
+            </div>
+          );
+        })()}
 
         {/* 13. Career Roadmap & Opportunities buttons */}
         <div className="grid grid-cols-2 gap-3">
