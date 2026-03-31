@@ -92,6 +92,33 @@ export default function CareersManager() {
     setFixingPhotos(false);
   };
 
+  const handleEnrichSkills = async () => {
+    if (!confirm("This will generate AI skill explanations for all careers missing them. Continue?")) return;
+    setEnrichingSkills(true);
+    const batchSize = 15;
+    const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
+    const total = count || 0;
+    let totalUpdated = 0;
+
+    for (let offset = 0; offset < total; offset += batchSize) {
+      setSkillProgress(`Processing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
+      try {
+        const { data, error } = await supabase.functions.invoke("enrich-skill-explanations", {
+          body: { batch_size: batchSize, offset },
+        });
+        if (error) throw error;
+        totalUpdated += data.updated || 0;
+      } catch (err: any) {
+        toast.error(`Batch at offset ${offset} failed: ${err.message}`);
+      }
+    }
+
+    setSkillProgress(`Done: ${totalUpdated} careers enriched out of ${total}`);
+    toast.success(`Skill explanations enriched: ${totalUpdated}/${total}`);
+    fetchAll();
+    setEnrichingSkills(false);
+  };
+
   const handleSeedFromHardcoded = async () => {
     if (!confirm(`This will insert ~${careerListings.length} careers from hardcoded data. Existing careers with matching titles will be skipped. Continue?`)) return;
     setSeeding(true);
