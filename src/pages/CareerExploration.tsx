@@ -322,10 +322,12 @@ export default function CareerExploration() {
           <h1 className="text-2xl font-bold text-foreground drop-shadow-md">{career.emoji} {career.title}</h1>
           <div className="flex items-center gap-2 flex-wrap mt-2">
             <span className="fact-pill">{career.category}</span>
-            {matchScore && <span className="fact-pill border-primary/30 text-primary font-bold">🎯 {matchScore}% fit</span>}
             <span className={demandClass[career.jobOutlook] || "demand-stable"}>{career.jobOutlook}</span>
             {outlookBadge && (
               <span className="fact-pill border-primary/20 text-primary font-bold">{outlookBadge.icon} {outlookBadge.text}</span>
+            )}
+            {isActivePath && (
+              <span className="fact-pill border-primary/30 bg-primary/15 text-primary font-bold">🟢 Active Path</span>
             )}
           </div>
         </div>
@@ -371,23 +373,28 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* Skills from DB (pill tags with importance bars) */}
-        {enrichedSkills && enrichedSkills.length > 0 && (
-          <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
-            <div className="flex flex-wrap gap-2">
-              {enrichedSkills.slice(0, 8).map((s, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
-                  <span className="text-xs font-semibold text-foreground">{s.name}</span>
-                  {s.importance > 0 && (
-                    <div className="w-10 h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${s.importance}%` }} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        {/* Skills — merge DB skills with detailed explanations */}
+        <Card title="Key Skills" icon={<Zap size={16} className="text-primary" />}>
+          <div className="space-y-3">
+            {(enrichedSkills && enrichedSkills.length > 0
+              ? enrichedSkills.slice(0, 6).map((s) => {
+                  const detail = skills.find((d) => d.name.toLowerCase() === s.name.toLowerCase());
+                  return { name: s.name, explanation: detail?.explanation || `Understanding ${s.name.toLowerCase()} helps you solve real problems and stand out in this career.`, resourceUrl: detail?.resourceUrl, resourceLabel: detail?.resourceLabel };
+                })
+              : skills
+            ).map((s) => (
+              <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
+                <p className="text-sm font-bold text-foreground">{s.name}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{s.explanation}</p>
+                {s.resourceUrl && (
+                  <a href={s.resourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1">
+                    🔗 {s.resourceLabel || "Start learning free"} <ChevronRight size={12} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
 
         {/* Work Values from DB */}
         {workValues && workValues.length > 0 && (
@@ -447,10 +454,25 @@ export default function CareerExploration() {
 
         {/* 4. Subjects that help */}
         <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-glow-purple" />}>
-          <div className="flex flex-wrap gap-1.5">
-            {career.recommendedSubjects.map((s) => (
-              <span key={s} className="fact-pill text-glow-purple border-glow-purple/20">{s}</span>
-            ))}
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">High School Subjects</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(career.recommendedSubjects.length >= 3
+                ? career.recommendedSubjects
+                : [...career.recommendedSubjects, ...["English", "Mathematics", "ICT"].filter(s => !career.recommendedSubjects.includes(s))]
+              ).slice(0, 5).map((s) => (
+                <span key={s} className="fact-pill text-glow-purple border-glow-purple/20">{s}</span>
+              ))}
+            </div>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mt-2">University Courses</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(dbCareer?.recommended_subjects?.filter((s: string) => s.toLowerCase().includes("degree") || s.toLowerCase().includes("university") || s.toLowerCase().includes("bsc") || s.toLowerCase().includes("bachelor"))?.length > 0
+                ? dbCareer.recommended_subjects.filter((s: string) => s.toLowerCase().includes("degree") || s.toLowerCase().includes("university") || s.toLowerCase().includes("bsc") || s.toLowerCase().includes("bachelor"))
+                : [`${career.category} Studies`, `${career.title}-related degree`]
+              ).slice(0, 2).map((s: string) => (
+                <span key={s} className="fact-pill text-primary border-primary/20">🎓 {s}</span>
+              ))}
+            </div>
           </div>
         </Card>
 
@@ -462,37 +484,7 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{career.futureGrowth}</p>
         </Card>
 
-        {/* 6. Salary — uses DB salary_context when available */}
-        <Card title="What you can earn" icon={<DollarSign size={16} className="text-glow-pink" />}>
-          {Object.keys(salaryContext).length > 0 ? (
-            <div className="text-center space-y-2">
-              <p className="text-lg font-bold text-foreground">
-                {salaryLabel}
-              </p>
-              {salaryIsEmpty && (
-                <p className="text-sm text-muted-foreground">Salary data coming soon 📊</p>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Starting</p>
-                  <p className="text-sm font-bold text-foreground">{career.salaryRange.entry}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground">3–5 years</p>
-                  <p className="text-sm font-bold text-glow-pink">{career.salaryRange.mid}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Senior</p>
-                  <p className="text-sm font-bold text-foreground">{career.salaryRange.senior}</p>
-                </div>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-2 text-center">This is what people earn after 3–5 years</p>
-            </>
-          )}
-        </Card>
+        {/* Salary section removed — same as Average Pay in quick stats */}
 
         {/* 7. Meet the people — horizontal swipeable */}
         <Card title="Meet the people" icon={<Users size={16} className="text-glow-pink" />}>
@@ -505,7 +497,11 @@ export default function CareerExploration() {
 
         {/* Why this job matters */}
         <Card title="Why this job matters 🌍" icon={<Star size={16} className="text-landing-mint" />}>
-          <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {growthOutlook
+              ? `${career.title}s play a vital role in ${career.category.toLowerCase()}. ${career.worldImpact} ${career.futureGrowth}`
+              : career.worldImpact}
+          </p>
         </Card>
 
         {/* 8. Try This Career — Missions (GATED) */}
@@ -560,46 +556,9 @@ export default function CareerExploration() {
           )}
         </Card>
 
-        {/* 9. Skills You'll Need */}
-        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-glow-purple" />}>
-          <div className="space-y-3">
-            {skills.map((s) => (
-              <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
-                <p className="text-sm font-bold text-foreground">{s.name}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{s.explanation}</p>
-                {s.resourceUrl && (
-                  <a href={s.resourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1">
-                    🔗 {s.resourceLabel || "Start learning free"} <ChevronRight size={12} />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* Duplicate skills section removed — kept Key Skills above */}
 
-        {/* 10. Step-by-Step Plan */}
-        <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-landing-mint" />}>
-          <div className="space-y-0">
-            {timeline.map((t, i) => (
-              <div key={i} className="flex items-start gap-3 pb-4 relative">
-                {i < timeline.length - 1 && (
-                  <div className="absolute left-[15px] top-8 w-0.5 h-full bg-border" />
-                )}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg z-10 flex-shrink-0 ${
-                  i === timeline.length - 1 ? "bg-primary/20" : i % 2 === 0 ? "bg-glow-purple/20" : "bg-glow-pink/20"
-                }`}>
-                  {t.emoji}
-                </div>
-                <div>
-                  <p className={`text-xs font-bold ${
-                    i === timeline.length - 1 ? "text-primary" : i % 2 === 0 ? "text-glow-purple" : "text-glow-pink"
-                  }`}>Age {t.age}</p>
-                  <p className="text-sm text-muted-foreground">{t.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* Step-by-step plan removed */}
 
         {/* 11. Opportunities / Internships (GATED) */}
         {internshipList.length > 0 && (
@@ -641,23 +600,24 @@ export default function CareerExploration() {
           </Card>
         )}
 
-        {/* 12. Imagine you at age snapshots */}
-        <div className="glass-card p-5 rounded-2xl space-y-4 neon-border">
-          <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
-            🔮 Imagine you at different ages
-          </h3>
-          <div className="space-y-4">
-            {imagineScenarios.map((scenario, i) => (
-              <div key={i} className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-glow-purple bg-glow-purple/10 px-2.5 py-1 rounded-full">Age {scenario.age}</span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{scenario.text}</p>
-                {i < imagineScenarios.length - 1 && <div className="border-t border-border/30 pt-2" />}
+        {/* 12. Imagine you — single future scenario */}
+        {imagineScenarios.length > 0 && (() => {
+          const entryAge = 18 + career.timelineYears;
+          const bestScenario = imagineScenarios.reduce((closest, s) =>
+            Math.abs(s.age - entryAge) < Math.abs(closest.age - entryAge) ? s : closest
+          , imagineScenarios[0]);
+          return (
+            <div className="glass-card p-5 rounded-2xl space-y-3 neon-border">
+              <h3 className="font-bold text-foreground flex items-center gap-2 text-sm">
+                🔮 Imagine you at age {bestScenario.age}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-glow-purple bg-glow-purple/10 px-2.5 py-1 rounded-full">Age {bestScenario.age}</span>
               </div>
-            ))}
-          </div>
-        </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{bestScenario.text}</p>
+            </div>
+          );
+        })()}
 
         {/* 13. Career Roadmap & Opportunities buttons */}
         <div className="grid grid-cols-2 gap-3">
@@ -689,36 +649,33 @@ export default function CareerExploration() {
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
 
-        {/* 15. Share */}
-        <button onClick={() => setShareOpen(true)} className="w-full btn-outline-glow flex items-center justify-center gap-2 text-sm">
-          <Share2 size={16} /> Share This Career
-        </button>
-
-        {/* 16. Save Career */}
-        <button
-          onClick={() => toggleSavedCareer(career.id)}
-          className={`w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-2xl px-6 py-3.5 transition-all duration-300 active:scale-95 ${
-            saved ? "bg-accent/20 text-accent border-2 border-accent/30" : "btn-outline-glow"
-          }`}
-        >
-          <Heart size={16} className={saved ? "fill-accent" : ""} />
-          {saved ? "Saved ❤️" : "Save Career"}
-        </button>
-
-        {/* 17. Set as Active Path */}
-        {!isActivePath ? (
-          <button
-            onClick={handleSetActivePath}
-            className="w-full btn-primary-glow text-sm py-3.5 flex items-center justify-center gap-2"
-          >
-            <Shield size={16} /> Set as Active Path
+        {/* Action pills — compact row */}
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => setShareOpen(true)} className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 border border-border bg-muted/30 active:scale-95 transition-transform text-muted-foreground">
+            <Share2 size={12} /> Share
           </button>
-        ) : (
-          <div className="w-full glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border-primary/30 bg-primary/5">
-            <Shield size={16} className="text-primary" />
-            <span className="text-sm font-bold text-primary">This is your Active Path 🟢</span>
-          </div>
-        )}
+          <button
+            onClick={() => toggleSavedCareer(career.id)}
+            className={`flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 border active:scale-95 transition-transform ${
+              saved ? "bg-accent/20 text-accent border-accent/30" : "border-border bg-muted/30 text-muted-foreground"
+            }`}
+          >
+            <Heart size={12} className={saved ? "fill-accent" : ""} />
+            {saved ? "Saved" : "Save"}
+          </button>
+          {!isActivePath ? (
+            <button
+              onClick={handleSetActivePath}
+              className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 bg-primary text-primary-foreground active:scale-95 transition-transform"
+            >
+              <Shield size={12} /> Set Active Path
+            </button>
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 bg-primary/15 text-primary border border-primary/30">
+              <Shield size={12} /> Active Path 🟢
+            </span>
+          )}
+        </div>
 
         {/* I'm done exploring — only when active */}
         {isActivePath && (

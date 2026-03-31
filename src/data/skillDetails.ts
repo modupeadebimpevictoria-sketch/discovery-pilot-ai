@@ -251,8 +251,39 @@ export const skillDetails: Record<string, SkillDetail[]> = {
 export function getSkillDetails(careerId: string, fallbackSkills: string[]): SkillDetail[] {
   if (skillDetails[careerId]) return skillDetails[careerId];
   
-  return fallbackSkills.slice(0, 6).map((s) => ({
-    name: s,
-    explanation: `A key skill for success in this career — understanding ${s.toLowerCase()} will set you apart from others in the field.`,
-  }));
+  // Generate contextual one-line explanations instead of generic filler
+  const explanationTemplates: Record<string, string> = {
+    "communication": "Expressing your ideas clearly so teammates, clients, and stakeholders actually understand what you mean.",
+    "teamwork": "Working with different personalities towards a shared goal — most jobs need you to collaborate, not just work solo.",
+    "problem solving": "Breaking down tricky situations into smaller parts and figuring out what to do when there's no obvious answer.",
+    "problem-solving": "Breaking down tricky situations into smaller parts and figuring out what to do when there's no obvious answer.",
+    "leadership": "Guiding a group, making tough decisions, and taking responsibility when things go right or wrong.",
+    "creativity": "Coming up with original ideas and fresh approaches instead of just doing things the way they've always been done.",
+    "critical thinking": "Analysing information carefully before making decisions — not just accepting things at face value.",
+    "time management": "Prioritising tasks and meeting deadlines without burning out — a skill every employer values.",
+    "adaptability": "Adjusting quickly when plans change — the people who thrive are the ones who can pivot without panicking.",
+    "attention to detail": "Catching small errors before they become big problems — precision matters in this field.",
+    "research": "Finding reliable information, comparing sources, and drawing conclusions based on evidence.",
+    "writing": "Putting your thoughts into clear, well-structured text that others can follow and act on.",
+    "data analysis": "Making sense of numbers and patterns to inform decisions — spreadsheets are your friend here.",
+    "project management": "Planning, organising, and tracking work from start to finish so nothing falls through the cracks.",
+    "customer service": "Understanding what people need and delivering it with patience, empathy, and professionalism.",
+    "public speaking": "Presenting ideas confidently in front of a group — nerve-wracking at first, but a superpower once you've got it.",
+    "negotiation": "Reaching agreements where both sides feel like they've won — useful in every career, not just business.",
+    "networking": "Building genuine professional relationships that open doors you didn't even know existed.",
+    "technical skills": "Mastering the specific tools, software, or equipment used day-to-day in this profession.",
+    "emotional intelligence": "Reading people's feelings and responding appropriately — crucial for working with humans.",
+    "organisation": "Keeping your work, files, and priorities structured so you can find anything in seconds.",
+    "mathematics": "Using numbers, calculations, and logical reasoning to solve practical problems in this field.",
+    "design": "Creating visually appealing and functional solutions that people actually want to use.",
+    "programming": "Writing code that tells computers exactly what to do — the language of the digital world.",
+    "analysis": "Examining complex information to find patterns, trends, and insights that drive better decisions.",
+  };
+
+  return fallbackSkills.slice(0, 6).map((s) => {
+    const key = s.toLowerCase().trim();
+    const explanation = explanationTemplates[key] 
+      || `Developing strong ${s.toLowerCase()} skills gives you an edge — employers in this field look for people who can do this well.`;
+    return { name: s, explanation };
+  });
 }
