@@ -206,7 +206,7 @@ export default function CareerExploration() {
   const missions = getMissionsByCareer(career.id);
   const internshipList = getInternshipsByCareer(career.id);
   const roleModels = getRoleModelProfiles(career.id, career.title, career.roleModels);
-  const skills = getSkillDetails(career.id, career.skills);
+  const skills = getSkillDetails(career.id, career.skills, enrichedSkills || undefined);
   const imagineScenarios = getImagineYouScenarios(career.id, career.title, currentAge, career.timelineYears, career);
   const heroPhoto = dbCareer?.unsplash_photo_url || getCareerPhoto(career.id);
 

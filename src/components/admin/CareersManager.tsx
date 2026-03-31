@@ -56,6 +56,8 @@ export default function CareersManager() {
   const [syncProgress, setSyncProgress] = useState("");
   const [fixingPhotos, setFixingPhotos] = useState(false);
   const [photoProgress, setPhotoProgress] = useState("");
+  const [enrichingSkills, setEnrichingSkills] = useState(false);
+  const [skillProgress, setSkillProgress] = useState("");
 
   const handleFixAllPhotos = async () => {
     if (!confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. This may take a few minutes. Continue?")) return;
@@ -88,6 +90,33 @@ export default function CareersManager() {
     toast.success(`Photos fixed: ${totalSucceeded}/${total}`);
     fetchAll();
     setFixingPhotos(false);
+  };
+
+  const handleEnrichSkills = async () => {
+    if (!confirm("This will generate AI skill explanations for all careers missing them. Continue?")) return;
+    setEnrichingSkills(true);
+    const batchSize = 15;
+    const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
+    const total = count || 0;
+    let totalUpdated = 0;
+
+    for (let offset = 0; offset < total; offset += batchSize) {
+      setSkillProgress(`Processing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
+      try {
+        const { data, error } = await supabase.functions.invoke("enrich-skill-explanations", {
+          body: { batch_size: batchSize, offset },
+        });
+        if (error) throw error;
+        totalUpdated += data.updated || 0;
+      } catch (err: any) {
+        toast.error(`Batch at offset ${offset} failed: ${err.message}`);
+      }
+    }
+
+    setSkillProgress(`Done: ${totalUpdated} careers enriched out of ${total}`);
+    toast.success(`Skill explanations enriched: ${totalUpdated}/${total}`);
+    fetchAll();
+    setEnrichingSkills(false);
   };
 
   const handleSeedFromHardcoded = async () => {
@@ -248,11 +277,19 @@ export default function CareersManager() {
           )}
           <button
             onClick={handleFixAllPhotos}
-            disabled={fixingPhotos || syncingOnet || syncingProspects}
+            disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
           >
             <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
           </button>
+          <button
+            onClick={handleEnrichSkills}
+            disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={enrichingSkills ? "animate-spin" : ""} /> Enrich Skill Explanations
+          </button>
+          {skillProgress && <span className="text-xs text-muted-foreground">{skillProgress}</span>}
           <button
             onClick={() => setEditing({
               title: "", family_id: "", description: "", emoji: "💼",
