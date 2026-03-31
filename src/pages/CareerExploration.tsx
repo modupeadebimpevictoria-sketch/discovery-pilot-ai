@@ -447,10 +447,25 @@ export default function CareerExploration() {
 
         {/* 4. Subjects that help */}
         <Card title="Subjects that help you get here" icon={<GraduationCap size={16} className="text-glow-purple" />}>
-          <div className="flex flex-wrap gap-1.5">
-            {career.recommendedSubjects.map((s) => (
-              <span key={s} className="fact-pill text-glow-purple border-glow-purple/20">{s}</span>
-            ))}
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">High School Subjects</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(career.recommendedSubjects.length >= 3
+                ? career.recommendedSubjects
+                : [...career.recommendedSubjects, ...["English", "Mathematics", "ICT"].filter(s => !career.recommendedSubjects.includes(s))]
+              ).slice(0, 5).map((s) => (
+                <span key={s} className="fact-pill text-glow-purple border-glow-purple/20">{s}</span>
+              ))}
+            </div>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mt-2">University Courses</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(dbCareer?.recommended_subjects?.filter((s: string) => s.toLowerCase().includes("degree") || s.toLowerCase().includes("university") || s.toLowerCase().includes("bsc") || s.toLowerCase().includes("bachelor"))?.length > 0
+                ? dbCareer.recommended_subjects.filter((s: string) => s.toLowerCase().includes("degree") || s.toLowerCase().includes("university") || s.toLowerCase().includes("bsc") || s.toLowerCase().includes("bachelor"))
+                : [`${career.category} Studies`, `${career.title}-related degree`]
+              ).slice(0, 2).map((s: string) => (
+                <span key={s} className="fact-pill text-primary border-primary/20">🎓 {s}</span>
+              ))}
+            </div>
           </div>
         </Card>
 
