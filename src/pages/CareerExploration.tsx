@@ -490,7 +490,11 @@ export default function CareerExploration() {
 
         {/* Why this job matters */}
         <Card title="Why this job matters 🌍" icon={<Star size={16} className="text-landing-mint" />}>
-          <p className="text-sm text-muted-foreground leading-relaxed">{career.worldImpact}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {growthOutlook
+              ? `${career.title}s play a vital role in ${career.category.toLowerCase()}. ${career.worldImpact} ${career.futureGrowth}`
+              : career.worldImpact}
+          </p>
         </Card>
 
         {/* 8. Try This Career — Missions (GATED) */}
