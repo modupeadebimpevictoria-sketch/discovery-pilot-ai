@@ -56,6 +56,8 @@ export default function CareersManager() {
   const [syncProgress, setSyncProgress] = useState("");
   const [fixingPhotos, setFixingPhotos] = useState(false);
   const [photoProgress, setPhotoProgress] = useState("");
+  const [enrichingSkills, setEnrichingSkills] = useState(false);
+  const [skillProgress, setSkillProgress] = useState("");
 
   const handleFixAllPhotos = async () => {
     if (!confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. This may take a few minutes. Continue?")) return;
