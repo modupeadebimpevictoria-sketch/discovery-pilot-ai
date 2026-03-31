@@ -248,10 +248,17 @@ export const skillDetails: Record<string, SkillDetail[]> = {
   ],
 };
 
-export function getSkillDetails(careerId: string, fallbackSkills: string[]): SkillDetail[] {
+export function getSkillDetails(careerId: string, fallbackSkills: string[], dbSkills?: { name: string; importance?: number; explanation?: string }[]): SkillDetail[] {
+  // If DB skills have explanations, use those first
+  if (dbSkills && dbSkills.some(s => s.explanation)) {
+    return dbSkills.slice(0, 6).map(s => ({
+      name: s.name,
+      explanation: s.explanation || `Developing strong ${s.name.toLowerCase()} skills gives you an edge in this field.`,
+    }));
+  }
+
   if (skillDetails[careerId]) return skillDetails[careerId];
   
-  // Generate contextual one-line explanations instead of generic filler
   const explanationTemplates: Record<string, string> = {
     "communication": "Expressing your ideas clearly so teammates, clients, and stakeholders actually understand what you mean.",
     "teamwork": "Working with different personalities towards a shared goal — most jobs need you to collaborate, not just work solo.",
