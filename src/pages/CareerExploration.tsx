@@ -530,22 +530,7 @@ export default function CareerExploration() {
           )}
         </Card>
 
-        {/* 9. Skills You'll Need */}
-        <Card title="🛠️ Skills you'll need" icon={<Zap size={16} className="text-glow-purple" />}>
-          <div className="space-y-3">
-            {skills.map((s) => (
-              <div key={s.name} className="glass-card p-3 rounded-xl space-y-1.5">
-                <p className="text-sm font-bold text-foreground">{s.name}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{s.explanation}</p>
-                {s.resourceUrl && (
-                  <a href={s.resourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1">
-                    🔗 {s.resourceLabel || "Start learning free"} <ChevronRight size={12} />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* Duplicate skills section removed — kept Key Skills above */}
 
         {/* 10. Step-by-Step Plan */}
         <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-landing-mint" />}>
