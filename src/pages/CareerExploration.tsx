@@ -642,36 +642,33 @@ export default function CareerExploration() {
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
 
-        {/* 15. Share */}
-        <button onClick={() => setShareOpen(true)} className="w-full btn-outline-glow flex items-center justify-center gap-2 text-sm">
-          <Share2 size={16} /> Share This Career
-        </button>
-
-        {/* 16. Save Career */}
-        <button
-          onClick={() => toggleSavedCareer(career.id)}
-          className={`w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-2xl px-6 py-3.5 transition-all duration-300 active:scale-95 ${
-            saved ? "bg-accent/20 text-accent border-2 border-accent/30" : "btn-outline-glow"
-          }`}
-        >
-          <Heart size={16} className={saved ? "fill-accent" : ""} />
-          {saved ? "Saved ❤️" : "Save Career"}
-        </button>
-
-        {/* 17. Set as Active Path */}
-        {!isActivePath ? (
-          <button
-            onClick={handleSetActivePath}
-            className="w-full btn-primary-glow text-sm py-3.5 flex items-center justify-center gap-2"
-          >
-            <Shield size={16} /> Set as Active Path
+        {/* Action pills — compact row */}
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => setShareOpen(true)} className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 border border-border bg-muted/30 active:scale-95 transition-transform text-muted-foreground">
+            <Share2 size={12} /> Share
           </button>
-        ) : (
-          <div className="w-full glass-card p-3 rounded-2xl flex items-center justify-center gap-2 border-primary/30 bg-primary/5">
-            <Shield size={16} className="text-primary" />
-            <span className="text-sm font-bold text-primary">This is your Active Path 🟢</span>
-          </div>
-        )}
+          <button
+            onClick={() => toggleSavedCareer(career.id)}
+            className={`flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 border active:scale-95 transition-transform ${
+              saved ? "bg-accent/20 text-accent border-accent/30" : "border-border bg-muted/30 text-muted-foreground"
+            }`}
+          >
+            <Heart size={12} className={saved ? "fill-accent" : ""} />
+            {saved ? "Saved" : "Save"}
+          </button>
+          {!isActivePath ? (
+            <button
+              onClick={handleSetActivePath}
+              className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 bg-primary text-primary-foreground active:scale-95 transition-transform"
+            >
+              <Shield size={12} /> Set Active Path
+            </button>
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 bg-primary/15 text-primary border border-primary/30">
+              <Shield size={12} /> Active Path 🟢
+            </span>
+          )}
+        </div>
 
         {/* I'm done exploring — only when active */}
         {isActivePath && (
