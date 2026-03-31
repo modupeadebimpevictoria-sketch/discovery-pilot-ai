@@ -532,29 +532,7 @@ export default function CareerExploration() {
 
         {/* Duplicate skills section removed — kept Key Skills above */}
 
-        {/* 10. Step-by-Step Plan */}
-        <Card title="Your Step-by-Step Plan" icon={<MapPin size={16} className="text-landing-mint" />}>
-          <div className="space-y-0">
-            {timeline.map((t, i) => (
-              <div key={i} className="flex items-start gap-3 pb-4 relative">
-                {i < timeline.length - 1 && (
-                  <div className="absolute left-[15px] top-8 w-0.5 h-full bg-border" />
-                )}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg z-10 flex-shrink-0 ${
-                  i === timeline.length - 1 ? "bg-primary/20" : i % 2 === 0 ? "bg-glow-purple/20" : "bg-glow-pink/20"
-                }`}>
-                  {t.emoji}
-                </div>
-                <div>
-                  <p className={`text-xs font-bold ${
-                    i === timeline.length - 1 ? "text-primary" : i % 2 === 0 ? "text-glow-purple" : "text-glow-pink"
-                  }`}>Age {t.age}</p>
-                  <p className="text-sm text-muted-foreground">{t.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {/* Step-by-step plan removed */}
 
         {/* 11. Opportunities / Internships (GATED) */}
         {internshipList.length > 0 && (
