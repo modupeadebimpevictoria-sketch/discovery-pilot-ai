@@ -93,6 +93,10 @@ export default function CareerCard({ career, matchScore, saved, onToggleSave, on
           </span>
         </div>
 
+        {cluster && (
+          <p className="text-[8px] text-muted-foreground/70">{cluster.emoji} {cluster.name}</p>
+        )}
+
         {career.growthTag && (
           <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
             career.growthTag.includes("Emerging")
