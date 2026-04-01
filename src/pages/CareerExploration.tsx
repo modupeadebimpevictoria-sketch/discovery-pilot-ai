@@ -334,6 +334,9 @@ export default function CareerExploration() {
               <span className="fact-pill border-primary/30 bg-primary/15 text-primary font-bold">🟢 Active Path</span>
             )}
           </div>
+          {cluster && (
+            <p className="text-[11px] text-muted-foreground/70 mt-1 drop-shadow-sm">{cluster.emoji} {cluster.name}</p>
+          )}
         </div>
       </div>
 
