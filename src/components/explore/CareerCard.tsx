@@ -37,6 +37,7 @@ interface CareerCardProps {
 export default function CareerCard({ career, matchScore, saved, onToggleSave, onClick, index }: CareerCardProps) {
   const { getCareerFamilyById } = useCareers();
   const family = getCareerFamilyById(career.familyId);
+  const cluster = getClusterByFamilyId(career.familyId);
   const score = matchScore ?? getMatchScore(career.id);
   const photoUrl = career.unsplashPhotoUrl || getCareerPhoto(career.id);
 
