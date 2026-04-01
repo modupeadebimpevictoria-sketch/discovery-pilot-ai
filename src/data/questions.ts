@@ -324,7 +324,7 @@ function getCareerRiasecProfile(tags: string[]): Record<RIASECCode, number> {
 }
 
 // ─── Scoring helpers ───
-function computeRiasecFromAnswers(answers: Record<number, any>): Record<RIASECCode, number> {
+export function computeRiasecFromAnswers(answers: Record<number, any>): Record<RIASECCode, number> {
   const scores: Record<RIASECCode, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
 
   assessmentQuestions.forEach(q => {
