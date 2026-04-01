@@ -97,8 +97,13 @@ No markdown, no explanation, just the JSON array.`;
 
     const aiData = await aiResp.json();
     const content = aiData.choices?.[0]?.message?.content || "";
-    // Parse JSON from response, stripping any markdown code fences
-    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    // Parse JSON from response, stripping markdown fences and control characters
+    const cleaned = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim()
+      // Remove control characters inside JSON string values (except normal whitespace)
+      .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "");
     keywords = JSON.parse(cleaned);
   } catch (err: any) {
     return new Response(JSON.stringify({ error: `AI keyword generation failed: ${err.message}` }), {
