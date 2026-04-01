@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCareers, careerFamilies, type CareerListing } from "@/contexts/CareersContext";
 import { useApp } from "@/contexts/AppContext";
@@ -6,6 +6,7 @@ import { Search, X, Bookmark, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import CareerCard from "@/components/explore/CareerCard";
 import FilterSortSheet, { type SortOption } from "@/components/explore/FilterSortSheet";
+import { clusters, type Cluster } from "@/data/clusters";
 
 function getMatchScore(careerId: string): number {
   let hash = 0;
@@ -16,9 +17,9 @@ function getMatchScore(careerId: string): number {
   return 55 + Math.abs(hash % 40);
 }
 
-const familyPills = [
+const clusterPills: { id: string; emoji: string; name: string }[] = [
   { id: "all", emoji: "⭐", name: "All" },
-  ...careerFamilies.map((f) => ({ id: f.id, emoji: f.emoji, name: f.name })),
+  ...clusters.map((c) => ({ id: c.id, emoji: c.emoji, name: c.name })),
 ];
 
 export default function CareerUniverse() {
@@ -26,19 +27,33 @@ export default function CareerUniverse() {
   const [searchParams] = useSearchParams();
   const { savedCareers, toggleSavedCareer, rejectedCareers, matchedCareers } = useApp();
   const { careerListings, searchCareerListings } = useCareers();
-  const familyParam = searchParams.get("family");
   const [search, setSearch] = useState("");
-  const [familyFilter, setFamilyFilter] = useState<string>(familyParam || "all");
+  const [selectedCluster, setSelectedCluster] = useState("all");
+  const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("match");
   const [growthFilter, setGrowthFilter] = useState("all");
 
+  // Get the active cluster object
+  const activeCluster: Cluster | undefined = clusters.find((c) => c.id === selectedCluster);
+
+  // Families to show in tier 2
+  const clusterFamilies = useMemo(() => {
+    if (!activeCluster) return [];
+    return careerFamilies.filter((f) => activeCluster.familyIds.includes(f.id));
+  }, [activeCluster]);
+
   const filtered = useMemo(() => {
     let results = search ? searchCareerListings(search) : careerListings;
 
-    if (familyFilter !== "all") {
-      results = results.filter((l) => l.familyId === familyFilter);
+    // Cluster filter
+    if (activeCluster) {
+      if (selectedFamily) {
+        results = results.filter((l) => l.familyId === selectedFamily);
+      } else {
+        results = results.filter((l) => activeCluster.familyIds.includes(l.familyId));
+      }
     }
 
     // Hide rejected
@@ -65,7 +80,7 @@ export default function CareerUniverse() {
     }
 
     return results;
-  }, [search, familyFilter, rejectedCareers, sortBy, growthFilter]);
+  }, [search, selectedCluster, selectedFamily, rejectedCareers, sortBy, growthFilter, activeCluster, careerListings, searchCareerListings]);
 
   const handleSaveSearch = (query: string) => {
     if (query && !savedSearches.includes(query)) {
@@ -74,19 +89,24 @@ export default function CareerUniverse() {
     }
   };
 
-  const handleFamilySelect = (id: string) => {
-    setFamilyFilter(id);
+  const handleClusterSelect = (id: string) => {
+    setSelectedCluster(id);
+    setSelectedFamily(null);
     setTimeout(() => {
-      const el = document.getElementById(`pill-${id}`);
+      const el = document.getElementById(`cluster-${id}`);
       el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     }, 50);
+  };
+
+  const handleFamilySelect = (familyId: string) => {
+    setSelectedFamily((prev) => (prev === familyId ? null : familyId));
   };
 
   const noResults = search.length > 0 && filtered.length === 0;
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Sticky header: search + pills */}
+      {/* Sticky header */}
       <div className="sticky top-[52px] z-30 bg-background/95 backdrop-blur-xl border-b border-border/40">
         {/* Search bar */}
         <div className="px-4 pt-3 pb-2">
@@ -107,19 +127,19 @@ export default function CareerUniverse() {
           </div>
         </div>
 
-        {/* Family filter pills */}
+        {/* Tier 1 — Cluster pills */}
         <div
-          className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3"
+          className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-2"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {familyPills.map((pill) => (
+          {clusterPills.map((pill) => (
             <button
               key={pill.id}
-              id={`pill-${pill.id}`}
-              onClick={() => handleFamilySelect(pill.id)}
+              id={`cluster-${pill.id}`}
+              onClick={() => handleClusterSelect(pill.id)}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                familyFilter === pill.id
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                selectedCluster === pill.id
+                  ? "bg-[#a3e635] text-black shadow-sm"
                   : "bg-transparent text-muted-foreground border border-border/60 hover:border-border"
               }`}
             >
@@ -128,14 +148,40 @@ export default function CareerUniverse() {
             </button>
           ))}
         </div>
+
+        {/* Tier 2 — Career Family pills (only when cluster selected) */}
+        {activeCluster && clusterFamilies.length > 0 && (
+          <div
+            className="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-3"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {clusterFamilies.map((fam) => (
+              <button
+                key={fam.id}
+                onClick={() => handleFamilySelect(fam.id)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                  selectedFamily === fam.id
+                    ? "border border-[#a3e635] text-[#a3e635] bg-background"
+                    : "bg-muted/40 text-muted-foreground border border-transparent hover:bg-muted/60"
+                }`}
+              >
+                <span>{fam.emoji}</span>
+                <span>{fam.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Results count */}
       <div className="px-4 pt-3 pb-1 flex items-center justify-between">
         <p className="text-[11px] text-muted-foreground">
           {filtered.length} career{filtered.length !== 1 ? "s" : ""}
-          {familyFilter !== "all" && !search && (
-            <> in <span className="font-semibold text-foreground">{familyPills.find(p => p.id === familyFilter)?.name}</span></>
+          {selectedCluster !== "all" && !search && (
+            <> in <span className="font-semibold text-foreground">{clusterPills.find(p => p.id === selectedCluster)?.name}</span></>
+          )}
+          {selectedFamily && (
+            <> · <span className="font-semibold text-foreground">{careerFamilies.find(f => f.id === selectedFamily)?.name}</span></>
           )}
           {search && (
             <> matching "<span className="font-semibold text-foreground">{search}</span>"</>
@@ -143,7 +189,7 @@ export default function CareerUniverse() {
         </p>
       </div>
 
-      {/* Career grid — 2 col mobile, 3 col desktop */}
+      {/* Career grid */}
       <div className="px-4 pt-1 grid grid-cols-2 md:grid-cols-3 gap-3">
         {filtered.map((career, i) => {
           const saved = savedCareers.includes(career.id);
