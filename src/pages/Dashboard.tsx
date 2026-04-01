@@ -39,11 +39,20 @@ export default function Dashboard() {
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
-  const { getCareerById } = useCareers();
+  const { getCareerById, getCareerListingById } = useCareers();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
   const arch = archetypes[archetype];
+
+  // Derive World & Cluster
+  const { assessmentAnswers } = useApp();
+  const riasecScores = computeRiasecFromAnswers(assessmentAnswers);
+  const matchedFamilyIds = matchedCareers.map((m) => {
+    const listing = getCareerListingById(m.careerId);
+    return listing?.familyId || "";
+  }).filter(Boolean);
+  const { world, cluster } = determineWorldAndCluster(riasecScores, matchedFamilyIds);
 
   // Active pathway — first matched career or selected one
   const activePathwayId = selectedCareerPath || matchedCareers[0]?.careerId || null;
