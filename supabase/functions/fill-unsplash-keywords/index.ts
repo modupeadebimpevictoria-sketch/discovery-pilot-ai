@@ -31,17 +31,17 @@ Deno.serve(async (req) => {
   // Parse optional parameters
   let body: any = {};
   try { body = await req.json(); } catch {}
-  const batchSize = body.batch_size || 20;
-  const offset = body.offset || 0;
+  const batchSize = body.batch_size || 40;
 
-  // Fetch careers
+  // Fetch careers that are missing a valid unsplash_photo_url
   const { data: careers, error: fetchErr } = await supabase
     .from("careers")
-    .select("id, title, family_id, unsplash_keyword")
+    .select("id, title, family_id, unsplash_keyword, unsplash_photo_url")
     .eq("is_active", true)
     .eq("is_deleted", false)
+    .or("unsplash_photo_url.is.null,unsplash_photo_url.eq.")
     .order("title")
-    .range(offset, offset + batchSize - 1);
+    .limit(batchSize);
 
   if (fetchErr) {
     return new Response(JSON.stringify({ error: fetchErr.message }), {
@@ -50,10 +50,24 @@ Deno.serve(async (req) => {
   }
 
   if (!careers || careers.length === 0) {
-    return new Response(JSON.stringify({ message: "No careers in range", succeeded: 0, failed: 0, total: 0 }), {
+    return new Response(JSON.stringify({ message: "All careers already have photos", succeeded: 0, failed: 0, remaining: 0 }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
+  // Get total counts for status reporting
+  const { count: totalCareers } = await supabase
+    .from("careers")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true)
+    .eq("is_deleted", false);
+
+  const { count: missingCount } = await supabase
+    .from("careers")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true)
+    .eq("is_deleted", false)
+    .or("unsplash_photo_url.is.null,unsplash_photo_url.eq.");
 
   // Generate keywords for all careers in this batch using AI
   const careerList = careers.map((c: any) => `${c.id}|||${c.title}|||${c.family_id || "general"}`).join("\n");
@@ -102,12 +116,10 @@ No markdown, no explanation, just the JSON array.`;
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim()
-      // Remove control characters (except normal whitespace)
       .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "");
     
-    // Fix unescaped newlines/tabs inside JSON string values by normalising to spaces
-    // Match content between quotes and replace raw newlines/tabs within
-    cleaned = cleaned.replace(/"([^"\\]|\\.)*"/g, (match) =>
+    // Fix unescaped newlines/tabs inside JSON string values
+    cleaned = cleaned.replace(/"([^"\\]|\\.)*"/g, (match: string) =>
       match.replace(/\n/g, " ").replace(/\r/g, "").replace(/\t/g, " ")
     );
     
@@ -126,7 +138,6 @@ No markdown, no explanation, just the JSON array.`;
 
   for (const item of keywords) {
     try {
-      // Search Unsplash
       const searchUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(item.keyword)}&per_page=1&orientation=landscape`;
       const unsplashResp = await fetch(searchUrl, {
         headers: { Authorization: `Client-ID ${unsplashKey}` },
@@ -150,7 +161,6 @@ No markdown, no explanation, just the JSON array.`;
         throw new Error("No Unsplash results");
       }
 
-      // Update career in DB
       const { error: updateErr } = await supabase
         .from("careers")
         .update({
@@ -167,18 +177,20 @@ No markdown, no explanation, just the JSON array.`;
       errors.push(`${item.id}: ${err.message}`);
     }
 
-    // Small delay to avoid Unsplash rate limits (50/hr for demo apps)
+    // Small delay to avoid Unsplash rate limits
     await new Promise((r) => setTimeout(r, 200));
   }
+
+  const remaining = (missingCount || 0) - succeeded;
 
   return new Response(JSON.stringify({
     succeeded,
     failed,
     rate_limited: rateLimited,
-    total: keywords.length,
-    offset,
     batch_size: batchSize,
-    next_offset: offset + succeeded + failed,
+    remaining: Math.max(0, remaining),
+    total_careers: totalCareers || 0,
+    with_photos: (totalCareers || 0) - (missingCount || 0) + succeeded,
     errors: errors.slice(0, 10),
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },

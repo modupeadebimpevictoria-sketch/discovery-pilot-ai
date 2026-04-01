@@ -55,63 +55,45 @@ export default function CareersManager() {
   const [seeding, setSeeding] = useState(false);
   const [syncProgress, setSyncProgress] = useState("");
   const [fixingPhotos, setFixingPhotos] = useState(false);
-  const [photoProgress, setPhotoProgress] = useState("");
-  const [photoOffset, setPhotoOffset] = useState(0);
-  const [photoTotal, setPhotoTotal] = useState(0);
+  const [photoStatus, setPhotoStatus] = useState<{ withPhotos: number; total: number } | null>(null);
+  const [photoStatusLoading, setPhotoStatusLoading] = useState(false);
   const [enrichingSkills, setEnrichingSkills] = useState(false);
   const [skillProgress, setSkillProgress] = useState("");
 
-  const handleFixAllPhotos = async () => {
-    const isResume = photoOffset > 0;
-    if (!isResume && !confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. Continue?")) return;
-    setFixingPhotos(true);
-    const batchSize = 20;
-
-    // Get total if not already known
-    let total = photoTotal;
-    if (!total) {
-      const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
-      total = count || 0;
-      setPhotoTotal(total);
-    }
-
-    let offset = photoOffset;
-    setPhotoProgress(`Fixing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
-
+  const fetchPhotoStatus = async () => {
+    setPhotoStatusLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("fill-unsplash-keywords", {
-        body: { batch_size: batchSize, offset },
-      });
-      if (error) throw error;
-
-      const newOffset = offset + (data.succeeded || 0) + (data.failed || 0);
-      setPhotoOffset(newOffset);
-
-      if (data.rate_limited) {
-        setPhotoProgress(`⚠️ Rate limited — fixed ${newOffset} of ${total}. Click to continue from ${newOffset + 1}`);
-        toast.warning(`Unsplash rate limit hit after ${data.succeeded} photos. Click again to continue.`);
-      } else if (newOffset >= total) {
-        setPhotoProgress(`✅ Done: all ${total} careers processed`);
-        setPhotoOffset(0);
-        setPhotoTotal(0);
-        toast.success(`All career photos updated!`);
-      } else {
-        setPhotoProgress(`Fixed ${newOffset} of ${total} — click to continue from ${newOffset + 1}`);
-        toast.success(`Batch done: ${data.succeeded} updated. Click again to continue.`);
-      }
-      fetchAll();
-    } catch (err: any) {
-      toast.error(`Batch at offset ${offset} failed: ${err.message}`);
-      setPhotoProgress(`❌ Error at ${offset}. Click to retry from ${offset + 1}`);
-    }
-
-    setFixingPhotos(false);
+      const { count: total } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
+      const { count: missing } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false).or("unsplash_photo_url.is.null,unsplash_photo_url.eq.");
+      setPhotoStatus({ withPhotos: (total || 0) - (missing || 0), total: total || 0 });
+    } catch { /* ignore */ }
+    setPhotoStatusLoading(false);
   };
 
-  const handleResetPhotoProgress = () => {
-    setPhotoOffset(0);
-    setPhotoTotal(0);
-    setPhotoProgress("");
+  // Fetch photo status on mount
+  useEffect(() => { fetchPhotoStatus(); }, []);
+
+  const handleForceRunPhotos = async () => {
+    setFixingPhotos(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fill-unsplash-keywords", {
+        body: { batch_size: 40 },
+      });
+      if (error) throw error;
+      if (data.remaining === 0 && data.succeeded === 0) {
+        toast.success("All careers already have photos!");
+      } else {
+        toast.success(`Batch done: ${data.succeeded} photos added. ${data.remaining} remaining.`);
+      }
+      if (data.rate_limited) {
+        toast.warning("Unsplash rate limit hit. The hourly cron will continue automatically.");
+      }
+      fetchPhotoStatus();
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`Force run failed: ${err.message}`);
+    }
+    setFixingPhotos(false);
   };
 
   const handleEnrichSkills = async () => {
