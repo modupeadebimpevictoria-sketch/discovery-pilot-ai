@@ -108,6 +108,11 @@ export default function Dashboard() {
           <div>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Welcome back</p>
             <h1 className="text-2xl font-bold text-foreground">Hey {profile.name}! 👋</h1>
+            {matchedCareers.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {world.emoji} {world.name} · {cluster.emoji} {cluster.name}
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
