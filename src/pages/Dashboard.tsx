@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
-import { archetypes } from "@/data/questions";
+import { archetypes, computeRiasecFromAnswers } from "@/data/questions";
+import { determineWorldAndCluster } from "@/data/worlds";
 import { getQuestsForCareer, getCurrentWeekNumber } from "@/data/weeklyQuests";
 import { Share2, Sparkles, Bot, ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
@@ -38,11 +39,20 @@ export default function Dashboard() {
     streak, pulseCheck, setPulseCheck,
     pathwayStartDate,
   } = useApp();
-  const { getCareerById } = useCareers();
+  const { getCareerById, getCareerListingById } = useCareers();
   const [shareOpen, setShareOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
   const arch = archetypes[archetype];
+
+  // Derive World & Cluster
+  const { assessmentAnswers } = useApp();
+  const riasecScores = computeRiasecFromAnswers(assessmentAnswers);
+  const matchedFamilyIds = matchedCareers.map((m) => {
+    const listing = getCareerListingById(m.careerId);
+    return listing?.familyId || "";
+  }).filter(Boolean);
+  const { world, cluster } = determineWorldAndCluster(riasecScores, matchedFamilyIds);
 
   // Active pathway — first matched career or selected one
   const activePathwayId = selectedCareerPath || matchedCareers[0]?.careerId || null;
@@ -98,6 +108,11 @@ export default function Dashboard() {
           <div>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Welcome back</p>
             <h1 className="text-2xl font-bold text-foreground">Hey {profile.name}! 👋</h1>
+            {matchedCareers.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {world.emoji} {world.name} · {cluster.emoji} {cluster.name}
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShareOpen(true)} className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
