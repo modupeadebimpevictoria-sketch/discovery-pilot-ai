@@ -56,6 +56,8 @@ export default function CareersManager() {
   const [syncProgress, setSyncProgress] = useState("");
   const [fixingPhotos, setFixingPhotos] = useState(false);
   const [photoProgress, setPhotoProgress] = useState("");
+  const [photoOffset, setPhotoOffset] = useState(0);
+  const [photoTotal, setPhotoTotal] = useState(0);
   const [enrichingSkills, setEnrichingSkills] = useState(false);
   const [skillProgress, setSkillProgress] = useState("");
 
