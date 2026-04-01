@@ -154,6 +154,9 @@ export default function CareerExploration() {
   const career = getCareerById(id || "") || listingToCareer(id || "", getCareerListingById, getCareerFamilyById);
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
+  const listing = getCareerListingById(id || "");
+  const cluster = listing ? getClusterByFamilyId(listing.familyId) : undefined;
+
   // Derive enriched description with fallback chain
   const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
   const dayInTheLife = dbCareer?.day_in_the_life || null;
