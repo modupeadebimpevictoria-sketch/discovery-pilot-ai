@@ -114,6 +114,7 @@ No markdown, no explanation, just the JSON array.`;
   // For each keyword, fetch top Unsplash result and update DB
   let succeeded = 0;
   let failed = 0;
+  let rateLimited = false;
   const errors: string[] = [];
 
   for (const item of keywords) {
@@ -123,6 +124,12 @@ No markdown, no explanation, just the JSON array.`;
       const unsplashResp = await fetch(searchUrl, {
         headers: { Authorization: `Client-ID ${unsplashKey}` },
       });
+
+      if (unsplashResp.status === 429) {
+        rateLimited = true;
+        errors.push(`Rate limited after ${succeeded} successful updates`);
+        break;
+      }
 
       if (!unsplashResp.ok) {
         const errText = await unsplashResp.text();
@@ -160,9 +167,11 @@ No markdown, no explanation, just the JSON array.`;
   return new Response(JSON.stringify({
     succeeded,
     failed,
+    rate_limited: rateLimited,
     total: keywords.length,
     offset,
     batch_size: batchSize,
+    next_offset: offset + succeeded + failed,
     errors: errors.slice(0, 10),
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },

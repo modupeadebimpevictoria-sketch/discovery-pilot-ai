@@ -56,40 +56,62 @@ export default function CareersManager() {
   const [syncProgress, setSyncProgress] = useState("");
   const [fixingPhotos, setFixingPhotos] = useState(false);
   const [photoProgress, setPhotoProgress] = useState("");
+  const [photoOffset, setPhotoOffset] = useState(0);
+  const [photoTotal, setPhotoTotal] = useState(0);
   const [enrichingSkills, setEnrichingSkills] = useState(false);
   const [skillProgress, setSkillProgress] = useState("");
 
   const handleFixAllPhotos = async () => {
-    if (!confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. This may take a few minutes. Continue?")) return;
+    const isResume = photoOffset > 0;
+    if (!isResume && !confirm("This will regenerate keywords and fetch new Unsplash photos for ALL active careers. Continue?")) return;
     setFixingPhotos(true);
     const batchSize = 20;
-    // Count total active careers
-    const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
-    const total = count || 0;
-    let processed = 0;
-    let totalSucceeded = 0;
-    let totalFailed = 0;
 
-    for (let offset = 0; offset < total; offset += batchSize) {
-      setPhotoProgress(`Fixing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
-      try {
-        const { data, error } = await supabase.functions.invoke("fill-unsplash-keywords", {
-          body: { batch_size: batchSize, offset },
-        });
-        if (error) throw error;
-        totalSucceeded += data.succeeded || 0;
-        totalFailed += data.failed || 0;
-        processed += data.total || 0;
-      } catch (err: any) {
-        toast.error(`Batch at offset ${offset} failed: ${err.message}`);
-        totalFailed += batchSize;
-      }
+    // Get total if not already known
+    let total = photoTotal;
+    if (!total) {
+      const { count } = await supabase.from("careers" as any).select("id", { count: "exact", head: true }).eq("is_active", true).eq("is_deleted", false);
+      total = count || 0;
+      setPhotoTotal(total);
     }
 
-    setPhotoProgress(`Done: ${totalSucceeded} updated, ${totalFailed} failed out of ${total}`);
-    toast.success(`Photos fixed: ${totalSucceeded}/${total}`);
-    fetchAll();
+    let offset = photoOffset;
+    setPhotoProgress(`Fixing ${offset + 1}–${Math.min(offset + batchSize, total)} / ${total}...`);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("fill-unsplash-keywords", {
+        body: { batch_size: batchSize, offset },
+      });
+      if (error) throw error;
+
+      const newOffset = offset + (data.succeeded || 0) + (data.failed || 0);
+      setPhotoOffset(newOffset);
+
+      if (data.rate_limited) {
+        setPhotoProgress(`⚠️ Rate limited — fixed ${newOffset} of ${total}. Click to continue from ${newOffset + 1}`);
+        toast.warning(`Unsplash rate limit hit after ${data.succeeded} photos. Click again to continue.`);
+      } else if (newOffset >= total) {
+        setPhotoProgress(`✅ Done: all ${total} careers processed`);
+        setPhotoOffset(0);
+        setPhotoTotal(0);
+        toast.success(`All career photos updated!`);
+      } else {
+        setPhotoProgress(`Fixed ${newOffset} of ${total} — click to continue from ${newOffset + 1}`);
+        toast.success(`Batch done: ${data.succeeded} updated. Click again to continue.`);
+      }
+      fetchAll();
+    } catch (err: any) {
+      toast.error(`Batch at offset ${offset} failed: ${err.message}`);
+      setPhotoProgress(`❌ Error at ${offset}. Click to retry from ${offset + 1}`);
+    }
+
     setFixingPhotos(false);
+  };
+
+  const handleResetPhotoProgress = () => {
+    setPhotoOffset(0);
+    setPhotoTotal(0);
+    setPhotoProgress("");
   };
 
   const handleEnrichSkills = async () => {
@@ -280,8 +302,18 @@ export default function CareersManager() {
             disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
           >
-            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
+            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} />
+            {photoOffset > 0 ? `Continue Photos (from ${photoOffset + 1})` : "Fix All Career Photos"}
           </button>
+          {photoOffset > 0 && (
+            <button
+              onClick={handleResetPhotoProgress}
+              className="px-2 py-2 rounded-lg bg-destructive/20 text-destructive text-xs font-semibold hover:bg-destructive/30"
+              title="Reset progress and start over"
+            >
+              <X size={14} />
+            </button>
+          )}
           <button
             onClick={handleEnrichSkills}
             disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
