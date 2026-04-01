@@ -1,6 +1,7 @@
 import { Heart, Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCareers, type CareerListing } from "@/contexts/CareersContext";
+import { getClusterByFamilyId } from "@/data/clusters";
 
 // Deterministic Unsplash photo for a career
 function getCareerPhoto(careerId: string): string {
