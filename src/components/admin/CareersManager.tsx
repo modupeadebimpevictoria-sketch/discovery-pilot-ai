@@ -280,23 +280,6 @@ export default function CareersManager() {
             </button>
           )}
           <button
-            onClick={handleFixAllPhotos}
-            disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} />
-            {photoOffset > 0 ? `Continue Photos (from ${photoOffset + 1})` : "Fix All Career Photos"}
-          </button>
-          {photoOffset > 0 && (
-            <button
-              onClick={handleResetPhotoProgress}
-              className="px-2 py-2 rounded-lg bg-destructive/20 text-destructive text-xs font-semibold hover:bg-destructive/30"
-              title="Reset progress and start over"
-            >
-              <X size={14} />
-            </button>
-          )}
-          <button
             onClick={handleEnrichSkills}
             disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
@@ -318,6 +301,30 @@ export default function CareersManager() {
         </div>
       </div>
 
+      {/* Photo Status Card */}
+      <div className="flex items-center gap-4 px-4 py-3 rounded-lg bg-muted/50 border border-border">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-foreground">
+            📷 Career Photos: {photoStatus ? `${photoStatus.withPhotos} of ${photoStatus.total} have photos` : "Loading..."}
+          </p>
+          <p className="text-xs text-muted-foreground">Auto-fills every hour via scheduled job</p>
+        </div>
+        <button
+          onClick={fetchPhotoStatus}
+          disabled={photoStatusLoading}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-semibold hover:bg-muted/80 disabled:opacity-50"
+        >
+          <RefreshCw size={12} className={photoStatusLoading ? "animate-spin" : ""} /> Refresh Status
+        </button>
+        <button
+          onClick={handleForceRunPhotos}
+          disabled={fixingPhotos || syncingOnet || syncingProspects}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
+        >
+          <RefreshCw size={12} className={fixingPhotos ? "animate-spin" : ""} /> Force run now
+        </button>
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-2">
         <button onClick={() => setTab("careers")} className={`px-4 py-1.5 rounded-full text-xs font-semibold ${tab === "careers" ? "gradient-bg text-primary-foreground" : "glass-card text-muted-foreground"}`}>
@@ -328,10 +335,10 @@ export default function CareersManager() {
         </button>
       </div>
 
-      {(syncProgress || photoProgress) && (
+      {syncProgress && (
         <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-          {(syncingOnet || syncingProspects || fixingPhotos) && <Loader2 size={14} className="animate-spin" />}
-          {syncProgress || photoProgress}
+          {(syncingOnet || syncingProspects) && <Loader2 size={14} className="animate-spin" />}
+          {syncProgress}
         </div>
       )}
 
