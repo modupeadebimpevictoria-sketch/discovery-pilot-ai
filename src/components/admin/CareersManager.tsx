@@ -302,8 +302,18 @@ export default function CareersManager() {
             disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 text-accent-foreground text-xs font-semibold hover:bg-accent/30 disabled:opacity-50"
           >
-            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} /> Fix All Career Photos
+            <RefreshCw size={14} className={fixingPhotos ? "animate-spin" : ""} />
+            {photoOffset > 0 ? `Continue Photos (from ${photoOffset + 1})` : "Fix All Career Photos"}
           </button>
+          {photoOffset > 0 && (
+            <button
+              onClick={handleResetPhotoProgress}
+              className="px-2 py-2 rounded-lg bg-destructive/20 text-destructive text-xs font-semibold hover:bg-destructive/30"
+              title="Reset progress and start over"
+            >
+              <X size={14} />
+            </button>
+          )}
           <button
             onClick={handleEnrichSkills}
             disabled={fixingPhotos || syncingOnet || syncingProspects || enrichingSkills}
