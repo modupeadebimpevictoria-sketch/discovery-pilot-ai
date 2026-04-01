@@ -1,6 +1,7 @@
 import { Heart, Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCareers, type CareerListing } from "@/contexts/CareersContext";
+import { getClusterByFamilyId } from "@/data/clusters";
 
 // Deterministic Unsplash photo for a career
 function getCareerPhoto(careerId: string): string {
@@ -36,6 +37,7 @@ interface CareerCardProps {
 export default function CareerCard({ career, matchScore, saved, onToggleSave, onClick, index }: CareerCardProps) {
   const { getCareerFamilyById } = useCareers();
   const family = getCareerFamilyById(career.familyId);
+  const cluster = getClusterByFamilyId(career.familyId);
   const score = matchScore ?? getMatchScore(career.id);
   const photoUrl = career.unsplashPhotoUrl || getCareerPhoto(career.id);
 
@@ -90,6 +92,10 @@ export default function CareerCard({ career, matchScore, saved, onToggleSave, on
             💰 {career.salaryRange}
           </span>
         </div>
+
+        {cluster && (
+          <p className="text-[8px] text-muted-foreground/70">{cluster.emoji} {cluster.name}</p>
+        )}
 
         {career.growthTag && (
           <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full ${

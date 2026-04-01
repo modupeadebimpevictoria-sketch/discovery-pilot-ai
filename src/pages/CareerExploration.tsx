@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { getClusterByFamilyId } from "@/data/clusters";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCareers, type Career } from "@/contexts/CareersContext";
 import { getMissionsByCareer } from "@/data/missions";
@@ -152,6 +153,9 @@ export default function CareerExploration() {
 
   const career = getCareerById(id || "") || listingToCareer(id || "", getCareerListingById, getCareerFamilyById);
   if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
+
+  const listing = getCareerListingById(id || "");
+  const cluster = listing ? getClusterByFamilyId(listing.familyId) : undefined;
 
   // Derive enriched description with fallback chain
   const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
@@ -330,6 +334,9 @@ export default function CareerExploration() {
               <span className="fact-pill border-primary/30 bg-primary/15 text-primary font-bold">🟢 Active Path</span>
             )}
           </div>
+          {cluster && (
+            <p className="text-[11px] text-muted-foreground/70 mt-1 drop-shadow-sm">{cluster.emoji} {cluster.name}</p>
+          )}
         </div>
       </div>
 
