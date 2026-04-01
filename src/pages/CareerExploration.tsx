@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { getClusterByFamilyId } from "@/data/clusters";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCareers, type Career } from "@/contexts/CareersContext";
 import { getMissionsByCareer } from "@/data/missions";
