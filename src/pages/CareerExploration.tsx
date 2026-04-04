@@ -212,7 +212,6 @@ export default function CareerExploration() {
             } catch {}
           }
         }
-        }
 
         const lines = text.split("\n").filter((l: string) => /^\d+\.\s/.test(l.trim()));
         const parsed = lines.slice(0, 3).map((l: string) => {
