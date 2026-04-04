@@ -167,6 +167,7 @@ export default function CareerExploration() {
   const clusterName = cluster ? cluster.name : "General";
 
   useEffect(() => {
+    if (!career) return;
     if (adjacentFetchedFor.current === career.id) return;
     adjacentFetchedFor.current = career.id;
     setAdjacentLoading(true);
@@ -182,7 +183,6 @@ export default function CareerExploration() {
         });
         if (resp.error) throw resp.error;
 
-        // resp.data is a ReadableStream — read it fully
         let text = "";
         if (resp.data instanceof ReadableStream) {
           const reader = resp.data.getReader();
@@ -213,7 +213,6 @@ export default function CareerExploration() {
           text = resp.data.choices[0]?.message?.content || "";
         }
 
-        // Parse numbered list
         const lines = text.split("\n").filter((l: string) => /^\d+\.\s/.test(l.trim()));
         const parsed = lines.slice(0, 3).map((l: string) => {
           const cleaned = l.replace(/^\d+\.\s*/, "").trim();
@@ -239,7 +238,9 @@ export default function CareerExploration() {
         setAdjacentLoading(false);
       }
     })();
-  }, [career.id, career.title, familyName, clusterName]);
+  }, [career?.id, career?.title, familyName, clusterName]);
+
+  if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
 
   const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
