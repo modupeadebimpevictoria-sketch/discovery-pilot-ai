@@ -178,39 +178,39 @@ export default function CareerExploration() {
 
     (async () => {
       try {
-        const resp = await supabase.functions.invoke("career-mentor", {
-          body: { messages: [{ role: "user", content: prompt }] },
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/career-mentor`;
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
         });
-        if (resp.error) throw resp.error;
+        if (!resp.ok || !resp.body) throw new Error("Failed");
 
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
         let text = "";
-        if (resp.data instanceof ReadableStream) {
-          const reader = resp.data.getReader();
-          const decoder = new TextDecoder();
-          let buf = "";
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buf += decoder.decode(value, { stream: true });
-            let idx: number;
-            while ((idx = buf.indexOf("\n")) !== -1) {
-              let line = buf.slice(0, idx);
-              buf = buf.slice(idx + 1);
-              if (line.endsWith("\r")) line = line.slice(0, -1);
-              if (!line.startsWith("data: ")) continue;
-              const json = line.slice(6).trim();
-              if (json === "[DONE]") continue;
-              try {
-                const parsed = JSON.parse(json);
-                const c = parsed.choices?.[0]?.delta?.content;
-                if (c) text += c;
-              } catch {}
-            }
+        let buf = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          let idx: number;
+          while ((idx = buf.indexOf("\n")) !== -1) {
+            let line = buf.slice(0, idx);
+            buf = buf.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line.startsWith("data: ")) continue;
+            const json = line.slice(6).trim();
+            if (json === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(json);
+              const c = parsed.choices?.[0]?.delta?.content;
+              if (c) text += c;
+            } catch {}
           }
-        } else if (typeof resp.data === "string") {
-          text = resp.data;
-        } else if (resp.data?.choices) {
-          text = resp.data.choices[0]?.message?.content || "";
         }
 
         const lines = text.split("\n").filter((l: string) => /^\d+\.\s/.test(l.trim()));
