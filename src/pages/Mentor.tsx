@@ -389,7 +389,7 @@ export default function MentorPage() {
         ))}
 
         {/* Typing indicator */}
-        {isLoading && messages[messages.length - 1]?.role === "user" && (
+        {isLoading && (messages.length === 0 || messages[messages.length - 1]?.role === "user") && (
           <div className="flex gap-2">
             <div className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
               <FindrLogo size={18} />
