@@ -29,6 +29,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Initialize PostHog (lazy to avoid dual-React bundle issues)
+if (typeof window !== 'undefined') {
+  import('./lib/posthog').then(({ initPostHog }) => initPostHog());
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
