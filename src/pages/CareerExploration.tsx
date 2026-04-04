@@ -448,6 +448,12 @@ export default function CareerExploration() {
         {/* 2. What people actually do */}
         <Card title="What people in this job actually do" icon={<BookOpen size={16} className="text-primary" />}>
           <p className="text-sm text-muted-foreground leading-relaxed">{heroDescription}</p>
+          <button
+            onClick={() => navigate(`/mentor?silent=${encodeURIComponent(`Show me what a career as a ${career.title} looks like in different settings`)}`)}
+            className="text-sm font-semibold text-[hsl(var(--glow-lime))] hover:underline mt-2 text-left"
+          >
+            See what this career looks like in different settings →
+          </button>
           <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
             {career.dailyLife.split(", ").slice(0, 5).map((task, i) => (
               <div key={i} className="flex items-start gap-2">
