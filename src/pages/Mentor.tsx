@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Sparkles, User } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
@@ -63,10 +64,91 @@ export default function MentorPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const studentContext = useStudentContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const autoSentRef = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Auto-send silent message from query param (e.g. adjacent career tap)
+  useEffect(() => {
+    const silentMsg = searchParams.get("silent");
+    if (silentMsg && !autoSentRef.current) {
+      autoSentRef.current = true;
+      // Clear the param from URL
+      setSearchParams({}, { replace: true });
+      sendSilent(silentMsg);
+    }
+  }, []);
+
+  /** Send a message silently — only the assistant response appears in the chat */
+  const sendSilent = async (text: string) => {
+    setIsLoading(true);
+    let assistantSoFar = "";
+    const allMessages: Msg[] = [{ role: "user", content: text }];
+
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ messages: allMessages, studentContext }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to connect");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let streamDone = false;
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") { streamDone = true; break; }
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantSoFar += content;
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant") {
+                  return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
+                }
+                return [...prev, { role: "assistant", content: assistantSoFar }];
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (e: any) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `Oops! ${e.message || "Something went wrong."} Try asking again! 😊` },
+      ]);
+    }
+    setIsLoading(false);
+  };
 
   const send = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -307,7 +389,7 @@ export default function MentorPage() {
         ))}
 
         {/* Typing indicator */}
-        {isLoading && messages[messages.length - 1]?.role === "user" && (
+        {isLoading && (messages.length === 0 || messages[messages.length - 1]?.role === "user") && (
           <div className="flex gap-2">
             <div className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
               <FindrLogo size={18} />

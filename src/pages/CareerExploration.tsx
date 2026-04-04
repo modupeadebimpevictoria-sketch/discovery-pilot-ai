@@ -771,8 +771,7 @@ export default function CareerExploration() {
                       const slug = match.slug || match.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
                       navigate(`/career/${slug}`);
                     } else {
-                      // Open mentor chat with the career title
-                      navigate(`/mentor?message=${encodeURIComponent(`Tell me about ${ac.title} and what it takes to get there`)}`);
+                      navigate(`/mentor?silent=${encodeURIComponent(`Tell me about ${ac.title}`)}`);
                     }
                   };
 
