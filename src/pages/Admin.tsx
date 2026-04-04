@@ -1254,26 +1254,99 @@ function SpotlightsManager({ data, editing, setEditing, onSave, onDelete }: any)
 // ANALYTICS
 // ═══════════════════════════════════════
 function AnalyticsDashboard() {
+  const [stats, setStats] = useState({
+    totalSignups: null as number | null,
+    assessmentRate: null as number | null,
+    dau: null as number | null,
+    topCareer: null as string | null,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { fetchStats(); }, []);
+
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const [
+        { count: signupCount },
+        { count: totalProfiles },
+        { count: assessedCount },
+        { count: dauCount },
+        { data: progressData },
+      ] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo.toISOString()),
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("user_progress").select("*", { count: "exact", head: true }).not("assessment_answers", "eq", "{}"),
+        supabase.from("user_progress").select("*", { count: "exact", head: true }).gte("updated_at", todayStart.toISOString()),
+        supabase.from("user_progress").select("saved_careers"),
+      ]);
+
+      const careerCounts: Record<string, number> = {};
+      progressData?.forEach((row: any) => {
+        if (Array.isArray(row.saved_careers)) {
+          row.saved_careers.forEach((id: string) => {
+            careerCounts[id] = (careerCounts[id] || 0) + 1;
+          });
+        }
+      });
+
+      const topCareerId = Object.entries(careerCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+      let topCareerName: string | null = null;
+      if (topCareerId) {
+        const { data: careerData } = await supabase.from("careers").select("title").eq("id", topCareerId).single();
+        topCareerName = careerData?.title || null;
+      }
+
+      setStats({
+        totalSignups: signupCount || 0,
+        assessmentRate: totalProfiles ? Math.round(((assessedCount || 0) / totalProfiles) * 100) : 0,
+        dau: dauCount || 0,
+        topCareer: topCareerName,
+      });
+    } catch (err) {
+      console.error("Analytics fetch error:", err);
+    }
+    setLoading(false);
+  };
+
+  const statCards = [
+    { label: "Total Signups", value: stats.totalSignups !== null ? stats.totalSignups.toLocaleString() : "—", desc: "Last 30 days" },
+    { label: "Assessment Rate", value: stats.assessmentRate !== null ? `${stats.assessmentRate}%` : "—", desc: "Completion %" },
+    { label: "DAU", value: stats.dau !== null ? stats.dau.toLocaleString() : "—", desc: "Active today" },
+    { label: "Top Career", value: stats.topCareer || "—", desc: "Most saved path" },
+  ];
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-foreground">Analytics</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-foreground">Analytics</h2>
+        <button onClick={fetchStats} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground">
+          <RefreshCw size={14} /> Refresh
+        </button>
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Signups", value: "—", desc: "Last 30 days" },
-          { label: "Assessment Rate", value: "—", desc: "Completion %" },
-          { label: "DAU", value: "—", desc: "Daily active users" },
-          { label: "Top Career", value: "—", desc: "Most popular path" },
-        ].map((stat) => (
+        {statCards.map((stat) => (
           <div key={stat.label} className="bg-card border border-border rounded-lg p-4">
-            <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+            {loading ? (
+              <div className="w-16 h-7 bg-muted/50 rounded animate-pulse mb-1" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground truncate">{stat.value}</p>
+            )}
             <p className="text-sm font-medium text-foreground">{stat.label}</p>
             <p className="text-[10px] text-muted-foreground">{stat.desc}</p>
           </div>
         ))}
       </div>
-      <div className="bg-card border border-border rounded-lg p-6 text-center text-muted-foreground">
-        <BarChart3 size={32} className="mx-auto mb-2 opacity-40" />
-        <p className="text-sm">Connect PostHog or analytics provider to see live data here</p>
+      <div className="bg-card border border-border rounded-lg p-4">
+        <p className="text-xs text-muted-foreground">
+          Signups, assessments, and saves pulled live from your database. Behavioral data (career clicks, quiz drop-off, session depth) is streaming to PostHog automatically and viewable at posthog.com.
+        </p>
       </div>
     </div>
   );
