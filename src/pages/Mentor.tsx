@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Sparkles, User } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
