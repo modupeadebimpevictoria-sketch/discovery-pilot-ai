@@ -65,11 +65,6 @@ export default function CareerProfileCard({
         )}
         {/* Bottom gradient scrim */}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card to-transparent" />
-        {/* Match badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-background/70 backdrop-blur-sm">
-          <Star size={10} className="text-primary fill-primary" />
-          <span className="text-[11px] font-bold text-foreground">{match}%</span>
-        </div>
       </div>
 
       {/* Info */}
