@@ -157,14 +157,13 @@ export default function CareerExploration() {
   }, [id]);
 
   const career = getCareerById(id || "") || listingToCareer(id || "", getCareerListingById, getCareerFamilyById);
-  if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   const listing = getCareerListingById(id || "");
   const cluster = listing ? getClusterByFamilyId(listing.familyId) : undefined;
 
   // Fetch adjacent careers from career-mentor
   const familyObj = listing ? getCareerFamilyById(listing.familyId) : undefined;
-  const familyName = familyObj?.name || career.category || "General";
+  const familyName = familyObj?.name || career?.category || "General";
   const clusterName = cluster ? cluster.name : "General";
 
   useEffect(() => {
