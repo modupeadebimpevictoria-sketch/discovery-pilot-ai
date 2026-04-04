@@ -450,7 +450,7 @@ export default function CareerExploration() {
           <p className="text-sm text-muted-foreground leading-relaxed">{heroDescription}</p>
           <button
             onClick={() => navigate(`/mentor?silent=${encodeURIComponent(`Show me what a career as a ${career.title} looks like in different settings`)}`)}
-            className="text-sm font-semibold text-[hsl(var(--glow-lime))] hover:underline mt-2 text-left"
+            className="text-sm font-semibold text-primary hover:underline mt-2 text-left"
           >
             See what this career looks like in different settings →
           </button>
