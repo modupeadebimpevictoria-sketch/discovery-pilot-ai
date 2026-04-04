@@ -8,7 +8,8 @@ import { getSkillDetails } from "@/data/skillDetails";
 import { getImagineYouScenarios } from "@/data/imagineYouScenarios";
 import { getInternshipsByCareer } from "@/data/internships";
 import { useApp } from "@/contexts/AppContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import ShareModal from "@/components/ShareModal";
 import OrbitChat from "@/components/PathfinderChat";
 import { SetActivePathModal, SwitchPathModal } from "@/components/ActivePathModal";
@@ -134,6 +135,10 @@ export default function CareerExploration() {
   const [showSetActiveModal, setShowSetActiveModal] = useState(false);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
   const [dbCareer, setDbCareer] = useState<any>(null);
+  const [adjacentCareers, setAdjacentCareers] = useState<{ title: string; connection: string }[] | null>(null);
+  const [adjacentLoading, setAdjacentLoading] = useState(true);
+  const [adjacentError, setAdjacentError] = useState(false);
+  const adjacentFetchedFor = useRef<string | null>(null);
 
   // Fetch enriched data from DB
   useEffect(() => {
@@ -152,12 +157,92 @@ export default function CareerExploration() {
   }, [id]);
 
   const career = getCareerById(id || "") || listingToCareer(id || "", getCareerListingById, getCareerFamilyById);
-  if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
 
   const listing = getCareerListingById(id || "");
   const cluster = listing ? getClusterByFamilyId(listing.familyId) : undefined;
 
-  // Derive enriched description with fallback chain
+  // Fetch adjacent careers from career-mentor
+  const familyObj = listing ? getCareerFamilyById(listing.familyId) : undefined;
+  const familyName = familyObj?.name || career?.category || "General";
+  const clusterName = cluster ? cluster.name : "General";
+
+  useEffect(() => {
+    if (!career) return;
+    if (adjacentFetchedFor.current === career.id) return;
+    adjacentFetchedFor.current = career.id;
+    setAdjacentLoading(true);
+    setAdjacentError(false);
+    setAdjacentCareers(null);
+
+    const prompt = `Based on the career ${career.title} which belongs to the ${familyName} family in the ${clusterName} cluster, suggest exactly 3 adjacent careers this teenager might also find interesting. For each career return: the career title, and one sentence explaining the connection to ${career.title}. The connection should be based on shared skills, overlapping work context, or a natural career crossover — not just similarity. Return only the 3 careers in this exact format:\n1. [Career Title] — [one sentence connection]\n2. [Career Title] — [one sentence connection]\n3. [Career Title] — [one sentence connection]\nNothing else. No intro, no outro.`;
+
+    (async () => {
+      try {
+        const resp = await supabase.functions.invoke("career-mentor", {
+          body: { messages: [{ role: "user", content: prompt }] },
+        });
+        if (resp.error) throw resp.error;
+
+        let text = "";
+        if (resp.data instanceof ReadableStream) {
+          const reader = resp.data.getReader();
+          const decoder = new TextDecoder();
+          let buf = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let idx: number;
+            while ((idx = buf.indexOf("\n")) !== -1) {
+              let line = buf.slice(0, idx);
+              buf = buf.slice(idx + 1);
+              if (line.endsWith("\r")) line = line.slice(0, -1);
+              if (!line.startsWith("data: ")) continue;
+              const json = line.slice(6).trim();
+              if (json === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(json);
+                const c = parsed.choices?.[0]?.delta?.content;
+                if (c) text += c;
+              } catch {}
+            }
+          }
+        } else if (typeof resp.data === "string") {
+          text = resp.data;
+        } else if (resp.data?.choices) {
+          text = resp.data.choices[0]?.message?.content || "";
+        }
+
+        const lines = text.split("\n").filter((l: string) => /^\d+\.\s/.test(l.trim()));
+        const parsed = lines.slice(0, 3).map((l: string) => {
+          const cleaned = l.replace(/^\d+\.\s*/, "").trim();
+          const dashIdx = cleaned.indexOf("—");
+          if (dashIdx === -1) {
+            const hyphenIdx = cleaned.indexOf(" - ");
+            if (hyphenIdx !== -1) {
+              return { title: cleaned.slice(0, hyphenIdx).trim(), connection: cleaned.slice(hyphenIdx + 3).trim() };
+            }
+            return { title: cleaned, connection: "" };
+          }
+          return { title: cleaned.slice(0, dashIdx).trim(), connection: cleaned.slice(dashIdx + 1).trim() };
+        });
+
+        if (parsed.length > 0) {
+          setAdjacentCareers(parsed);
+        } else {
+          setAdjacentError(true);
+        }
+      } catch {
+        setAdjacentError(true);
+      } finally {
+        setAdjacentLoading(false);
+      }
+    })();
+  }, [career?.id, career?.title, familyName, clusterName]);
+
+  if (!career) return <div className="p-8 text-center text-muted-foreground">Career not found</div>;
+
+
   const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
   const dayInTheLife = dbCareer?.day_in_the_life || null;
   const enrichedSkills: { name: string; importance: number }[] | null = dbCareer?.skills || null;
@@ -655,6 +740,59 @@ export default function CareerExploration() {
           </div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
+
+        {/* You might also like */}
+        {!adjacentError && (adjacentLoading || (adjacentCareers && adjacentCareers.length > 0)) && (
+          <div className="space-y-2">
+            <div>
+              <h3 className="font-bold text-foreground text-sm">You might also like</h3>
+              <p className="text-xs text-muted-foreground">Based on this career</p>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              {adjacentLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-[200px] glass-card rounded-2xl p-3 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                ))
+              ) : (
+                adjacentCareers?.map((ac, i) => {
+
+                  const handleCardClick = async () => {
+                    // Try to find the career in DB
+                    const { data } = await supabase.from("careers" as any).select("id, title, slug").eq("is_active", true);
+                    const normalised = ac.title.toLowerCase().trim();
+                    const match = (data as any[] || []).find((c: any) =>
+                      c.title.toLowerCase().trim() === normalised
+                    );
+                    if (match) {
+                      const slug = match.slug || match.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                      navigate(`/career/${slug}`);
+                    } else {
+                      // Open mentor chat with the career title
+                      navigate(`/mentor?message=${encodeURIComponent(`Tell me about ${ac.title} and what it takes to get there`)}`);
+                    }
+                  };
+
+                  return (
+                    <button
+                      key={i}
+                      onClick={handleCardClick}
+                      className="flex-shrink-0 w-[200px] glass-card rounded-2xl p-3 text-left space-y-1 active:scale-[0.98] transition-transform"
+                    >
+                      <p className="text-sm font-bold text-foreground leading-tight">{ac.title}</p>
+                      {ac.connection && (
+                        <p className="text-xs text-muted-foreground leading-snug">{ac.connection}</p>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Action pills — compact row */}
         <div className="flex flex-wrap gap-2">
