@@ -759,14 +759,6 @@ export default function CareerExploration() {
                 ))
               ) : (
                 adjacentCareers?.map((ac, i) => {
-                  // Try to find matching career in DB by title (case-insensitive)
-                  const matchingListing = (() => {
-                    const normalised = ac.title.toLowerCase().trim();
-                    // Search through all career families
-                    const allListings: any[] = [];
-                    // We can check dbCareer's siblings via supabase, but simpler: check CareersContext
-                    return null; // Will be resolved via click handler
-                  })();
 
                   const handleCardClick = async () => {
                     // Try to find the career in DB
