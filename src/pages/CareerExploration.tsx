@@ -741,6 +741,67 @@ export default function CareerExploration() {
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
 
+        {/* You might also like */}
+        {!adjacentError && (adjacentLoading || (adjacentCareers && adjacentCareers.length > 0)) && (
+          <div className="space-y-2">
+            <div>
+              <h3 className="font-bold text-foreground text-sm">You might also like</h3>
+              <p className="text-xs text-muted-foreground">Based on this career</p>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              {adjacentLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-[200px] glass-card rounded-2xl p-3 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                ))
+              ) : (
+                adjacentCareers?.map((ac, i) => {
+                  // Try to find matching career in DB by title (case-insensitive)
+                  const matchingListing = (() => {
+                    const normalised = ac.title.toLowerCase().trim();
+                    // Search through all career families
+                    const allListings: any[] = [];
+                    // We can check dbCareer's siblings via supabase, but simpler: check CareersContext
+                    return null; // Will be resolved via click handler
+                  })();
+
+                  const handleCardClick = async () => {
+                    // Try to find the career in DB
+                    const { data } = await supabase.from("careers" as any).select("id, title, slug").eq("is_active", true);
+                    const normalised = ac.title.toLowerCase().trim();
+                    const match = (data as any[] || []).find((c: any) =>
+                      c.title.toLowerCase().trim() === normalised
+                    );
+                    if (match) {
+                      const slug = match.slug || match.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                      navigate(`/career/${slug}`);
+                    } else {
+                      // Open mentor chat with the career title
+                      navigate(`/mentor?message=${encodeURIComponent(`Tell me about ${ac.title} and what it takes to get there`)}`);
+                    }
+                  };
+
+                  return (
+                    <button
+                      key={i}
+                      onClick={handleCardClick}
+                      className="flex-shrink-0 w-[200px] glass-card rounded-2xl p-3 text-left space-y-1 active:scale-[0.98] transition-transform"
+                    >
+                      <p className="text-sm font-bold text-foreground leading-tight">{ac.title}</p>
+                      {ac.connection && (
+                        <p className="text-xs text-muted-foreground leading-snug">{ac.connection}</p>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Action pills — compact row */}
         <div className="flex flex-wrap gap-2">
           <button onClick={() => setShareOpen(true)} className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2 border border-border bg-muted/30 active:scale-95 transition-transform text-muted-foreground">
