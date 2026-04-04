@@ -162,7 +162,87 @@ export default function CareerExploration() {
   const listing = getCareerListingById(id || "");
   const cluster = listing ? getClusterByFamilyId(listing.familyId) : undefined;
 
-  // Derive enriched description with fallback chain
+  // Fetch adjacent careers from career-mentor
+  const familyObj = listing ? getCareerFamilyById(listing.familyId) : undefined;
+  const familyName = familyObj?.name || career.category || "General";
+  const clusterName = cluster ? cluster.name : "General";
+
+  useEffect(() => {
+    if (adjacentFetchedFor.current === career.id) return;
+    adjacentFetchedFor.current = career.id;
+    setAdjacentLoading(true);
+    setAdjacentError(false);
+    setAdjacentCareers(null);
+
+    const prompt = `Based on the career ${career.title} which belongs to the ${familyName} family in the ${clusterName} cluster, suggest exactly 3 adjacent careers this teenager might also find interesting. For each career return: the career title, and one sentence explaining the connection to ${career.title}. The connection should be based on shared skills, overlapping work context, or a natural career crossover — not just similarity. Return only the 3 careers in this exact format:\n1. [Career Title] — [one sentence connection]\n2. [Career Title] — [one sentence connection]\n3. [Career Title] — [one sentence connection]\nNothing else. No intro, no outro.`;
+
+    (async () => {
+      try {
+        const resp = await supabase.functions.invoke("career-mentor", {
+          body: { messages: [{ role: "user", content: prompt }] },
+        });
+        if (resp.error) throw resp.error;
+
+        // resp.data is a ReadableStream — read it fully
+        let text = "";
+        if (resp.data instanceof ReadableStream) {
+          const reader = resp.data.getReader();
+          const decoder = new TextDecoder();
+          let buf = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let idx: number;
+            while ((idx = buf.indexOf("\n")) !== -1) {
+              let line = buf.slice(0, idx);
+              buf = buf.slice(idx + 1);
+              if (line.endsWith("\r")) line = line.slice(0, -1);
+              if (!line.startsWith("data: ")) continue;
+              const json = line.slice(6).trim();
+              if (json === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(json);
+                const c = parsed.choices?.[0]?.delta?.content;
+                if (c) text += c;
+              } catch {}
+            }
+          }
+        } else if (typeof resp.data === "string") {
+          text = resp.data;
+        } else if (resp.data?.choices) {
+          text = resp.data.choices[0]?.message?.content || "";
+        }
+
+        // Parse numbered list
+        const lines = text.split("\n").filter((l: string) => /^\d+\.\s/.test(l.trim()));
+        const parsed = lines.slice(0, 3).map((l: string) => {
+          const cleaned = l.replace(/^\d+\.\s*/, "").trim();
+          const dashIdx = cleaned.indexOf("—");
+          if (dashIdx === -1) {
+            const hyphenIdx = cleaned.indexOf(" - ");
+            if (hyphenIdx !== -1) {
+              return { title: cleaned.slice(0, hyphenIdx).trim(), connection: cleaned.slice(hyphenIdx + 3).trim() };
+            }
+            return { title: cleaned, connection: "" };
+          }
+          return { title: cleaned.slice(0, dashIdx).trim(), connection: cleaned.slice(dashIdx + 1).trim() };
+        });
+
+        if (parsed.length > 0) {
+          setAdjacentCareers(parsed);
+        } else {
+          setAdjacentError(true);
+        }
+      } catch {
+        setAdjacentError(true);
+      } finally {
+        setAdjacentLoading(false);
+      }
+    })();
+  }, [career.id, career.title, familyName, clusterName]);
+
+
   const heroDescription = dbCareer?.what_they_do_teen || dbCareer?.description_full || career.description;
   const dayInTheLife = dbCareer?.day_in_the_life || null;
   const enrichedSkills: { name: string; importance: number }[] | null = dbCareer?.skills || null;
