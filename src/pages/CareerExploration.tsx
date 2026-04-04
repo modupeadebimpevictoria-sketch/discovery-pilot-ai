@@ -135,6 +135,10 @@ export default function CareerExploration() {
   const [showSetActiveModal, setShowSetActiveModal] = useState(false);
   const [showSwitchModal, setShowSwitchModal] = useState(false);
   const [dbCareer, setDbCareer] = useState<any>(null);
+  const [adjacentCareers, setAdjacentCareers] = useState<{ title: string; connection: string }[] | null>(null);
+  const [adjacentLoading, setAdjacentLoading] = useState(true);
+  const [adjacentError, setAdjacentError] = useState(false);
+  const adjacentFetchedFor = useRef<string | null>(null);
 
   // Fetch enriched data from DB
   useEffect(() => {
