@@ -406,7 +406,7 @@ export default function MentorPage() {
       </div>
 
       {/* Input */}
-      <div className="glass-heavy border-t border-glass-border/30 px-4 py-3 sticky bottom-20">
+      <div className="glass-heavy border-t border-glass-border/30 px-4 py-3 flex-shrink-0">
         <form
           onSubmit={(e) => { e.preventDefault(); send(input); }}
           className="flex gap-2"
