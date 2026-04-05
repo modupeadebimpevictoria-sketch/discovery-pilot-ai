@@ -121,10 +121,10 @@ export default function Me() {
 
       if (error) throw error;
 
-      const { data } = supabase.storage
+      const { data } = await supabase.storage
         .from("avatars")
-        .getPublicUrl(`${user.id}/avatar`);
-      setAvatarUrl(`${data.publicUrl}?t=${Date.now()}`);
+        .createSignedUrl(`${user.id}/avatar`, 3600);
+      if (data?.signedUrl) setAvatarUrl(data.signedUrl);
       toast.success("Avatar updated! 📸");
     } catch (err: any) {
       toast.error(err.message || "Upload failed");
