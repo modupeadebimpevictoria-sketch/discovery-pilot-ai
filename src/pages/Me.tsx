@@ -31,7 +31,7 @@ export default function Me() {
     user, profile, setProfile, signOut, xp,
     savedCareers, journalEntries,
   } = useApp();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, toggle } = useTheme();
 
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(profile?.name || "");
@@ -381,20 +381,19 @@ export default function Me() {
           {/* Theme */}
           <div className="glass-card p-3.5 rounded-xl space-y-3">
             <div className="flex items-center gap-3">
-              {resolvedTheme === "dark" ? <Moon size={18} className="text-glow-purple" /> : <Sun size={18} className="text-primary" />}
+              {theme === "night" ? <Moon size={18} className="text-glow-purple" /> : <Sun size={18} className="text-primary" />}
               <p className="text-sm font-semibold text-foreground flex-1">Theme</p>
             </div>
             <div className="flex gap-1 p-1 rounded-xl bg-muted/50">
               {[
-                { value: "light" as const, label: "Light", icon: Sun },
-                { value: "dark" as const, label: "Dark", icon: Moon },
-                { value: "system" as const, label: "System", icon: Monitor },
+                { value: "night" as const, label: "Night", icon: Moon },
+                { value: "day" as const, label: "Day", icon: Sun },
               ].map((opt) => {
                 const active = theme === opt.value;
                 return (
                   <button
                     key={opt.value}
-                    onClick={() => setTheme(opt.value)}
+                    onClick={toggle}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all ${
                       active ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                     }`}
