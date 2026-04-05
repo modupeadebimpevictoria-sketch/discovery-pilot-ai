@@ -12,7 +12,7 @@ export default function Jobs() {
           className="text-2xl font-bold leading-snug"
           style={{ color: "#1a1a2e" }}
         >
-          Your first job is closer than you think.
+          Your first work experience is closer than you think.
         </h1>
         <p
           className="text-sm leading-relaxed"
