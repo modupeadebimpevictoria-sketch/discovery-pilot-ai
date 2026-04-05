@@ -202,7 +202,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
                 🚀
               </motion.div>
               <h3 className="text-lg font-bold gradient-text">
-                {studentContext.name ? `Hey ${studentContext.name}! 👋` : "Hey there! I'm Findr AI"}
+                {studentContext.name ? `Hey ${studentContext.name}! 👋` : "Hey there! I'm your AI Mentor"}
               </h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 {activeCareer

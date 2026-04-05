@@ -285,7 +285,7 @@ export default function MentorPage() {
           <img src="/findr-logo.png" alt="Findr" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
         </div>
         <div className="flex-1">
-          <h2 className="text-sm font-bold text-foreground">Findr AI Mentor</h2>
+          <h2 className="text-sm font-bold text-foreground">AI Mentor</h2>
           <p className="text-[10px] text-muted-foreground">
             {activeCareer ? `Helping you explore ${activeCareer} 🎯` : "Your career guide — ask anything 🚀"}
           </p>
