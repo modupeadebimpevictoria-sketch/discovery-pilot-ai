@@ -10,10 +10,10 @@ export default function Jobs() {
         <h1 className="text-xl font-bold text-foreground">
           Your first job is closer than you think.
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed mt-2">
           Internships, part-time roles, and holiday jobs for teenagers, all in one place. Coming soon on Findr.
         </p>
-        <p className="text-xs text-muted-foreground/70 leading-relaxed">
+        <p className="text-xs text-muted-foreground/70 leading-relaxed mt-6">
           Add Findr to your home screen so you're the first to know when Jobs drops.
         </p>
       </div>
