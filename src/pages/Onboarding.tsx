@@ -81,6 +81,11 @@ export default function Onboarding() {
         <motion.div className="h-full gradient-bg" animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
       </div>
 
+      {/* Logo */}
+      <div className="flex justify-center pt-6">
+        <img src="/findr-logo.png" alt="Findr" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
+      </div>
+
       <div className="px-5 pt-4 flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{step + 1} of {steps.length}</span>
         <span className="text-xs font-bold text-primary">{Math.round(progress)}%</span>
