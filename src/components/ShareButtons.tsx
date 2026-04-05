@@ -150,10 +150,10 @@ export default function ShareButtons({ cardRef, colors }: Props) {
             <button
               onClick={btn.handler}
               disabled={busy}
-              className="w-full py-2.5 px-4 rounded-full text-xs font-semibold transition-opacity disabled:opacity-60"
+              className="w-full py-2.5 px-4 rounded-full text-xs font-semibold transition-opacity disabled:opacity-60 flex items-center justify-center gap-1.5"
               style={{ background: colors.dark, color: colors.light }}
             >
-              {busy ? "…" : btn.label}
+              {busy ? "…" : <><btn.icon />{btn.label}</>}
             </button>
             {activeTooltip === btn.key && tooltipMessages[btn.key] && (
               <div
