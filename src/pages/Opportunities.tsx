@@ -272,7 +272,7 @@ export default function Opportunities() {
                   </p>
                   <button
                     onClick={() => navigate("/career-exploration")}
-                    className="mt-2 px-4 py-1.5 rounded-full text-xs font-bold bg-lime-500 text-black hover:bg-lime-400 transition-colors"
+                    className="mt-2 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     Explore careers →
                   </button>
