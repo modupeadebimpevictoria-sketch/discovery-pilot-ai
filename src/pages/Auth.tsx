@@ -63,8 +63,9 @@ export default function Auth() {
             <motion.span animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 3 }} className="text-6xl block">
               {mode === "forgot" ? "🔑" : "🚀"}
             </motion.span>
+            <img src="/findr-logo.png" alt="Findr" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} className="mx-auto" />
             <h1 className="text-2xl font-bold gradient-text">
-              {mode === "login" ? "Welcome Back!" : mode === "signup" ? "Join Findr" : "Reset Password"}
+              {mode === "login" ? "Welcome Back!" : mode === "signup" ? "Join Us" : "Reset Password"}
             </h1>
             <p className="text-sm text-muted-foreground">
               {mode === "login"

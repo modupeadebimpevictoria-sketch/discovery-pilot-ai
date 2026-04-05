@@ -182,7 +182,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
             <Bot size={20} className="text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-foreground">Findr AI</h2>
+            <h2 className="text-sm font-bold text-foreground">AI Mentor</h2>
             <p className="text-[10px] text-muted-foreground">
               {activeCareer ? `Helping you become a ${activeCareer} 🎯` : "Your career launchpad 🚀"}
             </p>
@@ -202,7 +202,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
                 🚀
               </motion.div>
               <h3 className="text-lg font-bold gradient-text">
-                {studentContext.name ? `Hey ${studentContext.name}! 👋` : "Hey there! I'm Findr AI"}
+                {studentContext.name ? `Hey ${studentContext.name}! 👋` : "Hey there! I'm your AI Mentor"}
               </h3>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 {activeCareer
