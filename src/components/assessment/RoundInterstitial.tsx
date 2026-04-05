@@ -19,31 +19,42 @@ function OrbitingSVG({ accent }: { accent: string }) {
   const lightAccent = accent + "33";
   return (
     <svg viewBox="0 0 200 200" className="w-40 h-40" aria-hidden>
-      {/* Central shape */}
-      <rect x="70" y="70" width="60" height="60" rx="14" fill={accent} opacity={0.18} />
-      <rect x="80" y="80" width="40" height="40" rx="10" fill={accent} opacity={0.5} />
-      {/* Orbit path */}
-      <circle cx="100" cy="100" r="80" fill="none" stroke={lightAccent} strokeWidth="1.5" />
-      {/* Orbiting circle */}
+      {/* Outer glow ring */}
       <motion.circle
-        cx="100"
-        cy="20"
-        r="10"
-        fill={accent}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
-        style={{ originX: "100px", originY: "100px", transformOrigin: "100px 100px" }}
+        cx="100" cy="100" r="80"
+        fill="none" stroke={lightAccent} strokeWidth="1.5"
+        animate={{ scale: [1, 1.04, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "100px 100px" }}
       />
-      {/* Small decorative dot on opposite side */}
-      <motion.circle
-        cx="100"
-        cy="180"
-        r="5"
+      {/* Central shape — breathing pulse */}
+      <motion.rect
+        x="70" y="70" width="60" height="60" rx="14"
+        fill={accent} opacity={0.18}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.18, 0.28, 0.18] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "100px 100px" }}
+      />
+      <motion.rect
+        x="80" y="80" width="40" height="40" rx="10"
         fill={accent}
-        opacity={0.35}
+        animate={{ scale: [1, 1.06, 1], opacity: [0.5, 0.7, 0.5] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+        style={{ transformOrigin: "100px 100px" }}
+      />
+      {/* Orbiting circle — slower */}
+      <motion.circle
+        cx="100" cy="20" r="10" fill={accent}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        style={{ transformOrigin: "100px 100px" }}
+      />
+      {/* Counter-orbiting dot */}
+      <motion.circle
+        cx="100" cy="180" r="5" fill={accent} opacity={0.35}
         animate={{ rotate: -360 }}
-        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
-        style={{ originX: "100px", originY: "100px", transformOrigin: "100px 100px" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        style={{ transformOrigin: "100px 100px" }}
       />
     </svg>
   );
