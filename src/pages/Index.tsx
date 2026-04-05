@@ -184,7 +184,7 @@ export default function Index() {
       >
         {/* Logo — top left */}
         <div className="absolute top-6 left-6 z-20 flex items-center gap-2.5">
-          <img src="/findr-logo.png" alt="Findr" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+          <img src="/findr-logo.png" alt="Findr" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
         </div>
 
         {/* Hero content */}

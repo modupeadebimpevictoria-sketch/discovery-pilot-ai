@@ -14,7 +14,7 @@ export default function TopBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-40 px-5 py-3 bg-background/80 backdrop-blur-xl border-b border-border/30 flex items-center justify-between">
       <div className="flex items-center gap-2.5">
-        <img src="/findr-logo.png" alt="Findr" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+        <img src="/findr-logo.png" alt="Findr" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
       </div>
       <div className="flex items-center gap-3">
         <ThemeToggle theme={theme} toggle={toggle} />
