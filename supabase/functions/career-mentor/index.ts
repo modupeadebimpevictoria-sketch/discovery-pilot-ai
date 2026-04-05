@@ -66,7 +66,7 @@ Rules:
     if (context.dreamCareer) parts.push(`Dream career: ${context.dreamCareer}`);
     if (context.activeCareer) parts.push(`Current Active Path career: ${context.activeCareer}`);
     if (context.matchedCareers?.length) {
-      parts.push(`Top 3 matched careers: ${context.matchedCareers.map(m => `${m.title} (${m.score}% match)`).join(", ")}`);
+      parts.push(`Top 3 matched careers: ${context.matchedCareers.map(m => m.title).join(", ")}`);
     }
     if (context.archetype) parts.push(`Career archetype: ${context.archetype}`);
     if (context.xp !== undefined) parts.push(`XP earned: ${context.xp}`);

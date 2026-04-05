@@ -44,7 +44,7 @@ export default function MatchedPathwaysQueue({ matchedCareers, activePathwayId, 
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground truncate">{career.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{match.score}% fit</p>
+                  <p className="text-[10px] text-muted-foreground">Matched for you</p>
                 </div>
                 <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
                   <Lock size={10} />
