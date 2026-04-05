@@ -233,7 +233,7 @@ export default function Results() {
                   onClick={() => setSelectedCareerPath(career.id)}
                   className={`flex-1 flex items-center justify-center gap-2 text-sm py-2.5 rounded-xl font-medium transition-all ${
                     isActive
-                      ? "bg-[#a3e635] text-black"
+                      ? "bg-primary text-primary-foreground"
                       : "btn-glass"
                   }`}
                 >
