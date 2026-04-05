@@ -52,15 +52,17 @@ export default function Me() {
   const levelProgress = nextLevel ? ((xp - level.min) / (nextLevel.min - level.min)) * 100 : 100;
   const initial = profile?.name?.[0]?.toUpperCase() || "?";
 
-  // Load avatar URL
-  useState(() => {
-    if (user) {
-      const { data } = supabase.storage
+  // Load avatar URL (signed URL since bucket is private)
+  useEffect(() => {
+    if (!user) return;
+    const loadAvatar = async () => {
+      const { data } = await supabase.storage
         .from("avatars")
-        .getPublicUrl(`${user.id}/avatar`);
-      setAvatarUrl(`${data.publicUrl}?t=${Date.now()}`);
-    }
-  });
+        .createSignedUrl(`${user.id}/avatar`, 3600);
+      if (data?.signedUrl) setAvatarUrl(data.signedUrl);
+    };
+    loadAvatar();
+  }, [user]);
 
   // Load saved opportunities
   useEffect(() => {
@@ -119,10 +121,10 @@ export default function Me() {
 
       if (error) throw error;
 
-      const { data } = supabase.storage
+      const { data } = await supabase.storage
         .from("avatars")
-        .getPublicUrl(`${user.id}/avatar`);
-      setAvatarUrl(`${data.publicUrl}?t=${Date.now()}`);
+        .createSignedUrl(`${user.id}/avatar`, 3600);
+      if (data?.signedUrl) setAvatarUrl(data.signedUrl);
       toast.success("Avatar updated! 📸");
     } catch (err: any) {
       toast.error(err.message || "Upload failed");
