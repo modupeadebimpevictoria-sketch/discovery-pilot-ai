@@ -12,9 +12,7 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ isOpen, onClose, careerTitle, careerEmoji, score, archetype }: ShareModalProps) {
-  const shareText = score
-    ? `I'm a Future ${careerTitle} ${careerEmoji} with ${score}% match on Findr! 🚀`
-    : archetype
+  const shareText = archetype
     ? `I'm ${archetype} ${careerEmoji} according to Findr! ✨`
     : `Check out ${careerTitle} ${careerEmoji} on Findr! 🔥`;
 

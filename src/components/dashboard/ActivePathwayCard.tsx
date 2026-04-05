@@ -28,7 +28,7 @@ export default function ActivePathwayCard({ career, matchScore, questsCompleted,
           </div>
           <div className="flex-1">
             <h3 className="text-base font-bold text-foreground">{career.title}</h3>
-            <span className="text-xs font-bold text-primary">{matchScore}% match</span>
+            <span className="text-xs font-bold text-primary">Your active path</span>
           </div>
         </div>
 
