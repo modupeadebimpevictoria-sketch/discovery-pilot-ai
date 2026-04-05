@@ -13,6 +13,9 @@ export default function Jobs() {
         <p className="text-sm text-muted-foreground leading-relaxed">
           Internships, part-time roles, and holiday jobs for teenagers, all in one place. Coming soon on Findr.
         </p>
+        <p className="text-xs text-muted-foreground/70 leading-relaxed">
+          Add Findr to your home screen so you're the first to know when Jobs drops.
+        </p>
       </div>
     </div>
   );
