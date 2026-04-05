@@ -182,9 +182,10 @@ export default function Index() {
         overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
-        {/* Logo — top left */}
-        <div className="absolute top-6 left-6 z-20 flex items-center gap-2.5">
+        {/* Top nav bar */}
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-5 py-4">
           <img src="/findr-logo.png" alt="Findr" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+          <div />
         </div>
 
         {/* Hero content */}
