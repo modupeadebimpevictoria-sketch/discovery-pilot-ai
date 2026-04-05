@@ -278,9 +278,9 @@ export default function MentorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20">
+    <div className="h-[100dvh] bg-background flex flex-col pb-20 overflow-hidden">
       {/* Header */}
-      <div className="glass-heavy border-b border-glass-border/30 px-4 py-3 flex items-center gap-3 sticky top-[52px] z-30">
+      <div className="glass-heavy border-b border-glass-border/30 px-4 py-3 flex items-center gap-3 flex-shrink-0 z-30">
         <div className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center overflow-hidden">
           <FindrLogo size={28} />
         </div>
