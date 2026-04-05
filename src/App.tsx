@@ -21,6 +21,7 @@ import Quests from "./pages/Quests";
 import CareerPassport from "./pages/CareerPassport";
 import Opportunities from "./pages/Opportunities";
 import Mentor from "./pages/Mentor";
+import Jobs from "./pages/Jobs";
 import Me from "./pages/Me";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
