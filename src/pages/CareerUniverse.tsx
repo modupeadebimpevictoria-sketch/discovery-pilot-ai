@@ -139,7 +139,7 @@ export default function CareerUniverse() {
               onClick={() => handleClusterSelect(pill.id)}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                 selectedCluster === pill.id
-                  ? "bg-[#a3e635] text-black shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-transparent text-muted-foreground border border-border/60 hover:border-border"
               }`}
             >
@@ -161,7 +161,7 @@ export default function CareerUniverse() {
                 onClick={() => handleFamilySelect(fam.id)}
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-200 ${
                   selectedFamily === fam.id
-                    ? "border border-[#a3e635] text-[#a3e635] bg-background"
+                    ? "border border-primary text-primary bg-background"
                     : "bg-muted/40 text-muted-foreground border border-transparent hover:bg-muted/60"
                 }`}
               >
