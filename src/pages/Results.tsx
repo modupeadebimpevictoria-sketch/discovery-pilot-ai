@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
 import { computeRiasecFromAnswers } from "@/data/questions";
@@ -8,6 +9,7 @@ import { determineWorldAndCluster } from "@/data/worlds";
 import { getClusterByFamilyId } from "@/data/clusters";
 import { fireConfetti } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";
+import ShareableResultCard from "@/components/ShareableResultCard";
 import PostAssessmentWalkthrough from "@/components/PostAssessmentWalkthrough";
 import { ArrowRight, Share2, Check } from "lucide-react";
 
@@ -22,6 +24,41 @@ export default function Results() {
   const [phase, setPhase] = useState<"reveal" | "results" | "walkthrough">("reveal");
   const [walkthroughSeen] = useState(() => localStorage.getItem("sb_walkthrough_seen") === "true");
   const [shareOpen, setShareOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareCard = useCallback(async () => {
+    if (!cardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      });
+      const blob = await new Promise<Blob | null>((res) =>
+        canvas.toBlob(res, "image/png")
+      );
+      if (!blob) return;
+
+      const file = new File([blob], "my-findr-result.png", { type: "image/png" });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "My Findr Result" });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "my-findr-result.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (e) {
+      console.error("Share failed", e);
+    } finally {
+      setSharing(false);
+    }
+  }, [sharing]);
 
   // Derive World & Cluster from assessment answers + matched careers
   const riasecScores = computeRiasecFromAnswers(assessmentAnswers);
@@ -139,7 +176,39 @@ export default function Results() {
         </motion.div>
       </div>
 
-      {/* Layer 2 — 3 career starting points */}
+      {/* Shareable Result Card — rendered off-screen at fixed 600px for capture */}
+      <div
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+          width: 600,
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      >
+        <ShareableResultCard
+          ref={cardRef}
+          world={world}
+          cluster={cluster}
+          careers={matchedCareers.slice(0, 3).map((m) => {
+            const c = getCareerById(m.careerId);
+            return { id: m.careerId, title: c?.title || "", emoji: c?.emoji || "" };
+          })}
+        />
+      </div>
+
+      {/* Share my result button */}
+      <div className="px-5 pb-4">
+        <button
+          onClick={handleShareCard}
+          disabled={sharing}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm btn-glass"
+        >
+          <Share2 size={16} />
+          {sharing ? "Generating…" : "Share my result"}
+        </button>
+      </div>
       <div className="px-5 space-y-4">
         <div>
           <h2 className="text-xl font-bold text-foreground">Start your exploration here</h2>
