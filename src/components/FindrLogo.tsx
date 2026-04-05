@@ -45,7 +45,7 @@ export default function FindrLogo({ size = 40, darkBackground, className = "" }:
       {/* Electric lime arc — springboard surface */}
       <path
         d="M 32 142 Q 100 172 168 142"
-        stroke="#AAED4E"
+        stroke="#F06D5C"
         strokeWidth="8"
         strokeLinecap="round"
         fill="none"
