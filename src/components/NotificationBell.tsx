@@ -35,18 +35,10 @@ export default function NotificationBell() {
 
     load();
 
-    const channel = supabase
-      .channel("user-notifications")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        (payload) => {
-          setNotifications((prev) => [payload.new as Notification, ...prev]);
-        }
-      )
-      .subscribe();
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(load, 30000);
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { clearInterval(interval); };
   }, [user]);
 
   const markAllRead = async () => {
