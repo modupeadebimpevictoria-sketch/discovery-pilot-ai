@@ -7,6 +7,7 @@ import { careers as careerData } from "@/data/careers";
 import { ArrowRight, ChevronLeft, Sparkles } from "lucide-react";
 import { fireBurst } from "@/lib/confetti";
 import { illustrationMap } from "@/components/assessment/AssessmentIllustrations";
+import RoundInterstitial from "@/components/assessment/RoundInterstitial";
 import { supabase } from "@/integrations/supabase/client";
 
 type Screen = { type: "intro"; round: number } | { type: "question"; qIndex: number } | { type: "celebration"; round: number } | { type: "loading" };
@@ -157,8 +158,7 @@ export default function Assessment() {
   }, [setAssessmentAnswers, setMatchedCareers, setArchetype, addBadge, addXp, navigate]);
 
   const handleCelebration = useCallback(() => {
-    fireBurst();
-    setTimeout(advance, 2000);
+    advance();
   }, [advance]);
 
   return (
@@ -188,10 +188,10 @@ export default function Assessment() {
             />
           )}
           {screen.type === "celebration" && (
-            <CelebrationScreen
+            <RoundInterstitial
               key={`celeb-${(screen as any).round}`}
               round={(screen as any).round}
-              onDone={handleCelebration}
+              onContinue={handleCelebration}
             />
           )}
           {screen.type === "loading" && (
