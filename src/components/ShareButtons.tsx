@@ -131,10 +131,10 @@ export default function ShareButtons({ cardRef, colors }: Props) {
   };
 
   const buttons = [
-    { label: "Instagram Stories", key: "instagram" as const, handler: handleInstagram },
-    { label: "WhatsApp", key: "whatsapp" as const, handler: handleWhatsApp },
-    { label: "TikTok", key: "tiktok" as const, handler: handleTikTok },
-    { label: "Snapchat", key: "snapchat" as const, handler: handleSnapchat },
+    { label: "Instagram Stories", key: "instagram" as const, handler: handleInstagram, icon: InstagramIcon },
+    { label: "WhatsApp", key: "whatsapp" as const, handler: handleWhatsApp, icon: WhatsAppIcon },
+    { label: "TikTok", key: "tiktok" as const, handler: handleTikTok, icon: TikTokIcon },
+    { label: "Snapchat", key: "snapchat" as const, handler: handleSnapchat, icon: SnapchatIcon },
   ];
 
   const tooltipMessages: Record<string, string> = {
