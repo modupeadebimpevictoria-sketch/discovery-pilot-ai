@@ -24,6 +24,41 @@ export default function Results() {
   const [phase, setPhase] = useState<"reveal" | "results" | "walkthrough">("reveal");
   const [walkthroughSeen] = useState(() => localStorage.getItem("sb_walkthrough_seen") === "true");
   const [shareOpen, setShareOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareCard = useCallback(async () => {
+    if (!cardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      });
+      const blob = await new Promise<Blob | null>((res) =>
+        canvas.toBlob(res, "image/png")
+      );
+      if (!blob) return;
+
+      const file = new File([blob], "my-findr-result.png", { type: "image/png" });
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "My Findr Result" });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "my-findr-result.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (e) {
+      console.error("Share failed", e);
+    } finally {
+      setSharing(false);
+    }
+  }, [sharing]);
 
   // Derive World & Cluster from assessment answers + matched careers
   const riasecScores = computeRiasecFromAnswers(assessmentAnswers);
