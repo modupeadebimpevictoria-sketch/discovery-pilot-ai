@@ -175,6 +175,12 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ===== TOP NAV BAR — fixed over hero ===== */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4">
+        <img src="/findr-logo.png" alt="Findr" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+        <div />
+      </div>
+
       {/* ===== HERO SECTION — Video Background ===== */}
       <VideoBackground
         videoUrl="https://videos.pexels.com/video-files/3205828/3205828-sd_960_506_25fps.mp4"
@@ -182,12 +188,6 @@ export default function Index() {
         overlayClassName="bg-gradient-to-t from-background via-background/70 to-background/40"
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
       >
-        {/* Top nav bar */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-5 py-4">
-          <img src="/findr-logo.png" alt="Findr" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-          <div />
-        </div>
-
         {/* Hero content */}
         <div className="max-w-lg w-full space-y-6">
           <motion.div {...stagger(0)}>
