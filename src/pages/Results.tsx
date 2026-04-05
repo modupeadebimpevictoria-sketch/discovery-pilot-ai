@@ -143,7 +143,7 @@ export default function Results() {
         </motion.div>
       </div>
 
-      {/* Shareable Result Card — rendered off-screen at fixed 600px for capture */}
+      {/* Shareable Result Card — off-screen copy for high-res capture */}
       <div
         style={{
           position: "absolute",
@@ -165,11 +165,32 @@ export default function Results() {
         />
       </div>
 
+      {/* Inline card preview */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="px-5 pb-2"
+      >
+        <div className="rounded-2xl overflow-hidden shadow-lg border border-white/10 max-w-[320px] mx-auto">
+          <ShareableResultCard
+            world={world}
+            cluster={cluster}
+            careers={matchedCareers.slice(0, 3).map((m) => {
+              const c = getCareerById(m.careerId);
+              return { id: m.careerId, title: c?.title || "", emoji: c?.emoji || "" };
+            })}
+          />
+        </div>
+      </motion.div>
+
       {/* Share buttons */}
-      <ShareButtons
-        cardRef={cardRef}
-        colors={worldColors[world.id] || worldColors["creating-expressing"]}
-      />
+      <div className="max-w-[320px] mx-auto">
+        <ShareButtons
+          cardRef={cardRef}
+          colors={worldColors[world.id] || worldColors["creating-expressing"]}
+        />
+      </div>
       <div className="px-5 space-y-4">
         <div>
           <h2 className="text-xl font-bold text-foreground">Start your exploration here</h2>
