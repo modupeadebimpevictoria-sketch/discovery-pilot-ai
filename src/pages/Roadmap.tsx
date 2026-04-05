@@ -103,11 +103,7 @@ export default function Roadmap() {
             />
           </div>
           <p className="text-[10px] text-muted-foreground">
-            {progress < 25 ? "Just getting started — every step counts! 💪" :
-             progress < 50 ? "Great progress! Keep building your path 🚀" :
-             progress < 75 ? "You're more than halfway there! Amazing! ⭐" :
-             progress < 100 ? "Almost there! The finish line is in sight! 🏆" :
-             "You did it! You're fully prepared! 🎓"}
+            We're building your personalized roadmap. Stay tuned.
           </p>
         </div>
       </div>
