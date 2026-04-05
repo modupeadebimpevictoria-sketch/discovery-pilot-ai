@@ -1,10 +1,13 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "@/contexts/AppContext";
-import { assessmentQuestions, roundIntros, roundCelebrations, matchCareers, determineArchetype } from "@/data/questions";
-import { ArrowRight, ChevronLeft, Sparkles, GripVertical } from "lucide-react";
+import { assessmentQuestions, roundIntros, roundCelebrations, matchCareers, determineArchetype, getCareerRiasecProfile } from "@/data/questions";
+import { careers as careerData } from "@/data/careers";
+import { ArrowRight, ChevronLeft, Sparkles } from "lucide-react";
 import { fireBurst } from "@/lib/confetti";
+import { illustrationMap } from "@/components/assessment/AssessmentIllustrations";
+import { supabase } from "@/integrations/supabase/client";
 
 type Screen = { type: "intro"; round: number } | { type: "question"; qIndex: number } | { type: "celebration"; round: number } | { type: "loading" };
 
@@ -13,14 +16,12 @@ function buildScreens(): Screen[] {
   let lastRound = 0;
   assessmentQuestions.forEach((q, i) => {
     if (q.round !== lastRound) {
-      // Add celebration for previous round (except before round 1)
       if (lastRound > 0) screens.push({ type: "celebration", round: lastRound });
       screens.push({ type: "intro", round: q.round });
       lastRound = q.round;
     }
     screens.push({ type: "question", qIndex: i });
   });
-  // Final celebration not needed — goes to loading
   screens.push({ type: "loading" });
   return screens;
 }
@@ -36,11 +37,11 @@ export default function Assessment() {
   const [dragItems, setDragItems] = useState<string[]>([]);
   const [freeText, setFreeText] = useState("");
   const [selectedPulse, setSelectedPulse] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const screen = allScreens[screenIdx];
   const totalQuestions = assessmentQuestions.length;
 
-  // Count how many questions answered so far
   const questionsAnswered = allScreens.slice(0, screenIdx + 1).filter(s => s.type === "question").length;
   const progress = (questionsAnswered / totalQuestions) * 100;
 
@@ -71,7 +72,7 @@ export default function Assessment() {
         }
         return { ...prev, [qId]: next };
       });
-      return; // Don't auto-advance for multi-select
+      return;
     }
 
     setSelectedPulse(value);
@@ -88,12 +89,55 @@ export default function Assessment() {
     setAnswers(prev => ({ ...prev, [qId]: items }));
   }, []);
 
-  const handleFreeText = useCallback((qId: number) => {
-    if (freeText.trim()) {
-      setAnswers(prev => ({ ...prev, [qId]: freeText.trim() }));
+  // Match free text career to closest career via AI, then finalize
+  const handleFreeText = useCallback(async (qId: number) => {
+    const text = freeText.trim();
+    if (!text) {
+      finalize({ ...answers });
+      return;
     }
-    finalize({ ...answers, [qId]: freeText.trim() || undefined });
+
+    setIsProcessing(true);
+    setScreenIdx(allScreens.length - 1); // Show loading screen
+
+    try {
+      const { data, error } = await supabase.functions.invoke("match-career-text", {
+        body: { text },
+      });
+
+      let dreamRiasec: Record<string, number> | undefined;
+
+      if (data?.careerId) {
+        // Find career in local data and compute RIASEC from tags
+        const career = careerData.find(c => c.id === data.careerId);
+        if (career) {
+          dreamRiasec = getCareerRiasecProfile(career.tags);
+        }
+      }
+
+      const finalAnswers = { ...answers, [qId]: text };
+      setAssessmentAnswers(finalAnswers);
+      const matched = matchCareers(finalAnswers, dreamRiasec as any);
+      setMatchedCareers(matched);
+      const arch = determineArchetype(finalAnswers);
+      setArchetype(arch);
+      addBadge("Career Explorer");
+      addXp(25);
+      fireBurst();
+      setTimeout(() => navigate("/results"), 3500);
+    } catch (e) {
+      console.error("Career matching error:", e);
+      // Fallback: finalize without AI boost
+      finalize({ ...answers, [qId]: text });
+    } finally {
+      setIsProcessing(false);
+    }
   }, [freeText, answers]);
+
+  // "I haven't thought about one yet" or skip
+  const handleNoIdea = useCallback(() => {
+    finalize({ ...answers });
+  }, [answers]);
 
   const handleSkip = useCallback((qId: number) => {
     finalize({ ...answers });
@@ -108,12 +152,10 @@ export default function Assessment() {
     addBadge("Career Explorer");
     addXp(25);
     fireBurst();
-    // Show loading screen, then navigate
     setScreenIdx(allScreens.length - 1);
     setTimeout(() => navigate("/results"), 3500);
   }, [setAssessmentAnswers, setMatchedCareers, setArchetype, addBadge, addXp, navigate]);
 
-  // Celebration auto-advance
   const handleCelebration = useCallback(() => {
     fireBurst();
     setTimeout(advance, 2000);
@@ -121,7 +163,6 @@ export default function Assessment() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-hidden">
-      {/* Progress bar — always visible */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <div className="h-1 bg-muted">
           <motion.div className="h-full bg-primary" animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
@@ -173,6 +214,7 @@ export default function Assessment() {
               onDragRank={handleDragRank}
               onFreeTextSubmit={handleFreeText}
               onSkip={handleSkip}
+              onNoIdea={handleNoIdea}
               onMultiSubmit={advance}
             />
           )}
@@ -190,9 +232,11 @@ function RoundIntroScreen({ round, onContinue }: { round: number; onContinue: ()
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
       className="flex-1 flex flex-col items-center justify-center px-8 text-center min-h-[80vh]"
     >
-      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 8 }} className="text-7xl mb-6">
-        {intro.emoji}
-      </motion.span>
+      {intro.emoji && (
+        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 8 }} className="text-7xl mb-6">
+          {intro.emoji}
+        </motion.span>
+      )}
       <h1 className="text-2xl font-bold text-foreground mb-3">Round {round}: {intro.headline}</h1>
       <p className="text-muted-foreground text-sm mb-8 max-w-xs">{intro.subtext}</p>
       <button onClick={onContinue} className="btn-primary-glow text-sm px-8">
@@ -205,7 +249,6 @@ function RoundIntroScreen({ round, onContinue }: { round: number; onContinue: ()
 // ─── Celebration Screen ───
 function CelebrationScreen({ round, onDone }: { round: number; onDone: () => void }) {
   const message = roundCelebrations[round] || "Great job! Keep going! 🔥";
-  // Auto-trigger on mount
   useState(() => { setTimeout(onDone, 100); });
   return (
     <motion.div
@@ -256,15 +299,15 @@ interface QuestionScreenProps {
   onDragRank: (qId: number, items: string[]) => void;
   onFreeTextSubmit: (qId: number) => void;
   onSkip: (qId: number) => void;
+  onNoIdea: () => void;
   onMultiSubmit: () => void;
 }
 
-function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setSliderValue, dragItems, setDragItems, freeText, setFreeText, onSelect, onSliderSubmit, onDragRank, onFreeTextSubmit, onSkip, onMultiSubmit }: QuestionScreenProps) {
+function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setSliderValue, dragItems, setDragItems, freeText, setFreeText, onSelect, onSliderSubmit, onDragRank, onFreeTextSubmit, onSkip, onNoIdea, onMultiSubmit }: QuestionScreenProps) {
   const currentAnswer = answers[q.id];
   const isMulti = q.type === "emoji-grid" || q.type === "pill-grid";
   const multiAnswer: string[] = isMulti ? (currentAnswer || []) : [];
 
-  // Init drag items
   if (q.type === "drag-rank" && dragItems.length === 0 && q.options) {
     setTimeout(() => setDragItems(q.options!.map(o => o.value)), 0);
   }
@@ -275,27 +318,33 @@ function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setS
       transition={{ duration: 0.25 }}
       className="flex flex-col px-5 pb-8 min-h-[80vh]"
     >
-      {/* Prompt */}
       <h2 className="text-lg font-bold text-foreground leading-snug pt-4 pb-5">{q.prompt}</h2>
 
-      {/* ── Swipe Cards ── */}
+      {/* ── Swipe Cards with SVG illustrations ── */}
       {q.type === "swipe-cards" && q.options && (
         <div className="flex-1 flex flex-col gap-3 overflow-y-auto pb-4">
-          {q.options.map((opt, i) => (
-            <motion.button key={opt.value} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-              onClick={() => onSelect(q.id, opt.value)}
-              className={`relative rounded-2xl overflow-hidden h-24 flex items-end transition-all ${
-                selectedPulse === opt.value ? "ring-2 ring-primary scale-[0.98]" : currentAnswer === opt.value ? "ring-2 ring-primary" : "ring-1 ring-border"
-              }`}
-            >
-              {opt.photoUrl && <img src={opt.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
-              <div className="relative z-10 p-3 flex items-center gap-2">
-                <span className="text-xl">{opt.emoji}</span>
-                <span className="text-sm font-medium text-foreground">{opt.label}</span>
-              </div>
-            </motion.button>
-          ))}
+          {q.options.map((opt, i) => {
+            const IllustrationComp = opt.illustration ? illustrationMap[opt.illustration] : null;
+            return (
+              <motion.button key={opt.value} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                onClick={() => onSelect(q.id, opt.value)}
+                className={`relative rounded-2xl overflow-hidden h-24 flex items-end transition-all ${
+                  selectedPulse === opt.value ? "ring-2 ring-primary scale-[0.98]" : currentAnswer === opt.value ? "ring-2 ring-primary" : "ring-1 ring-border"
+                }`}
+              >
+                {IllustrationComp && (
+                  <div className="absolute inset-0">
+                    <IllustrationComp />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
+                <div className="relative z-10 p-3 flex items-center gap-2">
+                  <span className="text-xl">{opt.emoji}</span>
+                  <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       )}
 
@@ -324,46 +373,32 @@ function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setS
         </>
       )}
 
-      {/* ── Photo Grid ── */}
-      {(q.type === "photo-grid" || q.type === "tap-photo-cards") && q.options && (
-        <div className="grid grid-cols-2 gap-3 pb-4">
-          {q.options.map((opt, i) => (
-            <motion.button key={opt.value} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              onClick={() => onSelect(q.id, opt.value)}
-              className={`rounded-2xl overflow-hidden relative aspect-square transition-all ${
-                selectedPulse === opt.value ? "ring-2 ring-primary scale-[0.97]" : currentAnswer === opt.value ? "ring-2 ring-primary" : "ring-1 ring-border"
-              }`}
-            >
-              {opt.photoUrl && <img src={opt.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <span className="text-xl mb-1 block">{opt.emoji}</span>
-                <span className="text-xs font-medium text-foreground leading-tight">{opt.label}</span>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-      )}
-
-      {/* ── Two Cards ── */}
+      {/* ── Two Cards with SVG illustrations ── */}
       {q.type === "two-cards" && q.options && (
         <div className="space-y-3 pb-4">
           <div className="grid grid-cols-2 gap-3">
-            {q.options.slice(0, 2).map((opt, i) => (
-              <motion.button key={opt.value} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                onClick={() => onSelect(q.id, opt.value)}
-                className={`rounded-2xl overflow-hidden relative aspect-[3/4] transition-all ${
-                  selectedPulse === opt.value ? "ring-2 ring-primary scale-[0.97]" : currentAnswer === opt.value ? "ring-2 ring-primary" : "ring-1 ring-border"
-                }`}
-              >
-                {opt.photoUrl && <img src={opt.photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <span className="text-lg mb-1 block">{opt.emoji}</span>
-                  <span className="text-xs font-medium text-foreground leading-tight">{opt.label}</span>
-                </div>
-              </motion.button>
-            ))}
+            {q.options.slice(0, 2).map((opt, i) => {
+              const IllustrationComp = opt.illustration ? illustrationMap[opt.illustration] : null;
+              return (
+                <motion.button key={opt.value} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                  onClick={() => onSelect(q.id, opt.value)}
+                  className={`rounded-2xl overflow-hidden relative aspect-[3/4] transition-all ${
+                    selectedPulse === opt.value ? "ring-2 ring-primary scale-[0.97]" : currentAnswer === opt.value ? "ring-2 ring-primary" : "ring-1 ring-border"
+                  }`}
+                >
+                  {IllustrationComp && (
+                    <div className="absolute inset-0">
+                      <IllustrationComp />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <span className="text-lg mb-1 block">{opt.emoji}</span>
+                    <span className="text-xs font-medium text-foreground leading-tight">{opt.label}</span>
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
           {q.options[2] && (
             <button onClick={() => onSelect(q.id, q.options![2].value)} className="text-xs text-muted-foreground text-center w-full py-2 hover:text-foreground transition-colors">
@@ -463,7 +498,7 @@ function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setS
         />
       )}
 
-      {/* ── Free Text ── */}
+      {/* ── Free Text with "No idea" option ── */}
       {q.type === "free-text" && (
         <div className="space-y-4 pb-4">
           <textarea
@@ -472,9 +507,21 @@ function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setS
             placeholder={q.placeholder}
             className="w-full bg-card border border-border rounded-2xl p-4 text-foreground text-sm resize-none h-32 focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          <button onClick={() => onFreeTextSubmit(q.id)} className="btn-primary-glow text-sm w-full flex items-center justify-center gap-2">
-            {freeText.trim() ? "See my results" : "Skip"} <Sparkles size={16} />
-          </button>
+          {freeText.trim() && (
+            <button onClick={() => onFreeTextSubmit(q.id)} className="btn-primary-glow text-sm w-full flex items-center justify-center gap-2">
+              See my results <Sparkles size={16} />
+            </button>
+          )}
+          {/* "No idea" tappable option */}
+          {q.options?.map(opt => (
+            <button
+              key={opt.value}
+              onClick={onNoIdea}
+              className="w-full p-4 rounded-2xl text-center text-sm font-medium bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+            >
+              {opt.label}
+            </button>
+          ))}
           {q.skippable && !freeText.trim() && (
             <button onClick={() => onSkip(q.id)} className="text-xs text-muted-foreground text-center w-full hover:text-foreground transition-colors">
               Skip →
@@ -486,7 +533,7 @@ function QuestionScreen({ question: q, answers, selectedPulse, sliderValue, setS
   );
 }
 
-// ─── Drag Rank Input (simplified with buttons) ───
+// ─── Drag Rank Input ───
 function DragRankInput({ options, items, onChange, onSubmit }: {
   options: { label: string; value: string; emoji?: string }[];
   items: string[];
