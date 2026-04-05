@@ -2,19 +2,35 @@ import { Briefcase } from "lucide-react";
 
 export default function Jobs() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 pb-24 pt-16">
-      <div className="text-center max-w-sm space-y-4">
-        <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center mx-auto">
-          <Briefcase size={28} className="text-primary-foreground" />
+    <div
+      className="min-h-screen flex items-center justify-center px-6 pb-24 pt-16"
+      style={{ background: "#f8f7ff" }}
+    >
+      <div className="text-center max-w-sm space-y-5">
+        <div className="flex justify-center">
+          <Briefcase
+            size={48}
+            className="animate-bounce"
+            style={{ color: "#4a3f6b" }}
+          />
         </div>
-        <h1 className="text-xl font-bold text-foreground">
+        <h1
+          className="text-2xl font-bold leading-snug"
+          style={{ color: "#1a1a2e" }}
+        >
           Your first job is closer than you think.
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed mt-2">
-          Internships, part-time roles, and holiday jobs for teenagers, all in one place. Coming soon on Findr.
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: "#7c7291" }}
+        >
+          Real jobs for teenagers. Coming soon.
         </p>
-        <p className="text-xs text-muted-foreground/70 leading-relaxed mt-6">
-          Add Findr to your home screen so you're the first to know when Jobs drops.
+        <p
+          className="text-xs leading-relaxed mt-8 pt-2"
+          style={{ color: "#a39bb5" }}
+        >
+          Add Findr to your home screen to be the first to know.
         </p>
       </div>
     </div>
