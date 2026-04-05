@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
 import { useApp } from "@/contexts/AppContext";
 import { useCareers } from "@/contexts/CareersContext";
 import { computeRiasecFromAnswers } from "@/data/questions";
@@ -8,6 +9,7 @@ import { determineWorldAndCluster } from "@/data/worlds";
 import { getClusterByFamilyId } from "@/data/clusters";
 import { fireConfetti } from "@/lib/confetti";
 import ShareModal from "@/components/ShareModal";
+import ShareableResultCard from "@/components/ShareableResultCard";
 import PostAssessmentWalkthrough from "@/components/PostAssessmentWalkthrough";
 import { ArrowRight, Share2, Check } from "lucide-react";
 
