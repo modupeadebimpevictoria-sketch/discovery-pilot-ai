@@ -182,7 +182,7 @@ export default function OrbitChat({ onClose }: { onClose: () => void }) {
             <Bot size={20} className="text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-foreground">Findr AI</h2>
+            <h2 className="text-sm font-bold text-foreground">AI Mentor</h2>
             <p className="text-[10px] text-muted-foreground">
               {activeCareer ? `Helping you become a ${activeCareer} 🎯` : "Your career launchpad 🚀"}
             </p>
