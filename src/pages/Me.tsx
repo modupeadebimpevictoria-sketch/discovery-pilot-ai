@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   User, Camera, Backpack, Heart, BookOpen, MapPin,
-  Sun, Moon, Monitor, Bell, Shield, RefreshCw, KeyRound,
+  Sun, Moon, Bell, Shield, RefreshCw, KeyRound,
   LogOut, Trash2, ChevronRight, Zap, Edit3, Check, X,
   ExternalLink, Bookmark,
 } from "lucide-react";
