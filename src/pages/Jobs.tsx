@@ -1,5 +1,3 @@
-import { Briefcase } from "lucide-react";
-
 export default function Jobs() {
   return (
     <div
@@ -8,11 +6,7 @@ export default function Jobs() {
     >
       <div className="text-center max-w-sm space-y-5">
         <div className="flex justify-center">
-          <Briefcase
-            size={48}
-            className="animate-bounce"
-            style={{ color: "#4a3f6b" }}
-          />
+          <span className="animate-bounce" style={{ fontSize: "64px", lineHeight: 1 }}>💼</span>
         </div>
         <h1
           className="text-2xl font-bold leading-snug"
