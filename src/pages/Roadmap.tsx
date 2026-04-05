@@ -133,35 +133,19 @@ export default function Roadmap() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    onClick={() => handleToggle(milestone)}
-                    className={`w-full glass-card p-3 rounded-xl flex items-start gap-3 text-left transition-all ${
-                      done ? "border-primary/30 bg-primary/5" : ""
-                    }`}
+                    className="w-full glass-card p-3 rounded-xl flex items-start gap-3 text-left transition-all opacity-50 pointer-events-none"
                   >
                     <div className="mt-0.5">
-                      {done ? (
-                        <CheckCircle size={20} className="text-primary" />
-                      ) : (
-                        <Circle size={20} className="text-muted-foreground" />
-                      )}
+                      <Circle size={20} className="text-muted-foreground/40" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">{milestone.emoji}</span>
-                        <p className={`text-sm font-semibold ${done ? "text-primary" : "text-foreground"}`}>
-                          {milestone.title}
+                        <span className="text-lg opacity-40">{milestone.emoji}</span>
+                        <p className="text-sm font-semibold text-muted-foreground">
+                          Coming soon
                         </p>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{milestone.description}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className={`flex items-center gap-1 text-[10px] font-medium ${categoryColors[milestone.category]}`}>
-                          {categoryIcons[milestone.category]} {milestone.category}
-                        </span>
-                        <span className="text-[10px] text-primary font-bold">+{milestone.xpReward} XP</span>
-                      </div>
-                      {milestone.alternativePath && (
-                        <p className="text-[9px] text-accent mt-1 italic">🌍 {milestone.alternativePath}</p>
-                      )}
+                      <p className="text-[10px] text-muted-foreground/60 mt-1.5">More details coming soon</p>
                     </div>
                   </motion.button>
                 );
