@@ -176,7 +176,39 @@ export default function Results() {
         </motion.div>
       </div>
 
-      {/* Layer 2 — 3 career starting points */}
+      {/* Shareable Result Card — rendered off-screen at fixed 600px for capture */}
+      <div
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+          width: 600,
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      >
+        <ShareableResultCard
+          ref={cardRef}
+          world={world}
+          cluster={cluster}
+          careers={matchedCareers.slice(0, 3).map((m) => {
+            const c = getCareerById(m.careerId);
+            return { id: m.careerId, title: c?.title || "", emoji: c?.emoji || "" };
+          })}
+        />
+      </div>
+
+      {/* Share my result button */}
+      <div className="px-5 pb-4">
+        <button
+          onClick={handleShareCard}
+          disabled={sharing}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm btn-glass"
+        >
+          <Share2 size={16} />
+          {sharing ? "Generating…" : "Share my result"}
+        </button>
+      </div>
       <div className="px-5 space-y-4">
         <div>
           <h2 className="text-xl font-bold text-foreground">Start your exploration here</h2>
