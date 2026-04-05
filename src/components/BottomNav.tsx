@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Compass, Home, Flame, Map, User } from "lucide-react";
+import { Compass, Home, Flame, Briefcase, User } from "lucide-react";
 
 const navItems = [
   { path: "/feed", icon: Home, label: "Home" },
-  { path: "/quests", icon: Map, label: "Quests" },
+  { path: "/jobs", icon: Briefcase, label: "Jobs" },
   { path: "/universe", icon: Compass, label: "Explore" },
   { path: "/mentor", icon: Flame, label: "Mentor" },
   { path: "/me", icon: User, label: "Me" },
