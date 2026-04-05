@@ -8,7 +8,7 @@ import VideoBackground from "@/components/VideoBackground";
 import CareerProfileCard from "@/components/CareerProfileCard";
 import CategoryVideoTile from "@/components/CategoryVideoTile";
 import TestimonialCard from "@/components/TestimonialCard";
-import FindrLogo from "@/components/FindrLogo";
+
 import confetti from "canvas-confetti";
 
 // Subtle fade-in only — no looping or bouncing
@@ -163,14 +163,6 @@ const testimonials = [
   },
 ];
 
-// Findr logo — uses the consistent SVG mark
-function FindrWordmark({ size = "text-2xl" }: { size?: string }) {
-  return (
-    <span className={`font-bold tracking-tight ${size}`}>
-      <span className="text-primary">Fin</span><span className="text-foreground">dr</span>
-    </span>
-  );
-}
 
 export default function Index() {
   const navigate = useNavigate();
@@ -192,8 +184,7 @@ export default function Index() {
       >
         {/* Logo — top left */}
         <div className="absolute top-6 left-6 z-20 flex items-center gap-2.5">
-          <FindrLogo size={28} darkBackground />
-          <FindrWordmark />
+          <img src="/findr-logo.png" alt="Findr" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
         </div>
 
         {/* Hero content */}
